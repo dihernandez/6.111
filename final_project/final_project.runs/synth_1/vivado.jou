@@ -2,8 +2,8 @@
 # Vivado v2019.1.2 (64-bit)
 # SW Build 2615518 on Fri Aug  9 15:53:29 MDT 2019
 # IP Build 2614745 on Fri Aug  9 20:55:02 MDT 2019
-# Start of session at: Tue Oct 29 17:39:29 2019
-# Process ID: 30699
+# Start of session at: Tue Oct 29 20:04:52 2019
+# Process ID: 17001
 # Current directory: /afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/final_project.runs/synth_1
 # Command line: vivado -log camera_top_level.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source camera_top_level.tcl
 # Log file: /afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/final_project.runs/synth_1/camera_top_level.vds

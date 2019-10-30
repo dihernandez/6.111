@@ -1,7 +1,7 @@
 Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version     : Vivado v.2019.1.2 (lin64) Build 2615518 Fri Aug  9 15:53:29 MDT 2019
-| Date             : Tue Oct 29 17:40:41 2019
+| Date             : Tue Oct 29 20:06:04 2019
 | Host             : eecs-digital-17 running 64-bit Ubuntu 14.04.6 LTS
 | Command          : report_power -file camera_top_level_power_routed.rpt -pb camera_top_level_power_summary_routed.pb -rpx camera_top_level_power_routed.rpx
 | Design           : camera_top_level
@@ -30,11 +30,11 @@ Table of Contents
 ----------
 
 +--------------------------+--------------+
-| Total On-Chip Power (W)  | 0.234        |
+| Total On-Chip Power (W)  | 0.237        |
 | Design Power Budget (W)  | Unspecified* |
 | Power Budget Margin (W)  | NA           |
-| Dynamic (W)              | 0.137        |
-| Device Static (W)        | 0.097        |
+| Dynamic (W)              | 0.140        |
+| Device Static (W)        | 0.098        |
 | Effective TJA (C/W)      | 4.6          |
 | Max Ambient (C)          | 83.9         |
 | Junction Temperature (C) | 26.1         |
@@ -53,16 +53,16 @@ Table of Contents
 | On-Chip        | Power (W) | Used     | Available | Utilization (%) |
 +----------------+-----------+----------+-----------+-----------------+
 | Clocks         |    <0.001 |        5 |       --- |             --- |
-| Slice Logic    |    <0.001 |       83 |       --- |             --- |
-|   LUT as Logic |    <0.001 |       37 |     63400 |            0.06 |
-|   CARRY4       |    <0.001 |        7 |     15850 |            0.04 |
-|   Register     |    <0.001 |       28 |    126800 |            0.02 |
-|   Others       |     0.000 |        6 |       --- |             --- |
-| Signals        |    <0.001 |       90 |       --- |             --- |
+| Slice Logic    |    <0.001 |      231 |       --- |             --- |
+|   LUT as Logic |    <0.001 |       95 |     63400 |            0.15 |
+|   CARRY4       |    <0.001 |       19 |     15850 |            0.12 |
+|   Register     |    <0.001 |       89 |    126800 |            0.07 |
+|   Others       |     0.000 |        8 |       --- |             --- |
+| Signals        |    <0.001 |      219 |       --- |             --- |
 | MMCM           |     0.122 |        1 |         6 |           16.67 |
-| I/O            |     0.014 |       34 |       210 |           16.19 |
-| Static Power   |     0.097 |          |           |                 |
-| Total          |     0.234 |          |           |                 |
+| I/O            |     0.016 |       50 |       210 |           23.81 |
+| Static Power   |     0.098 |          |           |                 |
+| Total          |     0.237 |          |           |                 |
 +----------------+-----------+----------+-----------+-----------------+
 
 
@@ -72,9 +72,9 @@ Table of Contents
 +-----------+-------------+-----------+-------------+------------+
 | Source    | Voltage (V) | Total (A) | Dynamic (A) | Static (A) |
 +-----------+-------------+-----------+-------------+------------+
-| Vccint    |       1.000 |     0.017 |       0.001 |      0.015 |
+| Vccint    |       1.000 |     0.017 |       0.002 |      0.015 |
 | Vccaux    |       1.800 |     0.086 |       0.068 |      0.018 |
-| Vcco33    |       3.300 |     0.008 |       0.004 |      0.004 |
+| Vcco33    |       3.300 |     0.009 |       0.005 |      0.004 |
 | Vcco25    |       2.500 |     0.000 |       0.000 |      0.000 |
 | Vcco18    |       1.800 |     0.000 |       0.000 |      0.000 |
 | Vcco15    |       1.500 |     0.000 |       0.000 |      0.000 |
@@ -143,7 +143,7 @@ Table of Contents
 +------------------+-----------+
 | Name             | Power (W) |
 +------------------+-----------+
-| camera_top_level |     0.137 |
+| camera_top_level |     0.140 |
 |   clkdivider     |     0.122 |
 +------------------+-----------+
 
