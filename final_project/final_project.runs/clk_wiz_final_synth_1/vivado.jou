@@ -1,0 +1,12 @@
+#-----------------------------------------------------------
+# Vivado v2019.1.2 (64-bit)
+# SW Build 2615518 on Fri Aug  9 15:53:29 MDT 2019
+# IP Build 2614745 on Fri Aug  9 20:55:02 MDT 2019
+# Start of session at: Wed Nov  6 15:55:56 2019
+# Process ID: 11418
+# Current directory: /afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/final_project.runs/clk_wiz_final_synth_1
+# Command line: vivado -log clk_wiz_final.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source clk_wiz_final.tcl
+# Log file: /afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/final_project.runs/clk_wiz_final_synth_1/clk_wiz_final.vds
+# Journal file: /afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/final_project.runs/clk_wiz_final_synth_1/vivado.jou
+#-----------------------------------------------------------
+source clk_wiz_final.tcl -notrace
