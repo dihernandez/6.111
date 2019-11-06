@@ -1,6 +1,6 @@
 
 *** Running vivado
-    with args -log camera_top_level.vds -m64 -product Vivado -mode batch -messageDb vivado.pb -notrace -source camera_top_level.tcl
+    with args -log blob.vds -m64 -product Vivado -mode batch -messageDb vivado.pb -notrace -source blob.tcl
 
 
 ****** Vivado v2019.1.2 (64-bit)
@@ -8,91 +8,24 @@
   **** IP Build 2614745 on Fri Aug  9 20:55:02 MDT 2019
     ** Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.
 
-source camera_top_level.tcl -notrace
-Command: synth_design -top camera_top_level -part xc7a100tcsg324-1
+source blob.tcl -notrace
+Command: synth_design -top blob -part xc7a100tcsg324-1
 Starting synth_design
 Attempting to get a license for feature 'Synthesis' and/or device 'xc7a100t'
 INFO: [Common 17-349] Got license for feature 'Synthesis' and/or device 'xc7a100t'
 INFO: [Device 21-403] Loading part xc7a100tcsg324-1
 INFO: Launching helper process for spawning children vivado processes
-INFO: Helper process launched with PID 17021 
+INFO: Helper process launched with PID 13411 
 ---------------------------------------------------------------------------------
-Starting RTL Elaboration : Time (s): cpu = 00:00:02 ; elapsed = 00:00:03 . Memory (MB): peak = 1798.426 ; gain = 153.496 ; free physical = 1257 ; free virtual = 12383
+Starting RTL Elaboration : Time (s): cpu = 00:00:02 ; elapsed = 00:00:03 . Memory (MB): peak = 1807.301 ; gain = 151.496 ; free physical = 201 ; free virtual = 5290
 ---------------------------------------------------------------------------------
-INFO: [Synth 8-6157] synthesizing module 'camera_top_level' [/afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/files/camera_top.sv:6]
-INFO: [Synth 8-6157] synthesizing module 'clk_wiz_65mhz' [/afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/files/clk_wiz_65mhz.sv:67]
-INFO: [Synth 8-6157] synthesizing module 'IBUF' [/var/local/xilinx-local/Vivado/2019.1/scripts/rt/data/unisim_comp.v:32872]
-	Parameter CAPACITANCE bound to: DONT_CARE - type: string 
-	Parameter IBUF_DELAY_VALUE bound to: 0 - type: string 
-	Parameter IBUF_LOW_PWR bound to: TRUE - type: string 
-	Parameter IFD_DELAY_VALUE bound to: AUTO - type: string 
-	Parameter IOSTANDARD bound to: DEFAULT - type: string 
-INFO: [Synth 8-6155] done synthesizing module 'IBUF' (1#1) [/var/local/xilinx-local/Vivado/2019.1/scripts/rt/data/unisim_comp.v:32872]
-INFO: [Synth 8-6157] synthesizing module 'MMCME2_ADV' [/var/local/xilinx-local/Vivado/2019.1/scripts/rt/data/unisim_comp.v:39829]
-	Parameter BANDWIDTH bound to: OPTIMIZED - type: string 
-	Parameter CLKFBOUT_MULT_F bound to: 50.375000 - type: float 
-	Parameter CLKFBOUT_PHASE bound to: 0.000000 - type: float 
-	Parameter CLKFBOUT_USE_FINE_PS bound to: FALSE - type: string 
-	Parameter CLKIN1_PERIOD bound to: 10.000000 - type: float 
-	Parameter CLKIN2_PERIOD bound to: 0.000000 - type: float 
-	Parameter CLKOUT0_DIVIDE_F bound to: 15.500000 - type: float 
-	Parameter CLKOUT0_DUTY_CYCLE bound to: 0.500000 - type: float 
-	Parameter CLKOUT0_PHASE bound to: 0.000000 - type: float 
-	Parameter CLKOUT0_USE_FINE_PS bound to: FALSE - type: string 
-	Parameter CLKOUT1_DIVIDE bound to: 1 - type: integer 
-	Parameter CLKOUT1_DUTY_CYCLE bound to: 0.500000 - type: float 
-	Parameter CLKOUT1_PHASE bound to: 0.000000 - type: float 
-	Parameter CLKOUT1_USE_FINE_PS bound to: FALSE - type: string 
-	Parameter CLKOUT2_DIVIDE bound to: 1 - type: integer 
-	Parameter CLKOUT2_DUTY_CYCLE bound to: 0.500000 - type: float 
-	Parameter CLKOUT2_PHASE bound to: 0.000000 - type: float 
-	Parameter CLKOUT2_USE_FINE_PS bound to: FALSE - type: string 
-	Parameter CLKOUT3_DIVIDE bound to: 1 - type: integer 
-	Parameter CLKOUT3_DUTY_CYCLE bound to: 0.500000 - type: float 
-	Parameter CLKOUT3_PHASE bound to: 0.000000 - type: float 
-	Parameter CLKOUT3_USE_FINE_PS bound to: FALSE - type: string 
-	Parameter CLKOUT4_CASCADE bound to: FALSE - type: string 
-	Parameter CLKOUT4_DIVIDE bound to: 1 - type: integer 
-	Parameter CLKOUT4_DUTY_CYCLE bound to: 0.500000 - type: float 
-	Parameter CLKOUT4_PHASE bound to: 0.000000 - type: float 
-	Parameter CLKOUT4_USE_FINE_PS bound to: FALSE - type: string 
-	Parameter CLKOUT5_DIVIDE bound to: 1 - type: integer 
-	Parameter CLKOUT5_DUTY_CYCLE bound to: 0.500000 - type: float 
-	Parameter CLKOUT5_PHASE bound to: 0.000000 - type: float 
-	Parameter CLKOUT5_USE_FINE_PS bound to: FALSE - type: string 
-	Parameter CLKOUT6_DIVIDE bound to: 1 - type: integer 
-	Parameter CLKOUT6_DUTY_CYCLE bound to: 0.500000 - type: float 
-	Parameter CLKOUT6_PHASE bound to: 0.000000 - type: float 
-	Parameter CLKOUT6_USE_FINE_PS bound to: FALSE - type: string 
-	Parameter COMPENSATION bound to: ZHOLD - type: string 
-	Parameter DIVCLK_DIVIDE bound to: 5 - type: integer 
-	Parameter IS_CLKINSEL_INVERTED bound to: 1'b0 
-	Parameter IS_PSEN_INVERTED bound to: 1'b0 
-	Parameter IS_PSINCDEC_INVERTED bound to: 1'b0 
-	Parameter IS_PWRDWN_INVERTED bound to: 1'b0 
-	Parameter IS_RST_INVERTED bound to: 1'b0 
-	Parameter REF_JITTER1 bound to: 0.010000 - type: float 
-	Parameter REF_JITTER2 bound to: 0.010000 - type: float 
-	Parameter SS_EN bound to: FALSE - type: string 
-	Parameter SS_MODE bound to: CENTER_HIGH - type: string 
-	Parameter SS_MOD_PERIOD bound to: 10000 - type: integer 
-	Parameter STARTUP_WAIT bound to: FALSE - type: string 
-INFO: [Synth 8-6155] done synthesizing module 'MMCME2_ADV' (2#1) [/var/local/xilinx-local/Vivado/2019.1/scripts/rt/data/unisim_comp.v:39829]
-INFO: [Synth 8-6157] synthesizing module 'BUFG' [/var/local/xilinx-local/Vivado/2019.1/scripts/rt/data/unisim_comp.v:1075]
-INFO: [Synth 8-6155] done synthesizing module 'BUFG' (3#1) [/var/local/xilinx-local/Vivado/2019.1/scripts/rt/data/unisim_comp.v:1075]
-INFO: [Synth 8-6155] done synthesizing module 'clk_wiz_65mhz' (4#1) [/afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/files/clk_wiz_65mhz.sv:67]
-INFO: [Synth 8-6157] synthesizing module 'timer' [/afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/files/timer.sv:23]
-INFO: [Synth 8-6155] done synthesizing module 'timer' (5#1) [/afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/files/timer.sv:23]
-INFO: [Synth 8-6157] synthesizing module 'display_8hex' [/afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/files/seven_seg_display.sv:10]
-	Parameter bits bound to: 13 - type: integer 
-INFO: [Synth 8-6155] done synthesizing module 'display_8hex' (6#1) [/afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/files/seven_seg_display.sv:10]
-WARNING: [Synth 8-3848] Net dp in module/entity camera_top_level does not have driver. [/afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/files/camera_top.sv:11]
-WARNING: [Synth 8-3848] Net start_timer in module/entity camera_top_level does not have driver. [/afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/files/camera_top.sv:26]
-WARNING: [Synth 8-3848] Net value in module/entity camera_top_level does not have driver. [/afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/files/camera_top.sv:27]
-INFO: [Synth 8-6155] done synthesizing module 'camera_top_level' (7#1) [/afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/files/camera_top.sv:6]
-WARNING: [Synth 8-3331] design camera_top_level has unconnected port dp
+INFO: [Synth 8-6157] synthesizing module 'blob' [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/final_project.srcs/sources_1/new/display_blob.sv:46]
+	Parameter WIDTH bound to: 64 - type: integer 
+	Parameter HEIGHT bound to: 64 - type: integer 
+	Parameter COLOR bound to: 12'b111111111111 
+INFO: [Synth 8-6155] done synthesizing module 'blob' (1#1) [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/final_project.srcs/sources_1/new/display_blob.sv:46]
 ---------------------------------------------------------------------------------
-Finished RTL Elaboration : Time (s): cpu = 00:00:03 ; elapsed = 00:00:04 . Memory (MB): peak = 1851.180 ; gain = 206.250 ; free physical = 1279 ; free virtual = 12406
+Finished RTL Elaboration : Time (s): cpu = 00:00:03 ; elapsed = 00:00:04 . Memory (MB): peak = 1864.023 ; gain = 208.219 ; free physical = 235 ; free virtual = 5318
 ---------------------------------------------------------------------------------
 
 Report Check Netlist: 
@@ -105,47 +38,197 @@ Report Check Netlist:
 Start Handling Custom Attributes
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Handling Custom Attributes : Time (s): cpu = 00:00:03 ; elapsed = 00:00:04 . Memory (MB): peak = 1854.145 ; gain = 209.215 ; free physical = 1274 ; free virtual = 12401
+Finished Handling Custom Attributes : Time (s): cpu = 00:00:03 ; elapsed = 00:00:05 . Memory (MB): peak = 1869.957 ; gain = 214.152 ; free physical = 232 ; free virtual = 5315
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished RTL Optimization Phase 1 : Time (s): cpu = 00:00:03 ; elapsed = 00:00:04 . Memory (MB): peak = 1854.145 ; gain = 209.215 ; free physical = 1274 ; free virtual = 12401
+Finished RTL Optimization Phase 1 : Time (s): cpu = 00:00:03 ; elapsed = 00:00:05 . Memory (MB): peak = 1869.957 ; gain = 214.152 ; free physical = 232 ; free virtual = 5315
 ---------------------------------------------------------------------------------
-INFO: [Netlist 29-17] Analyzing 1 Unisim elements for replacement
-INFO: [Netlist 29-28] Unisim Transformation completed in 0 CPU seconds
 INFO: [Project 1-570] Preparing netlist for logic optimization
 
 Processing XDC Constraints
 Initializing timing engine
-Parsing XDC File [/afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/files/nexys4_ddr_constraints.xdc]
-Finished Parsing XDC File [/afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/files/nexys4_ddr_constraints.xdc]
-INFO: [Project 1-236] Implementation specific constraints were found while reading constraint file [/afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/files/nexys4_ddr_constraints.xdc]. These constraints will be ignored for synthesis but will be used in implementation. Impacted constraints are listed in the file [.Xil/camera_top_level_propImpl.xdc].
-Resolution: To avoid this warning, move constraints listed in [.Xil/camera_top_level_propImpl.xdc] to another XDC file and exclude this new file from synthesis with the used_in_synthesis property (File Properties dialog in GUI) and re-run elaboration/synthesis.
-INFO: [Timing 38-2] Deriving generated clocks
+Parsing XDC File [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc]
+WARNING: [Vivado 12-584] No ports matched 'clk_100mhz'. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:14]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:14]
+Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
+WARNING: [Vivado 12-584] No ports matched 'clk_100mhz'. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:15]
+CRITICAL WARNING: [Vivado 12-4739] create_clock:No valid object(s) found for '-objects [get_ports clk_100mhz]'. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:15]
+Resolution: Check if the specified object(s) exists in the current design. If it does, ensure that the correct design hierarchy was specified for the object. If you are working with clocks, make sure create_clock was used to create the clock object before it is referenced.
+WARNING: [Vivado 12-584] No ports matched 'sw[0]'. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:20]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:20]
+Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
+WARNING: [Vivado 12-584] No ports matched 'sw[1]'. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:21]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:21]
+Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
+WARNING: [Vivado 12-584] No ports matched 'sw[2]'. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:22]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:22]
+Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
+WARNING: [Vivado 12-584] No ports matched 'sw[3]'. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:23]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:23]
+Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
+WARNING: [Vivado 12-584] No ports matched 'sw[4]'. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:24]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:24]
+Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
+WARNING: [Vivado 12-584] No ports matched 'sw[5]'. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:25]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:25]
+Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
+WARNING: [Vivado 12-584] No ports matched 'sw[6]'. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:26]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:26]
+Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
+WARNING: [Vivado 12-584] No ports matched 'sw[7]'. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:27]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:27]
+Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
+WARNING: [Vivado 12-584] No ports matched 'sw[8]'. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:28]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:28]
+Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
+WARNING: [Vivado 12-584] No ports matched 'sw[9]'. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:29]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:29]
+Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
+WARNING: [Vivado 12-584] No ports matched 'sw[10]'. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:30]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:30]
+Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
+WARNING: [Vivado 12-584] No ports matched 'sw[11]'. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:31]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:31]
+Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
+WARNING: [Vivado 12-584] No ports matched 'sw[12]'. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:32]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:32]
+Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
+WARNING: [Vivado 12-584] No ports matched 'sw[13]'. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:33]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:33]
+Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
+WARNING: [Vivado 12-584] No ports matched 'sw[14]'. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:34]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:34]
+Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
+WARNING: [Vivado 12-584] No ports matched 'sw[15]'. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:35]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:35]
+Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
+WARNING: [Vivado 12-584] No ports matched 'led[0]'. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:40]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:40]
+Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
+WARNING: [Vivado 12-584] No ports matched 'led[1]'. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:41]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:41]
+Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
+WARNING: [Vivado 12-584] No ports matched 'led[2]'. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:42]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:42]
+Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
+WARNING: [Vivado 12-584] No ports matched 'led[3]'. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:43]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:43]
+Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
+WARNING: [Vivado 12-584] No ports matched 'led[4]'. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:44]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:44]
+Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
+WARNING: [Vivado 12-584] No ports matched 'led[5]'. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:45]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:45]
+Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
+WARNING: [Vivado 12-584] No ports matched 'led[6]'. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:46]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:46]
+Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
+WARNING: [Vivado 12-584] No ports matched 'led[7]'. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:47]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:47]
+Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
+WARNING: [Vivado 12-584] No ports matched 'led[8]'. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:48]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:48]
+Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
+WARNING: [Vivado 12-584] No ports matched 'led[9]'. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:49]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:49]
+Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
+WARNING: [Vivado 12-584] No ports matched 'led[10]'. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:50]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:50]
+Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
+WARNING: [Vivado 12-584] No ports matched 'led[11]'. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:51]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:51]
+Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
+WARNING: [Vivado 12-584] No ports matched 'led[12]'. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:52]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:52]
+Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
+WARNING: [Vivado 12-584] No ports matched 'led[13]'. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:53]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:53]
+Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
+WARNING: [Vivado 12-584] No ports matched 'led[14]'. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:54]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:54]
+Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
+WARNING: [Vivado 12-584] No ports matched 'led[15]'. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:55]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:55]
+Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
+WARNING: [Vivado 12-584] No ports matched 'led16_b'. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:57]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:57]
+Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
+WARNING: [Vivado 12-584] No ports matched 'ca'. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:67]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:67]
+Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
+WARNING: [Vivado 12-584] No ports matched 'cb'. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:68]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:68]
+Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
+WARNING: [Vivado 12-584] No ports matched 'cc'. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:69]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:69]
+Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
+WARNING: [Vivado 12-584] No ports matched 'cd'. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:70]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:70]
+Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
+WARNING: [Vivado 12-584] No ports matched 'ce'. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:71]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:71]
+Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
+WARNING: [Vivado 12-584] No ports matched 'cf'. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:72]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:72]
+Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
+WARNING: [Vivado 12-584] No ports matched 'cg'. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:73]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:73]
+Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
+WARNING: [Vivado 12-584] No ports matched 'dp'. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:75]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:75]
+Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
+WARNING: [Vivado 12-584] No ports matched 'an[0]'. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:77]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:77]
+Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
+WARNING: [Vivado 12-584] No ports matched 'an[1]'. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:78]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:78]
+Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
+WARNING: [Vivado 12-584] No ports matched 'an[2]'. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:79]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:79]
+Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
+WARNING: [Vivado 12-584] No ports matched 'an[3]'. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:80]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:80]
+Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
+WARNING: [Vivado 12-584] No ports matched 'an[4]'. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:81]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:81]
+Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
+WARNING: [Vivado 12-584] No ports matched 'an[5]'. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:82]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:82]
+Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
+WARNING: [Vivado 12-584] No ports matched 'an[6]'. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:83]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:83]
+Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
+WARNING: [Vivado 12-584] No ports matched 'an[7]'. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:84]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc:84]
+Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
+Finished Parsing XDC File [/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/files/nexys4_ddr_constraints.xdc]
 Completed Processing XDC Constraints
 
-Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 2029.770 ; gain = 0.000 ; free physical = 1182 ; free virtual = 12312
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 1983.707 ; gain = 0.000 ; free physical = 142 ; free virtual = 5224
 INFO: [Project 1-111] Unisim Transformation Summary:
 No Unisim elements were transformed.
 
-Constraint Validation Runtime : Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 2029.770 ; gain = 0.000 ; free physical = 1182 ; free virtual = 12312
+WARNING: [Constraints 18-5210] No constraints selected for write.
+Resolution: This message can indicate that there are no constraints for the design, or it can indicate that the used_in flags are set such that the constraints are ignored. This later case is used when running synth_design to not write synthesis constraints to the resulting checkpoint. Instead, project constraints are read when the synthesized design is opened.
+Constraint Validation Runtime : Time (s): cpu = 00:00:00.05 ; elapsed = 00:00:00.09 . Memory (MB): peak = 1986.676 ; gain = 2.969 ; free physical = 146 ; free virtual = 5227
 ---------------------------------------------------------------------------------
-Finished Constraint Validation : Time (s): cpu = 00:00:06 ; elapsed = 00:00:09 . Memory (MB): peak = 2029.770 ; gain = 384.840 ; free physical = 1247 ; free virtual = 12376
+Finished Constraint Validation : Time (s): cpu = 00:00:07 ; elapsed = 00:00:10 . Memory (MB): peak = 1986.676 ; gain = 330.871 ; free physical = 203 ; free virtual = 5285
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Loading Part and Timing Information
 ---------------------------------------------------------------------------------
 Loading part: xc7a100tcsg324-1
 ---------------------------------------------------------------------------------
-Finished Loading Part and Timing Information : Time (s): cpu = 00:00:06 ; elapsed = 00:00:09 . Memory (MB): peak = 2029.770 ; gain = 384.840 ; free physical = 1247 ; free virtual = 12376
+Finished Loading Part and Timing Information : Time (s): cpu = 00:00:07 ; elapsed = 00:00:10 . Memory (MB): peak = 1986.676 ; gain = 330.871 ; free physical = 203 ; free virtual = 5285
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Applying 'set_property' XDC Constraints
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished applying 'set_property' XDC Constraints : Time (s): cpu = 00:00:06 ; elapsed = 00:00:09 . Memory (MB): peak = 2029.770 ; gain = 384.840 ; free physical = 1249 ; free virtual = 12378
+Finished applying 'set_property' XDC Constraints : Time (s): cpu = 00:00:07 ; elapsed = 00:00:10 . Memory (MB): peak = 1986.676 ; gain = 330.871 ; free physical = 203 ; free virtual = 5285
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished RTL Optimization Phase 2 : Time (s): cpu = 00:00:07 ; elapsed = 00:00:09 . Memory (MB): peak = 2029.770 ; gain = 384.840 ; free physical = 1238 ; free virtual = 12371
+Finished RTL Optimization Phase 2 : Time (s): cpu = 00:00:08 ; elapsed = 00:00:11 . Memory (MB): peak = 1986.676 ; gain = 330.871 ; free physical = 203 ; free virtual = 5285
 ---------------------------------------------------------------------------------
 
 Report RTL Partitions: 
@@ -158,21 +241,8 @@ Start RTL Component Statistics
 ---------------------------------------------------------------------------------
 Detailed RTL Component Info : 
 +---Adders : 
-	   2 Input     26 Bit       Adders := 1     
-	   2 Input      4 Bit       Adders := 1     
-+---Registers : 
-	               26 Bit    Registers := 1     
-	                8 Bit    Registers := 1     
-	                7 Bit    Registers := 1     
-	                4 Bit    Registers := 1     
-	                1 Bit    Registers := 6     
-+---Muxes : 
-	   3 Input     26 Bit        Muxes := 1     
-	   8 Input      8 Bit        Muxes := 1     
-	   2 Input      4 Bit        Muxes := 1     
-	   3 Input      2 Bit        Muxes := 1     
-	   2 Input      1 Bit        Muxes := 1     
-	   3 Input      1 Bit        Muxes := 1     
+	   3 Input     13 Bit       Adders := 1     
+	   3 Input     12 Bit       Adders := 1     
 ---------------------------------------------------------------------------------
 Finished RTL Component Statistics 
 ---------------------------------------------------------------------------------
@@ -180,32 +250,11 @@ Finished RTL Component Statistics
 Start RTL Hierarchical Component Statistics 
 ---------------------------------------------------------------------------------
 Hierarchical RTL Component report 
-Module camera_top_level 
-Detailed RTL Component Info : 
-+---Registers : 
-	                1 Bit    Registers := 1     
-Module timer 
+Module blob 
 Detailed RTL Component Info : 
 +---Adders : 
-	   2 Input     26 Bit       Adders := 1     
-	   2 Input      4 Bit       Adders := 1     
-+---Registers : 
-	               26 Bit    Registers := 1     
-	                4 Bit    Registers := 1     
-	                1 Bit    Registers := 5     
-+---Muxes : 
-	   3 Input     26 Bit        Muxes := 1     
-	   2 Input      4 Bit        Muxes := 1     
-	   3 Input      2 Bit        Muxes := 1     
-	   2 Input      1 Bit        Muxes := 1     
-	   3 Input      1 Bit        Muxes := 1     
-Module display_8hex 
-Detailed RTL Component Info : 
-+---Registers : 
-	                8 Bit    Registers := 1     
-	                7 Bit    Registers := 1     
-+---Muxes : 
-	   8 Input      8 Bit        Muxes := 1     
+	   3 Input     13 Bit       Adders := 1     
+	   3 Input     12 Bit       Adders := 1     
 ---------------------------------------------------------------------------------
 Finished RTL Hierarchical Component Statistics
 ---------------------------------------------------------------------------------
@@ -222,9 +271,8 @@ Finished Part Resource Summary
 Start Cross Boundary and Area Optimization
 ---------------------------------------------------------------------------------
 Warning: Parallel synthesis criteria is not met 
-WARNING: [Synth 8-3331] design camera_top_level has unconnected port dp
 ---------------------------------------------------------------------------------
-Finished Cross Boundary and Area Optimization : Time (s): cpu = 00:00:08 ; elapsed = 00:00:11 . Memory (MB): peak = 2029.770 ; gain = 384.840 ; free physical = 1217 ; free virtual = 12355
+Finished Cross Boundary and Area Optimization : Time (s): cpu = 00:00:08 ; elapsed = 00:00:11 . Memory (MB): peak = 1986.676 ; gain = 330.871 ; free physical = 181 ; free virtual = 5269
 ---------------------------------------------------------------------------------
 
 Report RTL Partitions: 
@@ -236,13 +284,13 @@ Report RTL Partitions:
 Start Applying XDC Timing Constraints
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Applying XDC Timing Constraints : Time (s): cpu = 00:00:12 ; elapsed = 00:00:15 . Memory (MB): peak = 2029.770 ; gain = 384.840 ; free physical = 1108 ; free virtual = 12240
+Finished Applying XDC Timing Constraints : Time (s): cpu = 00:00:16 ; elapsed = 00:00:19 . Memory (MB): peak = 1986.676 ; gain = 330.871 ; free physical = 157 ; free virtual = 5130
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Timing Optimization
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Timing Optimization : Time (s): cpu = 00:00:12 ; elapsed = 00:00:15 . Memory (MB): peak = 2029.770 ; gain = 384.840 ; free physical = 1105 ; free virtual = 12239
+Finished Timing Optimization : Time (s): cpu = 00:00:16 ; elapsed = 00:00:19 . Memory (MB): peak = 1986.676 ; gain = 330.871 ; free physical = 161 ; free virtual = 5130
 ---------------------------------------------------------------------------------
 
 Report RTL Partitions: 
@@ -254,7 +302,7 @@ Report RTL Partitions:
 Start Technology Mapping
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Technology Mapping : Time (s): cpu = 00:00:12 ; elapsed = 00:00:15 . Memory (MB): peak = 2029.770 ; gain = 384.840 ; free physical = 1104 ; free virtual = 12238
+Finished Technology Mapping : Time (s): cpu = 00:00:16 ; elapsed = 00:00:19 . Memory (MB): peak = 1986.676 ; gain = 330.871 ; free physical = 172 ; free virtual = 5125
 ---------------------------------------------------------------------------------
 
 Report RTL Partitions: 
@@ -278,7 +326,7 @@ Start Final Netlist Cleanup
 Finished Final Netlist Cleanup
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished IO Insertion : Time (s): cpu = 00:00:13 ; elapsed = 00:00:16 . Memory (MB): peak = 2029.770 ; gain = 384.840 ; free physical = 1101 ; free virtual = 12238
+Finished IO Insertion : Time (s): cpu = 00:00:18 ; elapsed = 00:00:22 . Memory (MB): peak = 1986.676 ; gain = 330.871 ; free physical = 182 ; free virtual = 5132
 ---------------------------------------------------------------------------------
 
 Report Check Netlist: 
@@ -291,7 +339,7 @@ Report Check Netlist:
 Start Renaming Generated Instances
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Renaming Generated Instances : Time (s): cpu = 00:00:13 ; elapsed = 00:00:16 . Memory (MB): peak = 2029.770 ; gain = 384.840 ; free physical = 1101 ; free virtual = 12238
+Finished Renaming Generated Instances : Time (s): cpu = 00:00:18 ; elapsed = 00:00:22 . Memory (MB): peak = 1986.676 ; gain = 330.871 ; free physical = 182 ; free virtual = 5132
 ---------------------------------------------------------------------------------
 
 Report RTL Partitions: 
@@ -303,25 +351,25 @@ Report RTL Partitions:
 Start Rebuilding User Hierarchy
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Rebuilding User Hierarchy : Time (s): cpu = 00:00:13 ; elapsed = 00:00:16 . Memory (MB): peak = 2029.770 ; gain = 384.840 ; free physical = 1101 ; free virtual = 12238
+Finished Rebuilding User Hierarchy : Time (s): cpu = 00:00:18 ; elapsed = 00:00:22 . Memory (MB): peak = 1986.676 ; gain = 330.871 ; free physical = 182 ; free virtual = 5132
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Renaming Generated Ports
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Renaming Generated Ports : Time (s): cpu = 00:00:13 ; elapsed = 00:00:16 . Memory (MB): peak = 2029.770 ; gain = 384.840 ; free physical = 1101 ; free virtual = 12238
+Finished Renaming Generated Ports : Time (s): cpu = 00:00:18 ; elapsed = 00:00:22 . Memory (MB): peak = 1986.676 ; gain = 330.871 ; free physical = 182 ; free virtual = 5132
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Handling Custom Attributes
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Handling Custom Attributes : Time (s): cpu = 00:00:13 ; elapsed = 00:00:16 . Memory (MB): peak = 2029.770 ; gain = 384.840 ; free physical = 1101 ; free virtual = 12238
+Finished Handling Custom Attributes : Time (s): cpu = 00:00:18 ; elapsed = 00:00:22 . Memory (MB): peak = 1986.676 ; gain = 330.871 ; free physical = 182 ; free virtual = 5132
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Renaming Generated Nets
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Renaming Generated Nets : Time (s): cpu = 00:00:13 ; elapsed = 00:00:16 . Memory (MB): peak = 2029.770 ; gain = 384.840 ; free physical = 1101 ; free virtual = 12238
+Finished Renaming Generated Nets : Time (s): cpu = 00:00:18 ; elapsed = 00:00:22 . Memory (MB): peak = 1986.676 ; gain = 330.871 ; free physical = 183 ; free virtual = 5132
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Writing Synthesis Report
@@ -334,56 +382,45 @@ Report BlackBoxes:
 +-+--------------+----------+
 
 Report Cell Usage: 
-+------+-----------+------+
-|      |Cell       |Count |
-+------+-----------+------+
-|1     |BUFG       |     2|
-|2     |CARRY4     |    19|
-|3     |LUT1       |     5|
-|4     |LUT2       |     7|
-|5     |LUT3       |     1|
-|6     |LUT4       |    35|
-|7     |LUT5       |     4|
-|8     |LUT6       |    63|
-|9     |MMCME2_ADV |     1|
-|10    |FDRE       |    81|
-|11    |FDSE       |     8|
-|12    |IBUF       |    17|
-|13    |OBUF       |    32|
-|14    |OBUFT      |     1|
-+------+-----------+------+
++------+-------+------+
+|      |Cell   |Count |
++------+-------+------+
+|1     |CARRY4 |    10|
+|2     |LUT2   |    25|
+|3     |LUT3   |     2|
+|4     |LUT4   |    26|
+|5     |IBUF   |    42|
+|6     |OBUF   |    12|
++------+-------+------+
 
 Report Instance Areas: 
-+------+--------------+--------------+------+
-|      |Instance      |Module        |Cells |
-+------+--------------+--------------+------+
-|1     |top           |              |   276|
-|2     |  clkdivider  |clk_wiz_65mhz |     4|
-|3     |  display_uut |display_8hex  |   105|
-|4     |  timer_uut   |timer         |    75|
-+------+--------------+--------------+------+
++------+---------+-------+------+
+|      |Instance |Module |Cells |
++------+---------+-------+------+
+|1     |top      |       |   117|
++------+---------+-------+------+
 ---------------------------------------------------------------------------------
-Finished Writing Synthesis Report : Time (s): cpu = 00:00:13 ; elapsed = 00:00:16 . Memory (MB): peak = 2029.770 ; gain = 384.840 ; free physical = 1101 ; free virtual = 12238
+Finished Writing Synthesis Report : Time (s): cpu = 00:00:18 ; elapsed = 00:00:22 . Memory (MB): peak = 1986.676 ; gain = 330.871 ; free physical = 183 ; free virtual = 5132
 ---------------------------------------------------------------------------------
-Synthesis finished with 0 errors, 0 critical warnings and 1 warnings.
-Synthesis Optimization Runtime : Time (s): cpu = 00:00:12 ; elapsed = 00:00:14 . Memory (MB): peak = 2029.770 ; gain = 209.215 ; free physical = 1154 ; free virtual = 12291
-Synthesis Optimization Complete : Time (s): cpu = 00:00:13 ; elapsed = 00:00:16 . Memory (MB): peak = 2029.770 ; gain = 384.840 ; free physical = 1167 ; free virtual = 12304
+Synthesis finished with 0 errors, 0 critical warnings and 0 warnings.
+Synthesis Optimization Runtime : Time (s): cpu = 00:00:17 ; elapsed = 00:00:20 . Memory (MB): peak = 1986.676 ; gain = 214.152 ; free physical = 237 ; free virtual = 5187
+Synthesis Optimization Complete : Time (s): cpu = 00:00:18 ; elapsed = 00:00:22 . Memory (MB): peak = 1986.676 ; gain = 330.871 ; free physical = 251 ; free virtual = 5200
 INFO: [Project 1-571] Translating synthesized netlist
-INFO: [Netlist 29-17] Analyzing 20 Unisim elements for replacement
+INFO: [Netlist 29-17] Analyzing 10 Unisim elements for replacement
 INFO: [Netlist 29-28] Unisim Transformation completed in 0 CPU seconds
 INFO: [Project 1-570] Preparing netlist for logic optimization
 INFO: [Opt 31-138] Pushed 0 inverter(s) to 0 load pin(s).
-Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 2029.770 ; gain = 0.000 ; free physical = 1096 ; free virtual = 12233
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 1996.426 ; gain = 0.000 ; free physical = 208 ; free virtual = 5151
 INFO: [Project 1-111] Unisim Transformation Summary:
 No Unisim elements were transformed.
 
 INFO: [Common 17-83] Releasing license: Synthesis
-29 Infos, 5 Warnings, 0 Critical Warnings and 0 Errors encountered.
+13 Infos, 52 Warnings, 51 Critical Warnings and 0 Errors encountered.
 synth_design completed successfully
-synth_design: Time (s): cpu = 00:00:16 ; elapsed = 00:00:19 . Memory (MB): peak = 2029.770 ; gain = 627.980 ; free physical = 1193 ; free virtual = 12330
-Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 2029.770 ; gain = 0.000 ; free physical = 1193 ; free virtual = 12330
+synth_design: Time (s): cpu = 00:00:22 ; elapsed = 00:00:26 . Memory (MB): peak = 1996.426 ; gain = 561.887 ; free physical = 305 ; free virtual = 5247
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 1996.426 ; gain = 0.000 ; free physical = 305 ; free virtual = 5247
 WARNING: [Constraints 18-5210] No constraints selected for write.
 Resolution: This message can indicate that there are no constraints for the design, or it can indicate that the used_in flags are set such that the constraints are ignored. This later case is used when running synth_design to not write synthesis constraints to the resulting checkpoint. Instead, project constraints are read when the synthesized design is opened.
-INFO: [Common 17-1381] The checkpoint '/afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/final_project.runs/synth_1/camera_top_level.dcp' has been generated.
-INFO: [runtcl-4] Executing : report_utilization -file camera_top_level_utilization_synth.rpt -pb camera_top_level_utilization_synth.pb
-INFO: [Common 17-206] Exiting Vivado at Tue Oct 29 20:05:19 2019...
+INFO: [Common 17-1381] The checkpoint '/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/final_project.runs/synth_1/blob.dcp' has been generated.
+INFO: [runtcl-4] Executing : report_utilization -file blob_utilization_synth.rpt -pb blob_utilization_synth.pb
+INFO: [Common 17-206] Exiting Vivado at Wed Nov  6 15:59:24 2019...

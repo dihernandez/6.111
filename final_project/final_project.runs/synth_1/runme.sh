@@ -20,7 +20,7 @@ else
 fi
 export LD_LIBRARY_PATH
 
-HD_PWD='/afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/final_project.runs/synth_1'
+HD_PWD='/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/final_project.runs/synth_1'
 cd "$HD_PWD"
 
 HD_LOG=runme.log
@@ -36,4 +36,4 @@ EAStep()
      fi
 }
 
-EAStep vivado -log camera_top_level.vds -m64 -product Vivado -mode batch -messageDb vivado.pb -notrace -source camera_top_level.tcl
+EAStep vivado -log blob.vds -m64 -product Vivado -mode batch -messageDb vivado.pb -notrace -source blob.tcl

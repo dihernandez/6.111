@@ -1,0 +1,12 @@
+#-----------------------------------------------------------
+# Vivado v2019.1.2 (64-bit)
+# SW Build 2615518 on Fri Aug  9 15:53:29 MDT 2019
+# IP Build 2614745 on Fri Aug  9 20:55:02 MDT 2019
+# Start of session at: Wed Nov  6 14:51:41 2019
+# Process ID: 15245
+# Current directory: /afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/final_project.runs/p1_at_rest_blue_synth_1
+# Command line: vivado -log p1_at_rest_blue.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source p1_at_rest_blue.tcl
+# Log file: /afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/final_project.runs/p1_at_rest_blue_synth_1/p1_at_rest_blue.vds
+# Journal file: /afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/final_project.runs/p1_at_rest_blue_synth_1/vivado.jou
+#-----------------------------------------------------------
+source p1_at_rest_blue.tcl -notrace
