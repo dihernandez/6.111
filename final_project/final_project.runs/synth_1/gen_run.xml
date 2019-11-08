@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<GenRun Id="synth_1" LaunchPart="xc7a100tcsg324-1" LaunchTime="1573073927">
-  <File Type="VDS-TIMING-PB" Name="blob_timing_summary_synth.pb"/>
-  <File Type="VDS-TIMINGSUMMARY" Name="blob_timing_summary_synth.rpt"/>
-  <File Type="RDS-DCP" Name="blob.dcp"/>
-  <File Type="RDS-UTIL-PB" Name="blob_utilization_synth.pb"/>
-  <File Type="RDS-UTIL" Name="blob_utilization_synth.rpt"/>
-  <File Type="RDS-PROPCONSTRS" Name="blob_drc_synth.rpt"/>
-  <File Type="RDS-RDS" Name="blob.vds"/>
-  <File Type="REPORTS-TCL" Name="blob_reports.tcl"/>
-  <File Type="PA-TCL" Name="blob.tcl"/>
+<GenRun Id="synth_1" LaunchPart="xc7a100tcsg324-1" LaunchTime="1573240443">
+  <File Type="VDS-TIMING-PB" Name="camera_top_level_timing_summary_synth.pb"/>
+  <File Type="VDS-TIMINGSUMMARY" Name="camera_top_level_timing_summary_synth.rpt"/>
+  <File Type="RDS-DCP" Name="camera_top_level.dcp"/>
+  <File Type="RDS-UTIL-PB" Name="camera_top_level_utilization_synth.pb"/>
+  <File Type="RDS-UTIL" Name="camera_top_level_utilization_synth.rpt"/>
+  <File Type="RDS-PROPCONSTRS" Name="camera_top_level_drc_synth.rpt"/>
+  <File Type="RDS-RDS" Name="camera_top_level.vds"/>
+  <File Type="REPORTS-TCL" Name="camera_top_level_reports.tcl"/>
+  <File Type="PA-TCL" Name="camera_top_level.tcl"/>
   <FileSet Name="sources" Type="DesignSrcs" RelSrcDir="$PSRCDIR/sources_1">
     <Filter Type="Srcs"/>
     <File Path="$PPRDIR/files/camera.sv">
@@ -82,7 +82,7 @@
     </File>
     <Config>
       <Option Name="DesignMode" Val="RTL"/>
-      <Option Name="TopModule" Val="blob"/>
+      <Option Name="TopModule" Val="camera_top_level"/>
     </Config>
   </FileSet>
   <FileSet Name="constrs_in" Type="Constrs" RelSrcDir="$PSRCDIR/constrs_1">
@@ -107,6 +107,7 @@
     <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2019"/>
     <Step Id="synth_design"/>
   </Strategy>
+  <BlockFileSet Type="BlockSrcs" Name="blk_mem_gen_0"/>
   <BlockFileSet Type="BlockSrcs" Name="clk_wiz_final"/>
   <BlockFileSet Type="BlockSrcs" Name="p1_at_rest_blue"/>
 </GenRun>

@@ -74,7 +74,11 @@ set rc [catch {
   set_property parent.project_path /afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/final_project.xpr [current_project]
   set_property ip_output_repo /afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/final_project.cache/ip [current_project]
   set_property ip_cache_permissions {read write} [current_project]
+  set_property XPM_LIBRARIES {XPM_CDC XPM_MEMORY} [current_project]
   add_files -quiet /afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/final_project.runs/synth_1/camera_top_level.dcp
+  read_ip -quiet /afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/final_project.srcs/sources_1/ip/p1_at_rest_blue/p1_at_rest_blue.xci
+  read_ip -quiet /afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/final_project.srcs/sources_1/ip/clk_wiz_final/clk_wiz_final.xci
+  read_ip -quiet /afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/final_project.srcs/sources_1/ip/blk_mem_gen_0/blk_mem_gen_0.xci
   read_xdc /afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/files/nexys4_ddr_constraints.xdc
   link_design -top camera_top_level -part xc7a100tcsg324-1
   close_msg_db -file init_design.pb
@@ -155,6 +159,7 @@ start_step write_bitstream
 set ACTIVE_STEP write_bitstream
 set rc [catch {
   create_msg_db write_bitstream.pb
+  set_property XPM_LIBRARIES {XPM_CDC XPM_MEMORY} [current_project]
   catch { write_mem_info -force camera_top_level.mmi }
   write_bitstream -force camera_top_level.bit 
   catch {write_debug_probes -quiet -force camera_top_level}

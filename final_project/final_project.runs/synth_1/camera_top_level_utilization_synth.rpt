@@ -1,8 +1,8 @@
 Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2019.1.2 (lin64) Build 2615518 Fri Aug  9 15:53:29 MDT 2019
-| Date         : Tue Oct 29 20:05:19 2019
-| Host         : eecs-digital-17 running 64-bit Ubuntu 14.04.6 LTS
+| Date         : Fri Nov  8 14:14:34 2019
+| Host         : eecs-digital-14 running 64-bit Ubuntu 14.04.6 LTS
 | Command      : report_utilization -file camera_top_level_utilization_synth.rpt -pb camera_top_level_utilization_synth.pb
 | Design       : camera_top_level
 | Device       : 7a100tcsg324-1
@@ -30,11 +30,11 @@ Table of Contents
 +-------------------------+------+-------+-----------+-------+
 |        Site Type        | Used | Fixed | Available | Util% |
 +-------------------------+------+-------+-----------+-------+
-| Slice LUTs*             |   95 |     0 |     63400 |  0.15 |
-|   LUT as Logic          |   95 |     0 |     63400 |  0.15 |
+| Slice LUTs*             |  195 |     0 |     63400 |  0.31 |
+|   LUT as Logic          |  195 |     0 |     63400 |  0.31 |
 |   LUT as Memory         |    0 |     0 |     19000 |  0.00 |
-| Slice Registers         |   89 |     0 |    126800 |  0.07 |
-|   Register as Flip Flop |   89 |     0 |    126800 |  0.07 |
+| Slice Registers         |  209 |     0 |    126800 |  0.16 |
+|   Register as Flip Flop |  209 |     0 |    126800 |  0.16 |
 |   Register as Latch     |    0 |     0 |    126800 |  0.00 |
 | F7 Muxes                |    0 |     0 |     31700 |  0.00 |
 | F8 Muxes                |    0 |     0 |     15850 |  0.00 |
@@ -57,7 +57,7 @@ Table of Contents
 | 0     |          Yes |           - |          Set |
 | 0     |          Yes |           - |        Reset |
 | 8     |          Yes |         Set |            - |
-| 81    |          Yes |       Reset |            - |
+| 201   |          Yes |       Reset |            - |
 +-------+--------------+-------------+--------------+
 
 
@@ -77,11 +77,12 @@ Table of Contents
 3. DSP
 ------
 
-+-----------+------+-------+-----------+-------+
-| Site Type | Used | Fixed | Available | Util% |
-+-----------+------+-------+-----------+-------+
-| DSPs      |    0 |     0 |       240 |  0.00 |
-+-----------+------+-------+-----------+-------+
++----------------+------+-------+-----------+-------+
+|    Site Type   | Used | Fixed | Available | Util% |
++----------------+------+-------+-----------+-------+
+| DSPs           |    1 |     0 |       240 |  0.42 |
+|   DSP48E1 only |    1 |       |           |       |
++----------------+------+-------+-----------+-------+
 
 
 4. IO and GT Specific
@@ -90,7 +91,7 @@ Table of Contents
 +-----------------------------+------+-------+-----------+-------+
 |          Site Type          | Used | Fixed | Available | Util% |
 +-----------------------------+------+-------+-----------+-------+
-| Bonded IOB                  |   50 |     0 |       210 | 23.81 |
+| Bonded IOB                  |   82 |     0 |       210 | 39.05 |
 | Bonded IPADs                |    0 |     0 |         2 |  0.00 |
 | PHY_CONTROL                 |    0 |     0 |         6 |  0.00 |
 | PHASER_REF                  |    0 |     0 |         6 |  0.00 |
@@ -112,7 +113,7 @@ Table of Contents
 +------------+------+-------+-----------+-------+
 |  Site Type | Used | Fixed | Available | Util% |
 +------------+------+-------+-----------+-------+
-| BUFGCTRL   |    2 |     0 |        32 |  6.25 |
+| BUFGCTRL   |    3 |     0 |        32 |  9.38 |
 | BUFIO      |    0 |     0 |        24 |  0.00 |
 | MMCME2_ADV |    1 |     0 |         6 | 16.67 |
 | PLLE2_ADV  |    0 |     0 |         6 |  0.00 |
@@ -146,29 +147,32 @@ Table of Contents
 +------------+------+---------------------+
 |  Ref Name  | Used | Functional Category |
 +------------+------+---------------------+
-| FDRE       |   81 |        Flop & Latch |
-| LUT6       |   63 |                 LUT |
-| LUT4       |   35 |                 LUT |
-| OBUF       |   32 |                  IO |
-| CARRY4     |   19 |          CarryLogic |
-| IBUF       |   17 |                  IO |
+| FDRE       |  201 |        Flop & Latch |
+| LUT6       |   60 |                 LUT |
+| LUT5       |   56 |                 LUT |
+| OBUF       |   48 |                  IO |
+| LUT4       |   45 |                 LUT |
+| LUT3       |   34 |                 LUT |
+| LUT2       |   28 |                 LUT |
+| IBUF       |   28 |                  IO |
+| CARRY4     |   28 |          CarryLogic |
+| LUT1       |    9 |                 LUT |
 | FDSE       |    8 |        Flop & Latch |
-| LUT2       |    7 |                 LUT |
-| LUT1       |    5 |                 LUT |
-| LUT5       |    4 |                 LUT |
-| BUFG       |    2 |               Clock |
-| OBUFT      |    1 |                  IO |
+| OBUFT      |    6 |                  IO |
+| BUFG       |    3 |               Clock |
 | MMCME2_ADV |    1 |               Clock |
-| LUT3       |    1 |                 LUT |
+| DSP48E1    |    1 |    Block Arithmetic |
 +------------+------+---------------------+
 
 
 8. Black Boxes
 --------------
 
-+----------+------+
-| Ref Name | Used |
-+----------+------+
++---------------+------+
+|    Ref Name   | Used |
++---------------+------+
+| blk_mem_gen_0 |    1 |
++---------------+------+
 
 
 9. Instantiated Netlists

@@ -3,8 +3,8 @@
 -- Tool Version: Vivado v.2019.1.2 (lin64) Build 2615518 Fri Aug  9 15:53:29 MDT 2019
 -- Date        : Wed Nov  6 14:53:03 2019
 -- Host        : eecs-digital-11 running 64-bit Ubuntu 14.04.6 LTS
--- Command     : write_vhdl -force -mode synth_stub
---               /afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/final_project.srcs/sources_1/ip/p1_at_rest_blue/p1_at_rest_blue_stub.vhdl
+-- Command     : write_vhdl -force -mode synth_stub -rename_top p1_at_rest_blue -prefix
+--               p1_at_rest_blue_ p1_at_rest_blue_stub.vhdl
 -- Design      : p1_at_rest_blue
 -- Purpose     : Stub declaration of top-level module interface
 -- Device      : xc7a100tcsg324-1

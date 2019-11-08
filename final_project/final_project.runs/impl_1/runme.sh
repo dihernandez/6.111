@@ -20,7 +20,7 @@ else
 fi
 export LD_LIBRARY_PATH
 
-HD_PWD='/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/final_project.runs/impl_1'
+HD_PWD='/afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/final_project.runs/impl_1'
 cd "$HD_PWD"
 
 HD_LOG=runme.log
@@ -38,6 +38,6 @@ EAStep()
 
 # pre-commands:
 /bin/touch .init_design.begin.rst
-EAStep vivado -log blob.vdi -applog -m64 -product Vivado -messageDb vivado.pb -mode batch -source blob.tcl -notrace
+EAStep vivado -log camera_top_level.vdi -applog -m64 -product Vivado -messageDb vivado.pb -mode batch -source camera_top_level.tcl -notrace
 
 
