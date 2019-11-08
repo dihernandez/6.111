@@ -1,0 +1,20 @@
+# ignore vivado log files
+*.jou
+*.log
+*.str
+
+# ignore vivado cache, ip user files, runs, etc.
+final_project.cache/*
+final_project.hw/*
+final_project.ip_user_files/*
+final_project.runs/*
+
+## DO NOT IGNORE
+# final project srcs folder
+# final project xpr file
+# files folder
+# sprites folder
+# README file
+
+## UNSURE
+# final project sim folder
