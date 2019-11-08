@@ -8,10 +8,10 @@ final_project/final_project.cache/**
 final_project/final_project.hw/**
 final_project/final_project.ip_user_files/**
 final_project/final_project.runs/**
+final_project/final_project.srcs/sources_1/ip/**
 
 ## DO NOT IGNORE
 # final project srcs folder
-# final project xpr file
 # files folder
 # sprites folder
 # README file
@@ -19,3 +19,4 @@ final_project/final_project.runs/**
 
 ## UNSURE
 # final project sim folder
+# final project xpr file
