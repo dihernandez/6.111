@@ -65,21 +65,22 @@ start_step init_design
 set ACTIVE_STEP init_design
 set rc [catch {
   create_msg_db init_design.pb
-  set_param chipscope.maxJobs 2
+  set_param chipscope.maxJobs 1
   create_project -in_memory -part xc7a100tcsg324-1
+  set_property board_part_repo_paths {/home/rdedhia/.Xilinx/Vivado/2019.1/xhub/board_store} [current_project]
   set_property board_part digilentinc.com:nexys4_ddr:part0:1.1 [current_project]
   set_property design_mode GateLvl [current_fileset]
   set_param project.singleFileAddWarning.threshold 0
-  set_property webtalk.parent_dir /afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/final_project.cache/wt [current_project]
-  set_property parent.project_path /afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/final_project.xpr [current_project]
-  set_property ip_output_repo /afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/final_project.cache/ip [current_project]
+  set_property webtalk.parent_dir /home/rdedhia/Documents/MIT/6_111/final_project/6.111/final_project/final_project.cache/wt [current_project]
+  set_property parent.project_path /home/rdedhia/Documents/MIT/6_111/final_project/6.111/final_project/final_project.xpr [current_project]
+  set_property ip_output_repo /home/rdedhia/Documents/MIT/6_111/final_project/6.111/final_project/final_project.cache/ip [current_project]
   set_property ip_cache_permissions {read write} [current_project]
   set_property XPM_LIBRARIES {XPM_CDC XPM_MEMORY} [current_project]
-  add_files -quiet /afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/final_project.runs/synth_1/camera_top_level.dcp
-  read_ip -quiet /afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/final_project.srcs/sources_1/ip/p1_at_rest_blue/p1_at_rest_blue.xci
-  read_ip -quiet /afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/final_project.srcs/sources_1/ip/clk_wiz_final/clk_wiz_final.xci
-  read_ip -quiet /afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/final_project.srcs/sources_1/ip/blk_mem_gen_0/blk_mem_gen_0.xci
-  read_xdc /afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/files/nexys4_ddr_constraints.xdc
+  add_files -quiet /home/rdedhia/Documents/MIT/6_111/final_project/6.111/final_project/final_project.runs/synth_1/camera_top_level.dcp
+  read_ip -quiet /home/rdedhia/Documents/MIT/6_111/final_project/6.111/final_project/final_project.srcs/sources_1/ip/p1_at_rest_blue/p1_at_rest_blue.xci
+  read_ip -quiet /home/rdedhia/Documents/MIT/6_111/final_project/6.111/final_project/final_project.srcs/sources_1/ip/clk_wiz_final/clk_wiz_final.xci
+  read_ip -quiet /home/rdedhia/Documents/MIT/6_111/final_project/6.111/final_project/final_project.srcs/sources_1/ip/blk_mem_gen_0/blk_mem_gen_0.xci
+  read_xdc /home/rdedhia/Documents/MIT/6_111/final_project/6.111/final_project/files/nexys4_ddr_constraints.xdc
   link_design -top camera_top_level -part xc7a100tcsg324-1
   close_msg_db -file init_design.pb
 } RESULT]

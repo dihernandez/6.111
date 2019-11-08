@@ -1,4 +1,4 @@
-set_property SRC_FILE_INFO {cfile:/afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/files/nexys4_ddr_constraints.xdc rfile:../../../files/nexys4_ddr_constraints.xdc id:1} [current_design]
+set_property SRC_FILE_INFO {cfile:/home/rdedhia/Documents/MIT/6_111/final_project/6.111/final_project/files/nexys4_ddr_constraints.xdc rfile:../../../files/nexys4_ddr_constraints.xdc id:1} [current_design]
 set_property src_info {type:XDC file:1 line:14 export:INPUT save:INPUT read:READ} [current_design]
 set_property -dict { PACKAGE_PIN E3    IOSTANDARD LVCMOS33 } [get_ports { clk_100mhz }]; #IO_L12P_T1_MRCC_35 Sch=clk100mhz
 set_property src_info {type:XDC file:1 line:20 export:INPUT save:INPUT read:READ} [current_design]

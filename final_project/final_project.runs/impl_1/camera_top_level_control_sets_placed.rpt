@@ -1,8 +1,8 @@
 Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------
-| Tool Version : Vivado v.2019.1.2 (lin64) Build 2615518 Fri Aug  9 15:53:29 MDT 2019
-| Date         : Fri Nov  8 14:15:06 2019
-| Host         : eecs-digital-14 running 64-bit Ubuntu 14.04.6 LTS
+| Tool Version : Vivado v.2019.1 (lin64) Build 2552052 Fri May 24 14:47:09 MDT 2019
+| Date         : Fri Nov  8 15:16:22 2019
+| Host         : rdedhia-Inspiron-7348 running 64-bit Ubuntu 18.04.3 LTS
 | Command      : report_control_sets -verbose -file camera_top_level_control_sets_placed.rpt
 | Design       : camera_top_level
 | Device       : xc7a100t
@@ -77,8 +77,8 @@ Table of Contents
 |  clkdivider/clk_out1 |                                      | display_uut/strobe_out[0]_i_1_n_0 |                1 |              1 |
 |  clkdivider/clk_out1 | xvga1/hreset                         |                                   |                1 |              1 |
 |  clkdivider/clk_out1 |                                      | display_uut/counter_reg[13]       |                1 |              2 |
-|  pclk_in_BUFG        |                                      |                                   |                1 |              4 |
 |  clkdivider/clk_out1 |                                      | display_uut/counter_reg[12]       |                3 |              4 |
+|  pclk_in_BUFG        |                                      |                                   |                1 |              4 |
 |  pclk_in_BUFG        | my_camera/pixel_data_out[15]_i_1_n_0 |                                   |                3 |              8 |
 |  pclk_in_BUFG        | my_camera/pixel_data_out[7]_i_1_n_0  |                                   |                2 |              8 |
 |  clkdivider/clk_out1 | xvga1/hreset                         | xvga1/vcount_out0                 |                2 |              9 |

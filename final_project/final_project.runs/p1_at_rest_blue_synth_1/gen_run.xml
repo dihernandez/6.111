@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<GenRun Id="p1_at_rest_blue_synth_1" LaunchPart="xc7a100tcsg324-1" LaunchTime="1573240003">
-  <File Type="VDS-TIMING-PB" Name="p1_at_rest_blue_timing_summary_synth.pb"/>
+<GenRun Id="p1_at_rest_blue_synth_1" LaunchPart="xc7a100tcsg324-1" LaunchTime="1573243945">
   <File Type="VDS-TIMINGSUMMARY" Name="p1_at_rest_blue_timing_summary_synth.rpt"/>
   <File Type="RDS-DCP" Name="p1_at_rest_blue.dcp"/>
   <File Type="RDS-UTIL-PB" Name="p1_at_rest_blue_utilization_synth.pb"/>
@@ -8,6 +7,7 @@
   <File Type="RDS-PROPCONSTRS" Name="p1_at_rest_blue_drc_synth.rpt"/>
   <File Type="RDS-RDS" Name="p1_at_rest_blue.vds"/>
   <File Type="REPORTS-TCL" Name="p1_at_rest_blue_reports.tcl"/>
+  <File Type="VDS-TIMING-PB" Name="p1_at_rest_blue_timing_summary_synth.pb"/>
   <File Type="PA-TCL" Name="p1_at_rest_blue.tcl"/>
   <FileSet Name="sources" Type="BlockSrcs" RelSrcDir="$PSRCDIR/p1_at_rest_blue">
     <File Path="$PSRCDIR/sources_1/ip/p1_at_rest_blue/p1_at_rest_blue.xci">

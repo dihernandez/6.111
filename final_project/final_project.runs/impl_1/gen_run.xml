@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<GenRun Id="impl_1" LaunchPart="xc7a100tcsg324-1" LaunchTime="1573240443">
+<GenRun Id="impl_1" LaunchPart="xc7a100tcsg324-1" LaunchTime="1573243945">
   <File Type="WBT-USG" Name="usage_statistics_webtalk.html"/>
+  <File Type="RDI-RDI" Name="camera_top_level.vdi"/>
   <File Type="BG-DRC" Name="camera_top_level.drc"/>
   <File Type="BG-BGN" Name="camera_top_level.bgn"/>
   <File Type="BITSTR-SYSDEF" Name="camera_top_level.sysdef"/>
@@ -16,12 +17,13 @@
   <File Type="POSTROUTE-PHYSOPT-BUS-SKEW-RPX" Name="camera_top_level_bus_skew_postroute_physopted.rpx"/>
   <File Type="POSTROUTE-PHYSOPT-BUS-SKEW-PB" Name="camera_top_level_bus_skew_postroute_physopted.pb"/>
   <File Type="POSTROUTE-PHYSOPT-BUS-SKEW" Name="camera_top_level_bus_skew_postroute_physopted.rpt"/>
-  <File Type="RDI-RDI" Name="camera_top_level.vdi"/>
   <File Type="POSTROUTE-PHYSOPT-TIMING-RPX" Name="camera_top_level_timing_summary_postroute_physopted.rpx"/>
   <File Type="POSTROUTE-PHYSOPT-TIMING-PB" Name="camera_top_level_timing_summary_postroute_physopted.pb"/>
   <File Type="POSTROUTE-PHYSOPT-TIMING" Name="camera_top_level_timing_summary_postroute_physopted.rpt"/>
   <File Type="POSTROUTE-PHYSOPT-BLACKBOX-DCP" Name="camera_top_level_postroute_physopt_bb.dcp"/>
   <File Type="POSTROUTE-PHYSOPT-DCP" Name="camera_top_level_postroute_physopt.dcp"/>
+  <File Type="ROUTE-BUS-SKEW-RPX" Name="camera_top_level_bus_skew_routed.rpx"/>
+  <File Type="ROUTE-BUS-SKEW-PB" Name="camera_top_level_bus_skew_routed.pb"/>
   <File Type="ROUTE-BUS-SKEW" Name="camera_top_level_bus_skew_routed.rpt"/>
   <File Type="ROUTE-CLK" Name="camera_top_level_clock_utilization_routed.rpt"/>
   <File Type="ROUTE-SIMILARITY" Name="camera_top_level_incremental_reuse_routed.rpt"/>
@@ -56,18 +58,16 @@
   <File Type="PLACE-CLK" Name="camera_top_level_clock_utilization_placed.rpt"/>
   <File Type="PLACE-IO" Name="camera_top_level_io_placed.rpt"/>
   <File Type="PLACE-DCP" Name="camera_top_level_placed.dcp"/>
-  <File Type="PWROPT-TIMING" Name="camera_top_level_timing_summary_pwropted.rpt"/>
   <File Type="PWROPT-DRC" Name="camera_top_level_drc_pwropted.rpt"/>
   <File Type="PWROPT-DCP" Name="camera_top_level_pwropt.dcp"/>
-  <File Type="OPT-TIMING" Name="camera_top_level_timing_summary_opted.rpt"/>
   <File Type="OPT-HWDEF" Name="camera_top_level.hwdef"/>
   <File Type="OPT-METHODOLOGY-DRC" Name="camera_top_level_methodology_drc_opted.rpt"/>
   <File Type="OPT-DRC" Name="camera_top_level_drc_opted.rpt"/>
   <File Type="OPT-DCP" Name="camera_top_level_opt.dcp"/>
   <File Type="INIT-TIMING" Name="camera_top_level_timing_summary_init.rpt"/>
-  <File Type="ROUTE-BUS-SKEW-RPX" Name="camera_top_level_bus_skew_routed.rpx"/>
+  <File Type="PWROPT-TIMING" Name="camera_top_level_timing_summary_pwropted.rpt"/>
   <File Type="REPORTS-TCL" Name="camera_top_level_reports.tcl"/>
-  <File Type="ROUTE-BUS-SKEW-PB" Name="camera_top_level_bus_skew_routed.pb"/>
+  <File Type="OPT-TIMING" Name="camera_top_level_timing_summary_opted.rpt"/>
   <File Type="PA-TCL" Name="camera_top_level.tcl"/>
   <FileSet Name="sources" Type="DesignSrcs" RelSrcDir="$PSRCDIR/sources_1">
     <Filter Type="Srcs"/>
@@ -175,7 +175,7 @@
     <Step Id="post_route_phys_opt_design"/>
     <Step Id="write_bitstream"/>
   </Strategy>
-  <BlockFileSet Type="BlockSrcs" Name="blk_mem_gen_0"/>
   <BlockFileSet Type="BlockSrcs" Name="clk_wiz_final"/>
+  <BlockFileSet Type="BlockSrcs" Name="blk_mem_gen_0"/>
   <BlockFileSet Type="BlockSrcs" Name="p1_at_rest_blue"/>
 </GenRun>

@@ -3,9 +3,9 @@
     with args -log camera_top_level.vds -m64 -product Vivado -mode batch -messageDb vivado.pb -notrace -source camera_top_level.tcl
 
 
-****** Vivado v2019.1.2 (64-bit)
-  **** SW Build 2615518 on Fri Aug  9 15:53:29 MDT 2019
-  **** IP Build 2614745 on Fri Aug  9 20:55:02 MDT 2019
+****** Vivado v2019.1 (64-bit)
+  **** SW Build 2552052 on Fri May 24 14:47:09 MDT 2019
+  **** IP Build 2548770 on Fri May 24 18:01:18 MDT 2019
     ** Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.
 
 source camera_top_level.tcl -notrace
@@ -15,20 +15,20 @@ Attempting to get a license for feature 'Synthesis' and/or device 'xc7a100t'
 INFO: [Common 17-349] Got license for feature 'Synthesis' and/or device 'xc7a100t'
 INFO: [Device 21-403] Loading part xc7a100tcsg324-1
 INFO: Launching helper process for spawning children vivado processes
-INFO: Helper process launched with PID 25945 
+INFO: Helper process launched with PID 26660 
 ---------------------------------------------------------------------------------
-Starting RTL Elaboration : Time (s): cpu = 00:00:02 ; elapsed = 00:00:03 . Memory (MB): peak = 1808.395 ; gain = 154.527 ; free physical = 943 ; free virtual = 11781
+Starting RTL Elaboration : Time (s): cpu = 00:00:04 ; elapsed = 00:00:04 . Memory (MB): peak = 1829.930 ; gain = 152.715 ; free physical = 303 ; free virtual = 4823
 ---------------------------------------------------------------------------------
-INFO: [Synth 8-6157] synthesizing module 'camera_top_level' [/afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/files/camera_top.sv:6]
-INFO: [Synth 8-6157] synthesizing module 'clk_wiz_65mhz' [/afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/files/clk_wiz_65mhz.sv:67]
-INFO: [Synth 8-6157] synthesizing module 'IBUF' [/var/local/xilinx-local/Vivado/2019.1/scripts/rt/data/unisim_comp.v:32872]
+INFO: [Synth 8-6157] synthesizing module 'camera_top_level' [/home/rdedhia/Documents/MIT/6_111/final_project/6.111/final_project/files/camera_top.sv:6]
+INFO: [Synth 8-6157] synthesizing module 'clk_wiz_65mhz' [/home/rdedhia/Documents/MIT/6_111/final_project/6.111/final_project/files/clk_wiz_65mhz.sv:67]
+INFO: [Synth 8-6157] synthesizing module 'IBUF' [/home/rdedhia/Documents/MIT/6_111/Vivado/Vivado/2019.1/scripts/rt/data/unisim_comp.v:32856]
 	Parameter CAPACITANCE bound to: DONT_CARE - type: string 
 	Parameter IBUF_DELAY_VALUE bound to: 0 - type: string 
 	Parameter IBUF_LOW_PWR bound to: TRUE - type: string 
 	Parameter IFD_DELAY_VALUE bound to: AUTO - type: string 
 	Parameter IOSTANDARD bound to: DEFAULT - type: string 
-INFO: [Synth 8-6155] done synthesizing module 'IBUF' (1#1) [/var/local/xilinx-local/Vivado/2019.1/scripts/rt/data/unisim_comp.v:32872]
-INFO: [Synth 8-6157] synthesizing module 'MMCME2_ADV' [/var/local/xilinx-local/Vivado/2019.1/scripts/rt/data/unisim_comp.v:39829]
+INFO: [Synth 8-6155] done synthesizing module 'IBUF' (1#1) [/home/rdedhia/Documents/MIT/6_111/Vivado/Vivado/2019.1/scripts/rt/data/unisim_comp.v:32856]
+INFO: [Synth 8-6157] synthesizing module 'MMCME2_ADV' [/home/rdedhia/Documents/MIT/6_111/Vivado/Vivado/2019.1/scripts/rt/data/unisim_comp.v:39813]
 	Parameter BANDWIDTH bound to: OPTIMIZED - type: string 
 	Parameter CLKFBOUT_MULT_F bound to: 50.375000 - type: float 
 	Parameter CLKFBOUT_PHASE bound to: 0.000000 - type: float 
@@ -77,11 +77,11 @@ INFO: [Synth 8-6157] synthesizing module 'MMCME2_ADV' [/var/local/xilinx-local/V
 	Parameter SS_MODE bound to: CENTER_HIGH - type: string 
 	Parameter SS_MOD_PERIOD bound to: 10000 - type: integer 
 	Parameter STARTUP_WAIT bound to: FALSE - type: string 
-INFO: [Synth 8-6155] done synthesizing module 'MMCME2_ADV' (2#1) [/var/local/xilinx-local/Vivado/2019.1/scripts/rt/data/unisim_comp.v:39829]
-INFO: [Synth 8-6157] synthesizing module 'BUFG' [/var/local/xilinx-local/Vivado/2019.1/scripts/rt/data/unisim_comp.v:1075]
-INFO: [Synth 8-6155] done synthesizing module 'BUFG' (3#1) [/var/local/xilinx-local/Vivado/2019.1/scripts/rt/data/unisim_comp.v:1075]
-INFO: [Synth 8-6155] done synthesizing module 'clk_wiz_65mhz' (4#1) [/afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/files/clk_wiz_65mhz.sv:67]
-INFO: [Synth 8-6157] synthesizing module 'xvga' [/afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/final_project.srcs/sources_1/new/display_blob.sv:122]
+INFO: [Synth 8-6155] done synthesizing module 'MMCME2_ADV' (2#1) [/home/rdedhia/Documents/MIT/6_111/Vivado/Vivado/2019.1/scripts/rt/data/unisim_comp.v:39813]
+INFO: [Synth 8-6157] synthesizing module 'BUFG' [/home/rdedhia/Documents/MIT/6_111/Vivado/Vivado/2019.1/scripts/rt/data/unisim_comp.v:1075]
+INFO: [Synth 8-6155] done synthesizing module 'BUFG' (3#1) [/home/rdedhia/Documents/MIT/6_111/Vivado/Vivado/2019.1/scripts/rt/data/unisim_comp.v:1075]
+INFO: [Synth 8-6155] done synthesizing module 'clk_wiz_65mhz' (4#1) [/home/rdedhia/Documents/MIT/6_111/final_project/6.111/final_project/files/clk_wiz_65mhz.sv:67]
+INFO: [Synth 8-6157] synthesizing module 'xvga' [/home/rdedhia/Documents/MIT/6_111/final_project/6.111/final_project/final_project.srcs/sources_1/new/display_blob.sv:122]
 	Parameter DISPLAY_WIDTH bound to: 1024 - type: integer 
 	Parameter DISPLAY_HEIGHT bound to: 768 - type: integer 
 	Parameter H_FP bound to: 24 - type: integer 
@@ -90,33 +90,33 @@ INFO: [Synth 8-6157] synthesizing module 'xvga' [/afs/athena.mit.edu/user/r/d/rd
 	Parameter V_FP bound to: 3 - type: integer 
 	Parameter V_SYNC_PULSE bound to: 6 - type: integer 
 	Parameter V_BP bound to: 29 - type: integer 
-INFO: [Synth 8-6155] done synthesizing module 'xvga' (5#1) [/afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/final_project.srcs/sources_1/new/display_blob.sv:122]
-INFO: [Synth 8-6157] synthesizing module 'blk_mem_gen_0' [/afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/final_project.runs/synth_1/.Xil/Vivado-25927-eecs-digital-14/realtime/blk_mem_gen_0_stub.v:6]
-INFO: [Synth 8-6155] done synthesizing module 'blk_mem_gen_0' (6#1) [/afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/final_project.runs/synth_1/.Xil/Vivado-25927-eecs-digital-14/realtime/blk_mem_gen_0_stub.v:6]
-WARNING: [Synth 8-689] width (12) of port connection 'doutb' does not match port width (16) of module 'blk_mem_gen_0' [/afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/files/camera_top.sv:80]
-INFO: [Synth 8-6157] synthesizing module 'camera_read' [/afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/files/camera.sv:6]
+INFO: [Synth 8-6155] done synthesizing module 'xvga' (5#1) [/home/rdedhia/Documents/MIT/6_111/final_project/6.111/final_project/final_project.srcs/sources_1/new/display_blob.sv:122]
+INFO: [Synth 8-6157] synthesizing module 'blk_mem_gen_0' [/home/rdedhia/Documents/MIT/6_111/final_project/6.111/final_project/final_project.runs/synth_1/.Xil/Vivado-26472-rdedhia-Inspiron-7348/realtime/blk_mem_gen_0_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'blk_mem_gen_0' (6#1) [/home/rdedhia/Documents/MIT/6_111/final_project/6.111/final_project/final_project.runs/synth_1/.Xil/Vivado-26472-rdedhia-Inspiron-7348/realtime/blk_mem_gen_0_stub.v:6]
+WARNING: [Synth 8-689] width (12) of port connection 'doutb' does not match port width (16) of module 'blk_mem_gen_0' [/home/rdedhia/Documents/MIT/6_111/final_project/6.111/final_project/files/camera_top.sv:80]
+INFO: [Synth 8-6157] synthesizing module 'camera_read' [/home/rdedhia/Documents/MIT/6_111/final_project/6.111/final_project/files/camera.sv:6]
 	Parameter WAIT_FRAME_START bound to: 0 - type: integer 
 	Parameter ROW_CAPTURE bound to: 1 - type: integer 
-INFO: [Synth 8-155] case statement is not full and has no default [/afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/files/camera.sv:26]
-INFO: [Synth 8-6155] done synthesizing module 'camera_read' (7#1) [/afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/files/camera.sv:6]
-INFO: [Synth 8-6157] synthesizing module 'timer' [/afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/files/timer.sv:23]
-INFO: [Synth 8-6155] done synthesizing module 'timer' (8#1) [/afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/files/timer.sv:23]
-INFO: [Synth 8-6157] synthesizing module 'display_8hex' [/afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/files/seven_seg_display.sv:10]
+INFO: [Synth 8-155] case statement is not full and has no default [/home/rdedhia/Documents/MIT/6_111/final_project/6.111/final_project/files/camera.sv:26]
+INFO: [Synth 8-6155] done synthesizing module 'camera_read' (7#1) [/home/rdedhia/Documents/MIT/6_111/final_project/6.111/final_project/files/camera.sv:6]
+INFO: [Synth 8-6157] synthesizing module 'timer' [/home/rdedhia/Documents/MIT/6_111/final_project/6.111/final_project/files/timer.sv:23]
+INFO: [Synth 8-6155] done synthesizing module 'timer' (8#1) [/home/rdedhia/Documents/MIT/6_111/final_project/6.111/final_project/files/timer.sv:23]
+INFO: [Synth 8-6157] synthesizing module 'display_8hex' [/home/rdedhia/Documents/MIT/6_111/final_project/6.111/final_project/files/seven_seg_display.sv:10]
 	Parameter bits bound to: 13 - type: integer 
-INFO: [Synth 8-6155] done synthesizing module 'display_8hex' (9#1) [/afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/files/seven_seg_display.sv:10]
-WARNING: [Synth 8-3936] Found unconnected internal register 'old_output_pixels_reg' and it is trimmed from '16' to '13' bits. [/afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/files/camera_top.sv:70]
-WARNING: [Synth 8-3848] Net phsync in module/entity camera_top_level does not have driver. [/afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/files/camera_top.sv:150]
-WARNING: [Synth 8-3848] Net pvsync in module/entity camera_top_level does not have driver. [/afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/files/camera_top.sv:150]
-WARNING: [Synth 8-3848] Net pblank in module/entity camera_top_level does not have driver. [/afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/files/camera_top.sv:150]
-WARNING: [Synth 8-3848] Net led16_g in module/entity camera_top_level does not have driver. [/afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/files/camera_top.sv:22]
-WARNING: [Synth 8-3848] Net led16_r in module/entity camera_top_level does not have driver. [/afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/files/camera_top.sv:22]
-WARNING: [Synth 8-3848] Net led17_b in module/entity camera_top_level does not have driver. [/afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/files/camera_top.sv:23]
-WARNING: [Synth 8-3848] Net led17_g in module/entity camera_top_level does not have driver. [/afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/files/camera_top.sv:23]
-WARNING: [Synth 8-3848] Net led17_r in module/entity camera_top_level does not have driver. [/afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/files/camera_top.sv:23]
-WARNING: [Synth 8-3848] Net dp in module/entity camera_top_level does not have driver. [/afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/files/camera_top.sv:25]
-WARNING: [Synth 8-3848] Net start_timer in module/entity camera_top_level does not have driver. [/afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/files/camera_top.sv:171]
-WARNING: [Synth 8-3848] Net value in module/entity camera_top_level does not have driver. [/afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/files/camera_top.sv:172]
-INFO: [Synth 8-6155] done synthesizing module 'camera_top_level' (10#1) [/afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/files/camera_top.sv:6]
+INFO: [Synth 8-6155] done synthesizing module 'display_8hex' (9#1) [/home/rdedhia/Documents/MIT/6_111/final_project/6.111/final_project/files/seven_seg_display.sv:10]
+WARNING: [Synth 8-3936] Found unconnected internal register 'old_output_pixels_reg' and it is trimmed from '16' to '13' bits. [/home/rdedhia/Documents/MIT/6_111/final_project/6.111/final_project/files/camera_top.sv:70]
+WARNING: [Synth 8-3848] Net phsync in module/entity camera_top_level does not have driver. [/home/rdedhia/Documents/MIT/6_111/final_project/6.111/final_project/files/camera_top.sv:150]
+WARNING: [Synth 8-3848] Net pvsync in module/entity camera_top_level does not have driver. [/home/rdedhia/Documents/MIT/6_111/final_project/6.111/final_project/files/camera_top.sv:150]
+WARNING: [Synth 8-3848] Net pblank in module/entity camera_top_level does not have driver. [/home/rdedhia/Documents/MIT/6_111/final_project/6.111/final_project/files/camera_top.sv:150]
+WARNING: [Synth 8-3848] Net led16_g in module/entity camera_top_level does not have driver. [/home/rdedhia/Documents/MIT/6_111/final_project/6.111/final_project/files/camera_top.sv:22]
+WARNING: [Synth 8-3848] Net led16_r in module/entity camera_top_level does not have driver. [/home/rdedhia/Documents/MIT/6_111/final_project/6.111/final_project/files/camera_top.sv:22]
+WARNING: [Synth 8-3848] Net led17_b in module/entity camera_top_level does not have driver. [/home/rdedhia/Documents/MIT/6_111/final_project/6.111/final_project/files/camera_top.sv:23]
+WARNING: [Synth 8-3848] Net led17_g in module/entity camera_top_level does not have driver. [/home/rdedhia/Documents/MIT/6_111/final_project/6.111/final_project/files/camera_top.sv:23]
+WARNING: [Synth 8-3848] Net led17_r in module/entity camera_top_level does not have driver. [/home/rdedhia/Documents/MIT/6_111/final_project/6.111/final_project/files/camera_top.sv:23]
+WARNING: [Synth 8-3848] Net dp in module/entity camera_top_level does not have driver. [/home/rdedhia/Documents/MIT/6_111/final_project/6.111/final_project/files/camera_top.sv:25]
+WARNING: [Synth 8-3848] Net start_timer in module/entity camera_top_level does not have driver. [/home/rdedhia/Documents/MIT/6_111/final_project/6.111/final_project/files/camera_top.sv:171]
+WARNING: [Synth 8-3848] Net value in module/entity camera_top_level does not have driver. [/home/rdedhia/Documents/MIT/6_111/final_project/6.111/final_project/files/camera_top.sv:172]
+INFO: [Synth 8-6155] done synthesizing module 'camera_top_level' (10#1) [/home/rdedhia/Documents/MIT/6_111/final_project/6.111/final_project/files/camera_top.sv:6]
 WARNING: [Synth 8-3331] design camera_top_level has unconnected port led16_g
 WARNING: [Synth 8-3331] design camera_top_level has unconnected port led16_r
 WARNING: [Synth 8-3331] design camera_top_level has unconnected port led17_b
@@ -132,7 +132,7 @@ WARNING: [Synth 8-3331] design camera_top_level has unconnected port jd[2]
 WARNING: [Synth 8-3331] design camera_top_level has unconnected port jd[1]
 WARNING: [Synth 8-3331] design camera_top_level has unconnected port jd[0]
 ---------------------------------------------------------------------------------
-Finished RTL Elaboration : Time (s): cpu = 00:00:03 ; elapsed = 00:00:04 . Memory (MB): peak = 1865.117 ; gain = 211.250 ; free physical = 964 ; free virtual = 11803
+Finished RTL Elaboration : Time (s): cpu = 00:00:05 ; elapsed = 00:00:06 . Memory (MB): peak = 1887.648 ; gain = 210.434 ; free physical = 330 ; free virtual = 4849
 ---------------------------------------------------------------------------------
 
 Report Check Netlist: 
@@ -145,10 +145,10 @@ Report Check Netlist:
 Start Handling Custom Attributes
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Handling Custom Attributes : Time (s): cpu = 00:00:03 ; elapsed = 00:00:04 . Memory (MB): peak = 1868.082 ; gain = 214.215 ; free physical = 966 ; free virtual = 11805
+Finished Handling Custom Attributes : Time (s): cpu = 00:00:05 ; elapsed = 00:00:06 . Memory (MB): peak = 1890.617 ; gain = 213.402 ; free physical = 326 ; free virtual = 4845
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished RTL Optimization Phase 1 : Time (s): cpu = 00:00:03 ; elapsed = 00:00:04 . Memory (MB): peak = 1868.082 ; gain = 214.215 ; free physical = 966 ; free virtual = 11805
+Finished RTL Optimization Phase 1 : Time (s): cpu = 00:00:05 ; elapsed = 00:00:06 . Memory (MB): peak = 1890.617 ; gain = 213.402 ; free physical = 326 ; free virtual = 4845
 ---------------------------------------------------------------------------------
 INFO: [Netlist 29-17] Analyzing 1 Unisim elements for replacement
 INFO: [Netlist 29-28] Unisim Transformation completed in 0 CPU seconds
@@ -156,41 +156,41 @@ INFO: [Project 1-570] Preparing netlist for logic optimization
 
 Processing XDC Constraints
 Initializing timing engine
-Parsing XDC File [/afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/final_project.srcs/sources_1/ip/blk_mem_gen_0/blk_mem_gen_0/blk_mem_gen_0_in_context.xdc] for cell 'bram_uut'
-Finished Parsing XDC File [/afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/final_project.srcs/sources_1/ip/blk_mem_gen_0/blk_mem_gen_0/blk_mem_gen_0_in_context.xdc] for cell 'bram_uut'
-Parsing XDC File [/afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/files/nexys4_ddr_constraints.xdc]
-Finished Parsing XDC File [/afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/files/nexys4_ddr_constraints.xdc]
-INFO: [Project 1-236] Implementation specific constraints were found while reading constraint file [/afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/files/nexys4_ddr_constraints.xdc]. These constraints will be ignored for synthesis but will be used in implementation. Impacted constraints are listed in the file [.Xil/camera_top_level_propImpl.xdc].
+Parsing XDC File [/home/rdedhia/Documents/MIT/6_111/final_project/6.111/final_project/final_project.srcs/sources_1/ip/blk_mem_gen_0/blk_mem_gen_0/blk_mem_gen_0_in_context.xdc] for cell 'bram_uut'
+Finished Parsing XDC File [/home/rdedhia/Documents/MIT/6_111/final_project/6.111/final_project/final_project.srcs/sources_1/ip/blk_mem_gen_0/blk_mem_gen_0/blk_mem_gen_0_in_context.xdc] for cell 'bram_uut'
+Parsing XDC File [/home/rdedhia/Documents/MIT/6_111/final_project/6.111/final_project/files/nexys4_ddr_constraints.xdc]
+Finished Parsing XDC File [/home/rdedhia/Documents/MIT/6_111/final_project/6.111/final_project/files/nexys4_ddr_constraints.xdc]
+INFO: [Project 1-236] Implementation specific constraints were found while reading constraint file [/home/rdedhia/Documents/MIT/6_111/final_project/6.111/final_project/files/nexys4_ddr_constraints.xdc]. These constraints will be ignored for synthesis but will be used in implementation. Impacted constraints are listed in the file [.Xil/camera_top_level_propImpl.xdc].
 Resolution: To avoid this warning, move constraints listed in [.Xil/camera_top_level_propImpl.xdc] to another XDC file and exclude this new file from synthesis with the used_in_synthesis property (File Properties dialog in GUI) and re-run elaboration/synthesis.
 INFO: [Timing 38-2] Deriving generated clocks
 Completed Processing XDC Constraints
 
-Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 2046.738 ; gain = 0.000 ; free physical = 806 ; free virtual = 11646
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 2038.227 ; gain = 0.000 ; free physical = 232 ; free virtual = 4752
 INFO: [Project 1-111] Unisim Transformation Summary:
 No Unisim elements were transformed.
 
-Constraint Validation Runtime : Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.01 . Memory (MB): peak = 2046.738 ; gain = 0.000 ; free physical = 806 ; free virtual = 11646
+Constraint Validation Runtime : Time (s): cpu = 00:00:00.01 ; elapsed = 00:00:00.01 . Memory (MB): peak = 2038.227 ; gain = 0.000 ; free physical = 232 ; free virtual = 4752
 WARNING: [Timing 38-316] Clock period '20.000' specified during out-of-context synthesis of instance 'bram_uut' at clock pin 'clkb' is different from the actual clock period '15.385', this can lead to different synthesis results.
 ---------------------------------------------------------------------------------
-Finished Constraint Validation : Time (s): cpu = 00:00:06 ; elapsed = 00:00:09 . Memory (MB): peak = 2046.738 ; gain = 392.871 ; free physical = 949 ; free virtual = 11788
+Finished Constraint Validation : Time (s): cpu = 00:00:11 ; elapsed = 00:00:14 . Memory (MB): peak = 2038.227 ; gain = 361.012 ; free physical = 301 ; free virtual = 4822
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Loading Part and Timing Information
 ---------------------------------------------------------------------------------
 Loading part: xc7a100tcsg324-1
 ---------------------------------------------------------------------------------
-Finished Loading Part and Timing Information : Time (s): cpu = 00:00:06 ; elapsed = 00:00:09 . Memory (MB): peak = 2046.738 ; gain = 392.871 ; free physical = 949 ; free virtual = 11788
+Finished Loading Part and Timing Information : Time (s): cpu = 00:00:11 ; elapsed = 00:00:14 . Memory (MB): peak = 2038.227 ; gain = 361.012 ; free physical = 301 ; free virtual = 4822
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Applying 'set_property' XDC Constraints
 ---------------------------------------------------------------------------------
 Applied set_property DONT_TOUCH = true for bram_uut. (constraint file  auto generated constraint, line ).
 ---------------------------------------------------------------------------------
-Finished applying 'set_property' XDC Constraints : Time (s): cpu = 00:00:07 ; elapsed = 00:00:09 . Memory (MB): peak = 2046.738 ; gain = 392.871 ; free physical = 950 ; free virtual = 11790
+Finished applying 'set_property' XDC Constraints : Time (s): cpu = 00:00:11 ; elapsed = 00:00:14 . Memory (MB): peak = 2038.227 ; gain = 361.012 ; free physical = 301 ; free virtual = 4821
 ---------------------------------------------------------------------------------
 INFO: [Synth 8-802] inferred FSM for state register 'FSM_state_reg' in module 'camera_read'
-INFO: [Synth 8-5818] HDL ADVISOR - The operator resource <adder> is shared. To prevent sharing consider applying a KEEP on the output of the operator [/afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/files/camera_top.sv:128]
-INFO: [Synth 8-5818] HDL ADVISOR - The operator resource <multiplier> is shared. To prevent sharing consider applying a KEEP on the output of the operator [/afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/files/camera_top.sv:128]
+INFO: [Synth 8-5818] HDL ADVISOR - The operator resource <adder> is shared. To prevent sharing consider applying a KEEP on the output of the operator [/home/rdedhia/Documents/MIT/6_111/final_project/6.111/final_project/files/camera_top.sv:128]
+INFO: [Synth 8-5818] HDL ADVISOR - The operator resource <multiplier> is shared. To prevent sharing consider applying a KEEP on the output of the operator [/home/rdedhia/Documents/MIT/6_111/final_project/6.111/final_project/files/camera_top.sv:128]
 ---------------------------------------------------------------------------------------------------
                    State |                     New Encoding |                Previous Encoding 
 ---------------------------------------------------------------------------------------------------
@@ -199,7 +199,7 @@ INFO: [Synth 8-5818] HDL ADVISOR - The operator resource <multiplier> is shared.
 ---------------------------------------------------------------------------------------------------
 INFO: [Synth 8-3354] encoded FSM with state register 'FSM_state_reg' using encoding 'sequential' in module 'camera_read'
 ---------------------------------------------------------------------------------
-Finished RTL Optimization Phase 2 : Time (s): cpu = 00:00:07 ; elapsed = 00:00:09 . Memory (MB): peak = 2046.738 ; gain = 392.871 ; free physical = 941 ; free virtual = 11782
+Finished RTL Optimization Phase 2 : Time (s): cpu = 00:00:12 ; elapsed = 00:00:14 . Memory (MB): peak = 2038.227 ; gain = 361.012 ; free physical = 291 ; free virtual = 4812
 ---------------------------------------------------------------------------------
 
 Report RTL Partitions: 
@@ -343,7 +343,7 @@ WARNING: [Synth 8-3331] design camera_top_level has unconnected port jd[2]
 WARNING: [Synth 8-3331] design camera_top_level has unconnected port jd[1]
 WARNING: [Synth 8-3331] design camera_top_level has unconnected port jd[0]
 ---------------------------------------------------------------------------------
-Finished Cross Boundary and Area Optimization : Time (s): cpu = 00:00:08 ; elapsed = 00:00:11 . Memory (MB): peak = 2046.738 ; gain = 392.871 ; free physical = 922 ; free virtual = 11767
+Finished Cross Boundary and Area Optimization : Time (s): cpu = 00:00:14 ; elapsed = 00:00:17 . Memory (MB): peak = 2038.227 ; gain = 361.012 ; free physical = 280 ; free virtual = 4806
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start ROM, RAM, DSP and Shift Register Reporting
@@ -370,13 +370,13 @@ Report RTL Partitions:
 Start Applying XDC Timing Constraints
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Applying XDC Timing Constraints : Time (s): cpu = 00:00:14 ; elapsed = 00:00:16 . Memory (MB): peak = 2046.738 ; gain = 392.871 ; free physical = 767 ; free virtual = 11612
+Finished Applying XDC Timing Constraints : Time (s): cpu = 00:00:23 ; elapsed = 00:00:26 . Memory (MB): peak = 2038.227 ; gain = 361.012 ; free physical = 127 ; free virtual = 4640
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Timing Optimization
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Timing Optimization : Time (s): cpu = 00:00:14 ; elapsed = 00:00:17 . Memory (MB): peak = 2046.738 ; gain = 392.871 ; free physical = 765 ; free virtual = 11610
+Finished Timing Optimization : Time (s): cpu = 00:00:24 ; elapsed = 00:00:26 . Memory (MB): peak = 2038.227 ; gain = 361.012 ; free physical = 133 ; free virtual = 4637
 ---------------------------------------------------------------------------------
 
 Report RTL Partitions: 
@@ -388,7 +388,7 @@ Report RTL Partitions:
 Start Technology Mapping
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Technology Mapping : Time (s): cpu = 00:00:14 ; elapsed = 00:00:17 . Memory (MB): peak = 2046.738 ; gain = 392.871 ; free physical = 763 ; free virtual = 11608
+Finished Technology Mapping : Time (s): cpu = 00:00:24 ; elapsed = 00:00:27 . Memory (MB): peak = 2046.234 ; gain = 369.020 ; free physical = 137 ; free virtual = 4636
 ---------------------------------------------------------------------------------
 
 Report RTL Partitions: 
@@ -412,7 +412,7 @@ Start Final Netlist Cleanup
 Finished Final Netlist Cleanup
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished IO Insertion : Time (s): cpu = 00:00:15 ; elapsed = 00:00:18 . Memory (MB): peak = 2046.738 ; gain = 392.871 ; free physical = 763 ; free virtual = 11608
+Finished IO Insertion : Time (s): cpu = 00:00:26 ; elapsed = 00:00:29 . Memory (MB): peak = 2046.234 ; gain = 369.020 ; free physical = 136 ; free virtual = 4634
 ---------------------------------------------------------------------------------
 
 Report Check Netlist: 
@@ -425,7 +425,7 @@ Report Check Netlist:
 Start Renaming Generated Instances
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Renaming Generated Instances : Time (s): cpu = 00:00:15 ; elapsed = 00:00:18 . Memory (MB): peak = 2046.738 ; gain = 392.871 ; free physical = 763 ; free virtual = 11608
+Finished Renaming Generated Instances : Time (s): cpu = 00:00:26 ; elapsed = 00:00:29 . Memory (MB): peak = 2046.234 ; gain = 369.020 ; free physical = 136 ; free virtual = 4634
 ---------------------------------------------------------------------------------
 
 Report RTL Partitions: 
@@ -437,25 +437,25 @@ Report RTL Partitions:
 Start Rebuilding User Hierarchy
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Rebuilding User Hierarchy : Time (s): cpu = 00:00:15 ; elapsed = 00:00:18 . Memory (MB): peak = 2046.738 ; gain = 392.871 ; free physical = 763 ; free virtual = 11608
+Finished Rebuilding User Hierarchy : Time (s): cpu = 00:00:26 ; elapsed = 00:00:29 . Memory (MB): peak = 2046.234 ; gain = 369.020 ; free physical = 136 ; free virtual = 4634
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Renaming Generated Ports
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Renaming Generated Ports : Time (s): cpu = 00:00:15 ; elapsed = 00:00:18 . Memory (MB): peak = 2046.738 ; gain = 392.871 ; free physical = 763 ; free virtual = 11608
+Finished Renaming Generated Ports : Time (s): cpu = 00:00:26 ; elapsed = 00:00:29 . Memory (MB): peak = 2046.234 ; gain = 369.020 ; free physical = 136 ; free virtual = 4634
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Handling Custom Attributes
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Handling Custom Attributes : Time (s): cpu = 00:00:15 ; elapsed = 00:00:18 . Memory (MB): peak = 2046.738 ; gain = 392.871 ; free physical = 763 ; free virtual = 11608
+Finished Handling Custom Attributes : Time (s): cpu = 00:00:26 ; elapsed = 00:00:29 . Memory (MB): peak = 2046.234 ; gain = 369.020 ; free physical = 136 ; free virtual = 4634
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Renaming Generated Nets
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Renaming Generated Nets : Time (s): cpu = 00:00:15 ; elapsed = 00:00:18 . Memory (MB): peak = 2046.738 ; gain = 392.871 ; free physical = 763 ; free virtual = 11608
+Finished Renaming Generated Nets : Time (s): cpu = 00:00:26 ; elapsed = 00:00:29 . Memory (MB): peak = 2046.234 ; gain = 369.020 ; free physical = 136 ; free virtual = 4634
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Writing Synthesis Report
@@ -502,27 +502,27 @@ Report Instance Areas:
 |6     |  xvga1       |xvga          |    88|
 +------+--------------+--------------+------+
 ---------------------------------------------------------------------------------
-Finished Writing Synthesis Report : Time (s): cpu = 00:00:15 ; elapsed = 00:00:18 . Memory (MB): peak = 2046.738 ; gain = 392.871 ; free physical = 763 ; free virtual = 11608
+Finished Writing Synthesis Report : Time (s): cpu = 00:00:26 ; elapsed = 00:00:29 . Memory (MB): peak = 2046.234 ; gain = 369.020 ; free physical = 136 ; free virtual = 4634
 ---------------------------------------------------------------------------------
 Synthesis finished with 0 errors, 0 critical warnings and 14 warnings.
-Synthesis Optimization Runtime : Time (s): cpu = 00:00:13 ; elapsed = 00:00:16 . Memory (MB): peak = 2046.738 ; gain = 214.215 ; free physical = 829 ; free virtual = 11674
-Synthesis Optimization Complete : Time (s): cpu = 00:00:15 ; elapsed = 00:00:18 . Memory (MB): peak = 2046.738 ; gain = 392.871 ; free physical = 844 ; free virtual = 11689
+Synthesis Optimization Runtime : Time (s): cpu = 00:00:23 ; elapsed = 00:00:26 . Memory (MB): peak = 2046.234 ; gain = 221.410 ; free physical = 202 ; free virtual = 4700
+Synthesis Optimization Complete : Time (s): cpu = 00:00:26 ; elapsed = 00:00:29 . Memory (MB): peak = 2046.242 ; gain = 369.020 ; free physical = 202 ; free virtual = 4700
 INFO: [Project 1-571] Translating synthesized netlist
 INFO: [Netlist 29-17] Analyzing 30 Unisim elements for replacement
 INFO: [Netlist 29-28] Unisim Transformation completed in 0 CPU seconds
 INFO: [Project 1-570] Preparing netlist for logic optimization
 INFO: [Opt 31-138] Pushed 0 inverter(s) to 0 load pin(s).
-Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 2054.746 ; gain = 0.000 ; free physical = 775 ; free virtual = 11620
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 2046.242 ; gain = 0.000 ; free physical = 151 ; free virtual = 4647
 INFO: [Project 1-111] Unisim Transformation Summary:
 No Unisim elements were transformed.
 
 INFO: [Common 17-83] Releasing license: Synthesis
 40 Infos, 42 Warnings, 0 Critical Warnings and 0 Errors encountered.
 synth_design completed successfully
-synth_design: Time (s): cpu = 00:00:18 ; elapsed = 00:00:21 . Memory (MB): peak = 2054.746 ; gain = 620.207 ; free physical = 876 ; free virtual = 11721
-Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 2054.746 ; gain = 0.000 ; free physical = 876 ; free virtual = 11721
+synth_design: Time (s): cpu = 00:00:31 ; elapsed = 00:00:34 . Memory (MB): peak = 2046.242 ; gain = 586.070 ; free physical = 252 ; free virtual = 4749
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 2046.242 ; gain = 0.000 ; free physical = 252 ; free virtual = 4749
 WARNING: [Constraints 18-5210] No constraints selected for write.
 Resolution: This message can indicate that there are no constraints for the design, or it can indicate that the used_in flags are set such that the constraints are ignored. This later case is used when running synth_design to not write synthesis constraints to the resulting checkpoint. Instead, project constraints are read when the synthesized design is opened.
-INFO: [Common 17-1381] The checkpoint '/afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/final_project.runs/synth_1/camera_top_level.dcp' has been generated.
+INFO: [Common 17-1381] The checkpoint '/home/rdedhia/Documents/MIT/6_111/final_project/6.111/final_project/final_project.runs/synth_1/camera_top_level.dcp' has been generated.
 INFO: [runtcl-4] Executing : report_utilization -file camera_top_level_utilization_synth.rpt -pb camera_top_level_utilization_synth.pb
-INFO: [Common 17-206] Exiting Vivado at Fri Nov  8 14:14:34 2019...
+INFO: [Common 17-206] Exiting Vivado at Fri Nov  8 15:15:26 2019...

@@ -1,12 +1,12 @@
 #-----------------------------------------------------------
-# Vivado v2019.1.2 (64-bit)
-# SW Build 2615518 on Fri Aug  9 15:53:29 MDT 2019
-# IP Build 2614745 on Fri Aug  9 20:55:02 MDT 2019
-# Start of session at: Fri Nov  8 14:06:45 2019
-# Process ID: 17173
-# Current directory: /afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/final_project.runs/p1_at_rest_blue_synth_1
+# Vivado v2019.1 (64-bit)
+# SW Build 2552052 on Fri May 24 14:47:09 MDT 2019
+# IP Build 2548770 on Fri May 24 18:01:18 MDT 2019
+# Start of session at: Fri Nov  8 15:12:29 2019
+# Process ID: 25131
+# Current directory: /home/rdedhia/Documents/MIT/6_111/final_project/6.111/final_project/final_project.runs/p1_at_rest_blue_synth_1
 # Command line: vivado -log p1_at_rest_blue.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source p1_at_rest_blue.tcl
-# Log file: /afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/final_project.runs/p1_at_rest_blue_synth_1/p1_at_rest_blue.vds
-# Journal file: /afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/final_project.runs/p1_at_rest_blue_synth_1/vivado.jou
+# Log file: /home/rdedhia/Documents/MIT/6_111/final_project/6.111/final_project/final_project.runs/p1_at_rest_blue_synth_1/p1_at_rest_blue.vds
+# Journal file: /home/rdedhia/Documents/MIT/6_111/final_project/6.111/final_project/final_project.runs/p1_at_rest_blue_synth_1/vivado.jou
 #-----------------------------------------------------------
 source p1_at_rest_blue.tcl -notrace
