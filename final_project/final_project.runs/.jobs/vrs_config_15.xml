@@ -1,8 +1,0 @@
-<?xml version="1.0"?>
-<Runs Version="1" Minor="0">
-	<Run Id="eight_bit_kicking_image_synth_1" LaunchDir="/afs/athena.mit.edu/user/d/i/dianah13/ddl/6.111/final_project/final_project.runs/eight_bit_kicking_image_synth_1" FlowId="Vivado_Synthesis" FromStepId="vivado" ToStepId="vivado"/>
-	<Parameters>
-		<Parameter Name="runs.monitorLSFJobs" Val="true" Type="bool"/>
-	</Parameters>
-</Runs>
-

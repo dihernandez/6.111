@@ -3,20 +3,16 @@
 *.log
 *.str
 
-# ignore vivado cache, ip user files, runs, etc.
-final_project/final_project.cache/**
-final_project/final_project.hw/**
-final_project/final_project.ip_user_files/**
-final_project/final_project.runs/**
-final_project/final_project.srcs/sources_1/ip/**
+# ignore final_project.hw, final_project.ip_user_files,
+# final_project.runs, final_project.sim, but will keep 
+# final_project.srcs 
+/final_project/final_project.*/
+!/final_project/final_project.srcs/
 
 ## DO NOT IGNORE
-# final project srcs folder
-# files folder
-# sprites folder
-# README file
-# arduino code folder
-
-## UNSURE
-# final project sim folder
-# final project xpr file
+# /final_project/final_project.srcs/ folder
+# /final_project/files folder
+# /sprites folder
+# README.md file
+# /final_project/arduino_code folder
+# /final_project/final_project.xpr

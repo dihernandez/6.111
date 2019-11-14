@@ -25,7 +25,7 @@ module camera_top_level (
         output ca, cb, cc, cd, ce, cf, cg, dp,  // segments a-g, dp
         output [7:0] an    // Display location 0-7
     );
-
+    
     // create 65mhz system clock, happens to match 1024 x 768
     // XVGA timing
     wire clk_65mhz;
