@@ -9,6 +9,15 @@
 /final_project/final_project.*/
 !/final_project/final_project.srcs/
 
+# ignore /ip/ files that aren't important
+/final_project/final_project.srcs/sources_1/ip/*/*
+!/final_project/final_project.srcs/sources_1/ip/*/
+!/final_project/final_project.srcs/sources_1/ip/*/*.xci
+!/final_project/final_project.srcs/sources_1/ip/*/*.prj
+
+# ignore waveform files
+*.wcfg 
+
 ## DO NOT IGNORE
 # /final_project/final_project.srcs/ folder
 # /final_project/files folder
