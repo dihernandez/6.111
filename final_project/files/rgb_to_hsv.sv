@@ -9,44 +9,58 @@
 
 // TODO: make sure the latency of the dividor is constant
 
+// TODO: use valid variables ???
+
+// pipeline instead of using buffers ???
+
 module rgb_to_hsv (
         input clk_in,
+        input valid_in,
         input [11:0] rgb,
-        output logic valid,
+        output logic valid_out,
         output logic [11:0] hsv
     );
 
     // saturation divider variables
     logic sat_num_valid, sat_denom_valid, sat_out_valid;
+    assign sat_num_valid = valid_in;
+    assign sat_denom_valid = valid_in;
     logic [3:0] sat_denom;
     logic [9:0] sat_num;
     logic [9:0] sat_out;
+    
     // create division circuit for calculating saturation
     div_gen_0 div_uut_sat(
             .aclk(clk_in),
             .s_axis_divisor_tdata(sat_denom),
             .s_axis_divisor_tvalid(sat_denom_valid),
             .s_axis_dividend_tdata(sat_num),
-            .s_axis_divident_tvalid(sat_num_valid),
+            .s_axis_dividend_tvalid(sat_num_valid),
             .m_axis_dout_tdata(sat_out),
             .m_axis_dout_tvalid(sat_out_valid)
         );
 
     // hue divider variables
     logic hue_num_valid, hue_denom_valid, hue_out_valid;
+    assign hue_num_valid = valid_in;
+    assign hue_denom_valid = valid_in;
     logic [3:0] hue_denom;
     logic [9:0] hue_num;
     logic [9:0] hue_out;
+    
     // create division circuit for calculating hue
     div_gen_0 div_uut_hue(
             .aclk(clk_in),
             .s_axis_divisor_tdata(hue_denom),
             .s_axis_divisor_tvalid(hue_denom_valid),
             .s_axis_dividend_tdata(hue_num),
-            .s_axis_divident_tvalid(hue_num_valid),
+            .s_axis_dividend_tvalid(hue_num_valid),
             .m_axis_dout_tdata(hue_out),
             .m_axis_dout_tvalid(hue_out_valid)
         );
+        
+    // output valid when output of divider valid
+    assign valid_out = sat_out_valid && hue_out_valid;
 
     // get red, green, blue values from rgb
     logic [3:0] red, green, blue;
@@ -89,6 +103,6 @@ module rgb_to_hsv (
         end
     end
 
-    assign hsv = {hue_out, sat_out, val_buffer[11]}; 
+    assign hsv = {hue_out, sat_out, val_buffer[47:44]}; 
 
 endmodule

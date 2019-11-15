@@ -49,41 +49,106 @@ module camera_top_level (
     logic href_buff, href_in;
     logic[7:0] pixel_buff, pixel_in;
     
-    logic [11:0] cam;
-    logic [11:0] frame_buff_out;
-    logic [15:0] output_pixels;
-    logic [15:0] old_output_pixels;
-    logic [12:0] processed_pixels;
-    logic [3:0] red_diff;
-    logic [3:0] green_diff;
-    logic [3:0] blue_diff;
-    logic valid_pixel;
-    logic frame_done_out;
-    
-    logic [16:0] pixel_addr_in;
-    logic [16:0] pixel_addr_out;
-    
     assign xclk = (xclk_count >2'b01);
     assign jbclk = xclk;
     assign jdclk = xclk;
     
-    assign red_diff = (output_pixels[15:12]>old_output_pixels[15:12])?output_pixels[15:12]-old_output_pixels[15:12]:old_output_pixels[15:12]-output_pixels[15:12];
-    assign green_diff = (output_pixels[10:7]>old_output_pixels[10:7])?output_pixels[10:7]-old_output_pixels[10:7]:old_output_pixels[10:7]-output_pixels[10:7];
-    assign blue_diff = (output_pixels[4:1]>old_output_pixels[4:1])?output_pixels[4:1]-old_output_pixels[4:1]:old_output_pixels[4:1]-output_pixels[4:1];
+    // bram_rgb variable
+    logic [11:0] frame_buff_out_rgb;
+    logic [12:0] processed_pixels_rgb;
+    logic [16:0] rgb_pixel_addr_in;
+    logic [16:0] rgb_pixel_addr_out;
+    logic valid_rgb_pixel;
 
-    blk_mem_gen_0 bram_uut(.addra(pixel_addr_in), 
-                             .clka(pclk_in),
-                             .dina(processed_pixels),
-                             .wea(valid_pixel),
-                             .addrb(pixel_addr_out),
-                             .clkb(clk_65mhz),
-                             .doutb(frame_buff_out));
+    // memory that holds RGB image from camera
+    blk_mem_gen_0 bram_rgb(
+                // inputs
+                .addra(rgb_pixel_addr_in), 
+                .clka(pclk_in),
+                .dina(processed_pixels_rgb),
+                .wea(valid_rgb_pixel),
+                .addrb(rgb_pixel_addr_out), 
+                .clkb(clk_65mhz),
+                // output
+                .doutb(frame_buff_out_rgb)
+        );
+
+    // bram_hsv variable
+    // 0 = no match; 1-3 = match to hsv color 1-3
+    logic [1:0] frame_buff_out_hsv_thresh;
+    logic [1:0] processed_hsv_thresh;
+    logic [16:0] hsv_pixel_addr_in;
+    logic [16:0] hsv_pixel_addr_out;
+    logic valid_hsv_thresh;
+
+    // memory that holds HSV threshholding of camera image
+    blk_mem_gen_1 bram_hsv(
+                // inputs
+                .addra(hsv_pixel_addr_in), 
+                .clka(pclk_in),
+                .dina(processed_hsv_thresh),
+                .wea(valid_rgb_pixel),
+                .addrb(hsv_pixel_addr_out), 
+                .clkb(clk_65mhz),
+                // output
+                .doutb(frame_buff_out_hsv_thresh)
+        );
+
+    // camera variables
+    logic [11:0] cam;
+    logic [15:0] output_pixels_rgb;
+    logic [1:0] output_hsv_thresh;
+    //logic [15:0] old_output_pixels;
+    logic rgb_frame_done_out;
+    logic hsv_frame_done_out;
     
+    camera_read my_camera (
+            .p_clock_in(pclk_in),
+            .vsync_in(vsync_in),
+            .href_in(href_in),
+            .p_data_in(pixel_in),
+            .pixel_data_out(output_pixels_rgb),
+            .hsv_thresh_data_out(output_hsv_thresh),
+            .rgb_pixel_valid_out(valid_rgb_pixel),
+            .hsv_thresh_valid_out(valid_hsv_thresh),
+            .hsv_frame_done_out(hsv_frame_done_out),
+            .rgb_frame_done_out(rgb_frame_done_out)
+        );
+
+    // display image larger if sw[2] is on
+    assign rgb_pixel_addr_out = sw[2]?((hcount>>1)+(vcount>>1)*32'd320):hcount+vcount*32'd320;
+    assign hsv_pixel_addr_out = sw[2]?((hcount>>1)+(vcount>>1)*32'd320):hcount+vcount*32'd320;
+
+
+    // if sw[6], sw[7] or sw[8] on, determine frame_buff_out from frame_buff_out_hsv_thresh
+    // else set frame_buff_out to frame_buff_out_rgb
+    logic [11:0] frame_buff_out;
+    always_comb begin
+        if (sw[6] || sw[7] || sw[8]) begin
+            if (frame_buff_out_hsv_thresh==1) frame_buff_out = 12'hF00;
+            else if (frame_buff_out_hsv_thresh==2) frame_buff_out = 12'h0F0;
+            else if (frame_buff_out_hsv_thresh==3) frame_buff_out = 12'h00F;
+            else frame_buff_out = 12'h000;
+        end else begin
+            frame_buff_out = frame_buff_out_rgb;
+        end
+    end
+
+    // get pixel to display from image from camera 
+    assign cam = sw[2]&&((hcount<640)&&(vcount<480)) ? frame_buff_out : 
+        ~sw[2]&&((hcount<320)&&(vcount<240)) ? frame_buff_out : 12'h000;
+
     always_ff @(posedge pclk_in)begin
-        if (frame_done_out)begin
-            pixel_addr_in <= 17'b0;  
-        end else if (valid_pixel)begin
-            pixel_addr_in <= pixel_addr_in +1;  
+        if (rgb_frame_done_out) begin
+            rgb_pixel_addr_in <= 17'b0;  
+        end else if (valid_rgb_pixel) begin
+            rgb_pixel_addr_in <= rgb_pixel_addr_in +1;  
+        end
+        
+        if (hsv_frame_done_out) begin
+            hsv_pixel_addr_in <= 17'b0;  
+        end else if (valid_hsv_thresh) begin
+            hsv_pixel_addr_in <= hsv_pixel_addr_in +1;  
         end
     end
     
@@ -96,38 +161,61 @@ module camera_top_level (
         vsync_in <= vsync_buff;
         href_in <= href_buff;
         pixel_in <= pixel_buff;
-        old_output_pixels <= output_pixels;
+        //old_output_pixels <= output_pixels;
         xclk_count <= xclk_count + 2'b01;
 
-        if (sw[3])begin
-            //processed_pixels <= {red_diff<<2, green_diff<<2, blue_diff<<2};
-            processed_pixels <= output_pixels - old_output_pixels;
-        end else if (sw[4]) begin
-            if ((output_pixels[15:12]>4'b1000)&&(output_pixels[10:7]<4'b1000)&&(output_pixels[4:1]<4'b1000))begin
-                processed_pixels <= 12'hF00;
+        // RGB threshholding
+        if (sw[3]) begin
+            if ((output_pixels_rgb[15:12]>4'b1000)&&(output_pixels_rgb[10:7]<4'b1000)&&
+                    (output_pixels_rgb[4:1]<4'b1000)) begin
+                processed_pixels_rgb <= 12'hF00;
             end else begin
-                processed_pixels <= 12'h000;
+                processed_pixels_rgb <= 12'h000;
+            end
+        end else if (sw[4]) begin
+            if ((output_pixels_rgb[15:12]<4'b1000)&&(output_pixels_rgb[10:7]>4'b1000)&&
+                    (output_pixels_rgb[4:1]<4'b1000)) begin
+                processed_pixels_rgb <= 12'h0F0;
+            end else begin
+                processed_pixels_rgb <= 12'h000;
             end
         end else if (sw[5]) begin
-            if ((output_pixels[15:12]<4'b1000)&&(output_pixels[10:7]>4'b1000)&&(output_pixels[4:1]<4'b1000))begin
-                processed_pixels <= 12'h0F0;
+            if ((output_pixels_rgb[15:12]<4'b1000)&&(output_pixels_rgb[10:7]<4'b1000)&&
+                    (output_pixels_rgb[4:1]>4'b1000)) begin
+                processed_pixels_rgb <= 12'h00F;
             end else begin
-                processed_pixels <= 12'h000;
-            end
-        end else if (sw[6]) begin
-            if ((output_pixels[15:12]<4'b1000)&&(output_pixels[10:7]<4'b1000)&&(output_pixels[4:1]>4'b1000))begin
-                processed_pixels <= 12'h00F;
-            end else begin
-                processed_pixels <= 12'h000;
+                processed_pixels_rgb <= 12'h000;
             end
         end else begin
-            processed_pixels = {output_pixels[15:12],output_pixels[10:7],output_pixels[4:1]};
+            processed_pixels_rgb <= {output_pixels_rgb[15:12],output_pixels_rgb[10:7],
+                output_pixels_rgb[4:1]};
+        end
+
+        // HSV threshholding
+        if (sw[6]) begin
+            if (output_hsv_thresh==1) begin
+                processed_hsv_thresh <= 1;
+            end else begin
+                processed_hsv_thresh <= 0;
+            end
+        end else if (sw[7]) begin
+            if (output_hsv_thresh==2) begin
+                processed_hsv_thresh <= 1;
+            end else begin
+                processed_hsv_thresh <= 0;
+            end
+        end else if (sw[8]) begin
+            if (output_hsv_thresh==3) begin
+                processed_hsv_thresh <= 1;
+            end else begin
+                processed_hsv_thresh <= 0;
+            end
+        end else begin
+            processed_hsv_thresh <= 0;
         end
             
     end
-    assign pixel_addr_out = sw[2]?((hcount>>1)+(vcount>>1)*32'd320):hcount+vcount*32'd320;
-    assign cam = sw[2]&&((hcount<640) &&  (vcount<480))?frame_buff_out:~sw[2]&&((hcount<320) &&  (vcount<240))?frame_buff_out:12'h000;
-    
+
     /*
     ila_0 ila_uut(.clk(clk_65mhz),    
         .probe0(pixel_in), 
@@ -137,47 +225,19 @@ module camera_top_level (
         .probe4(jbclk)
     );
     */
-                                        
-   camera_read  my_camera(.p_clock_in(pclk_in),
-                          .vsync_in(vsync_in),
-                          .href_in(href_in),
-                          .p_data_in(pixel_in),
-                          .pixel_data_out(output_pixels),
-                          .pixel_valid_out(valid_pixel),
-                          .frame_done_out(frame_done_out));
-
-    wire phsync,pvsync,pblank;
-    wire reset, up, down;
-    pong_game pg(.vclock_in(clk_65mhz),.reset_in(reset),
-                .up_in(up),.down_in(down),.pspeed_in(sw[15:12]),
-                .hcount_in(hcount),.vcount_in(vcount),
-                .hsync_in(hsync),.vsync_in(vsync),.blank_in(blank),
-                .phsync_out(phsync),.pvsync_out(pvsync),.pblank_out(pblank),.pixel_out(pixel)
-    );
-
 
     wire border = (hcount==0 | hcount==1023 | vcount==0 | vcount==767 |
                    hcount == 512 | vcount == 384);
-
-    reg b,hs,vs;
     always_ff @(posedge clk_65mhz) begin
+      // debugging - make sure screen is working
       if (sw[1:0] == 2'b01) begin
          // 1 pixel outline of visible area (white)
-         hs <= hsync;
-         vs <= vsync;
-         b <= blank;
          rgb <= {12{border}};
       end else if (sw[1:0] == 2'b10) begin
          // color bars
-         hs <= hsync;
-         vs <= vsync;
-         b <= blank;
          rgb <= {{4{hcount[8]}}, {4{hcount[7]}}, {4{hcount[6]}}} ;
+      // default: display image from camera
       end else begin
-         // default: pong
-         hs <= phsync;
-         vs <= pvsync;
-         b <= pblank;
          rgb <= cam;
       end
     end
@@ -221,9 +281,8 @@ module camera_top_level (
         .strobe_out(an)
     );
 
-    // test timer
+    // one second timer
     logic one_second_pulse;
-    assign led16_b = one_second_pulse;
 
     always_ff @(posedge clk_65mhz) begin
         if (one_hz) begin
@@ -233,6 +292,11 @@ module camera_top_level (
     end
 
     // the following lines are required for the Nexys4 VGA circuit - do not change
+    reg b,hs,vs;
+    assign hs = hsync;
+    assign vs = vsync;
+    assign b = blank;
+
     assign vga_r = ~b ? rgb[11:8]: 0;
     assign vga_g = ~b ? rgb[7:4] : 0;
     assign vga_b = ~b ? rgb[3:0] : 0;
@@ -256,45 +320,4 @@ module synchronize #(parameter NSYNC = 3)  // number of sync flops.  must be >= 
   begin
     {out,sync} <= {sync[NSYNC-2:0],in};
   end
-endmodule
-
-////////////////////////////////////////////////////////////////////////////////
-//
-// pong_game: the game itself!
-//
-////////////////////////////////////////////////////////////////////////////////
-
-module pong_game (
-   input vclock_in,        // 65MHz clock
-   input reset_in,         // 1 to initialize module
-   input up_in,            // 1 when paddle should move up
-   input down_in,          // 1 when paddle should move down
-   input [3:0] pspeed_in,  // puck speed in pixels/tick 
-   input [10:0] hcount_in, // horizontal index of current pixel (0..1023)
-   input [9:0]  vcount_in, // vertical index of current pixel (0..767)
-   input hsync_in,         // XVGA horizontal sync signal (active low)
-   input vsync_in,         // XVGA vertical sync signal (active low)
-   input blank_in,         // XVGA blanking (1 means output black pixel)
-        
-   output phsync_out,       // pong game's horizontal sync
-   output pvsync_out,       // pong game's vertical sync
-   output pblank_out,       // pong game's blanking
-   output [11:0] pixel_out  // pong game's pixel  // r=23:16, g=15:8, b=7:0 
-   );
-
-   wire [2:0] checkerboard;
-        
-   // REPLACE ME! The code below just generates a color checkerboard
-   // using 64 pixel by 64 pixel squares.
-   
-   assign phsync_out = hsync_in;
-   assign pvsync_out = vsync_in;
-   assign pblank_out = blank_in;
-   assign checkerboard = hcount_in[8:6] + vcount_in[8:6];
-
-   // here we use three bits from hcount and vcount to generate the
-   // checkerboard
-
-   assign pixel_out = {{4{checkerboard[2]}}, {4{checkerboard[1]}}, {4{checkerboard[0]}}} ;
-     
 endmodule
