@@ -75,8 +75,10 @@ module camera_top_level (
 
     // bram_hsv variable
     // 0 = no match; 1-3 = match to hsv color 1-3
-    logic [1:0] frame_buff_out_hsv_thresh;
+    logic [1:0] hsv_thresh;
+    // displays hsv values if correct sw's on
     logic [1:0] processed_hsv_thresh;
+    logic [1:0] frame_buff_out_hsv_thresh;
     logic [16:0] hsv_pixel_addr_in;
     logic [16:0] hsv_pixel_addr_out;
     logic valid_hsv_thresh;
@@ -87,7 +89,7 @@ module camera_top_level (
                 .addra(hsv_pixel_addr_in), 
                 .clka(pclk_in),
                 .dina(processed_hsv_thresh),
-                .wea(valid_rgb_pixel),
+                .wea(valid_hsv_thresh),
                 .addrb(hsv_pixel_addr_out), 
                 .clkb(clk_65mhz),
                 // output
@@ -97,7 +99,6 @@ module camera_top_level (
     // camera variables
     logic [11:0] cam;
     logic [15:0] output_pixels_rgb;
-    logic [1:0] output_hsv_thresh;
     //logic [15:0] old_output_pixels;
     logic rgb_frame_done_out;
     logic hsv_frame_done_out;
@@ -108,7 +109,7 @@ module camera_top_level (
             .href_in(href_in),
             .p_data_in(pixel_in),
             .pixel_data_out(output_pixels_rgb),
-            .hsv_thresh_data_out(output_hsv_thresh),
+            .hsv_thresh_data_out(hsv_thresh),
             .rgb_pixel_valid_out(valid_rgb_pixel),
             .hsv_thresh_valid_out(valid_hsv_thresh),
             .hsv_frame_done_out(hsv_frame_done_out),
@@ -119,22 +120,22 @@ module camera_top_level (
     assign rgb_pixel_addr_out = sw[2]?((hcount>>1)+(vcount>>1)*32'd320):hcount+vcount*32'd320;
     assign hsv_pixel_addr_out = sw[2]?((hcount>>1)+(vcount>>1)*32'd320):hcount+vcount*32'd320;
 
-
     // if sw[6], sw[7] or sw[8] on, determine frame_buff_out from frame_buff_out_hsv_thresh
     // else set frame_buff_out to frame_buff_out_rgb
     logic [11:0] frame_buff_out;
     always_comb begin
-        if (sw[6] || sw[7] || sw[8]) begin
+        if (sw[13] || sw[14] || sw[15]) begin
             if (frame_buff_out_hsv_thresh==1) frame_buff_out = 12'hF00;
             else if (frame_buff_out_hsv_thresh==2) frame_buff_out = 12'h0F0;
             else if (frame_buff_out_hsv_thresh==3) frame_buff_out = 12'h00F;
-            else frame_buff_out = 12'h000;
+            else frame_buff_out = 12'hFFF;
         end else begin
             frame_buff_out = frame_buff_out_rgb;
         end
     end
 
     // get pixel to display from image from camera 
+    // display image larger if sw[2] is on
     assign cam = sw[2]&&((hcount<640)&&(vcount<480)) ? frame_buff_out : 
         ~sw[2]&&((hcount<320)&&(vcount<240)) ? frame_buff_out : 12'h000;
 
@@ -142,16 +143,17 @@ module camera_top_level (
         if (rgb_frame_done_out) begin
             rgb_pixel_addr_in <= 17'b0;  
         end else if (valid_rgb_pixel) begin
-            rgb_pixel_addr_in <= rgb_pixel_addr_in +1;  
+            rgb_pixel_addr_in <= rgb_pixel_addr_in + 1;  
         end
         
         if (hsv_frame_done_out) begin
             hsv_pixel_addr_in <= 17'b0;  
         end else if (valid_hsv_thresh) begin
-            hsv_pixel_addr_in <= hsv_pixel_addr_in +1;  
+            hsv_pixel_addr_in <= hsv_pixel_addr_in + 1;  
         end
     end
     
+    // use switches to determine output
     always_ff @(posedge clk_65mhz) begin
         pclk_buff <= jb[0];
         vsync_buff <= jb[1]; 
@@ -192,28 +194,10 @@ module camera_top_level (
         end
 
         // HSV threshholding
-        if (sw[6]) begin
-            if (output_hsv_thresh==1) begin
-                processed_hsv_thresh <= 1;
-            end else begin
-                processed_hsv_thresh <= 0;
-            end
-        end else if (sw[7]) begin
-            if (output_hsv_thresh==2) begin
-                processed_hsv_thresh <= 1;
-            end else begin
-                processed_hsv_thresh <= 0;
-            end
-        end else if (sw[8]) begin
-            if (output_hsv_thresh==3) begin
-                processed_hsv_thresh <= 1;
-            end else begin
-                processed_hsv_thresh <= 0;
-            end
-        end else begin
-            processed_hsv_thresh <= 0;
-        end
-            
+        if (sw[15] && hsv_thresh==1) processed_hsv_thresh <= 1;
+        else if (sw[14] && hsv_thresh==2) processed_hsv_thresh <= 2;
+        else if (sw[13] && hsv_thresh==3) processed_hsv_thresh <= 3;
+        else processed_hsv_thresh <= 0;
     end
 
     /*
