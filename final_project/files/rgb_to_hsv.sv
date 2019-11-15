@@ -8,10 +8,7 @@
 // of divider (it has a latency of 12 clock cycles)
 
 // TODO: make sure the latency of the dividor is constant
-
-// TODO: use valid variables ???
-
-// pipeline instead of using buffers ???
+// TODO: make sure buffering is correct
 
 module rgb_to_hsv (
         input clk_in,

@@ -120,7 +120,7 @@ module camera_top_level (
     assign rgb_pixel_addr_out = sw[2]?((hcount>>1)+(vcount>>1)*32'd320):hcount+vcount*32'd320;
     assign hsv_pixel_addr_out = sw[2]?((hcount>>1)+(vcount>>1)*32'd320):hcount+vcount*32'd320;
 
-    // if sw[6], sw[7] or sw[8] on, determine frame_buff_out from frame_buff_out_hsv_thresh
+    // if sw[13], sw[14] or sw[15] on, determine frame_buff_out from frame_buff_out_hsv_thresh
     // else set frame_buff_out to frame_buff_out_rgb
     logic [11:0] frame_buff_out;
     always_comb begin

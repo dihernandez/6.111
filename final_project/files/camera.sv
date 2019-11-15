@@ -20,9 +20,6 @@ module camera_read(
     logic [1:0] FSM_state = 0;
     logic pixel_half = 0;
 
-    // buffer to hold last 12 pixel out values
-    //logic [191:0] pixel_out_buffer;
-
     // calculate hsv_frame_done_out (buffered frame_done_out)
     logic [11:0] buffer_frame_done;
     assign hsv_frame_done_out = buffer_frame_done[11];
@@ -34,7 +31,6 @@ module camera_read(
     rgb_to_hsv rgb_to_hsv_uut(
             .clk_in(p_clock_in),
             .valid_in(rgb_pixel_valid_out),
-            //.rgb({pixel_out_buffer[15:12],pixel_out_buffer[10:7],pixel_out_buffer[4:1]}),
             .rgb({pixel_data_out[15:12],pixel_data_out[10:7],pixel_data_out[4:1]}),
             .valid_out(hsv_valid_out),
             .hsv(hsv)
@@ -54,14 +50,6 @@ module camera_read(
         end
     end
 
-    // assign values to outputs when valid
-    /*always_ff @(posedge p_clock_in) begin
-        if (hsv_valid_out) begin
-            hsv_thresh_data_out <= hsv_thresh;
-            pixel_data_out <= pixel_out_buffer[191:176];
-        end
-    end*/
-	
 	localparam WAIT_FRAME_START = 0;
 	localparam ROW_CAPTURE = 1;
 	
@@ -82,11 +70,6 @@ module camera_read(
                 if (href_in) begin
                     pixel_half <= ~pixel_half;
                     if (pixel_half) begin
-                        /*pixel_out_buffer <= {
-                                pixel_out_buffer[175:0],
-                                8'd0,
-                                p_data_in
-                            };*/
                         pixel_data_out[7:0] <= p_data_in;
                     end else begin
                         //pixel_out_buffer[15:8] <= p_data_in;
