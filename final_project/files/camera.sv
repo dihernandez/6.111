@@ -39,17 +39,11 @@ module camera_read(
     // 0=no match; 1-3=match with color 1-3
     always_ff @(posedge p_clock_in) begin
         if (hsv_valid_out) begin
-            //if (hsv[11:10]==2'b00 && hsv[7:6]==2'b11 && hsv[3:2]==2'b11) begin
-            //if (hsv[10]==0 && hsv[6]==1 && hsv[2]==1) begin
-            if (hsv[11:9]==3'b00) begin
+            if (hsv[11:9]==3'b00) begin // red
                 hsv_thresh_data_out <= 1; 
-            //end else if (hsv[11:10]==2'b01 && hsv[7:6]==2'b11 && hsv[3:2]==2'b11) begin
-            //end else if (hsv[10]==1 && hsv[6]==0 && hsv[2]==1) begin
-            end else if (hsv[11:9]==3'b011) begin
+            end else if (hsv[11:9]==3'b011) begin // green
                 hsv_thresh_data_out <= 2;
-            //end else if (hsv[11:10]==2'b11 && hsv[7:6]==2'b11 && hsv[3:2]==2'b11) begin
-            //end else if (hsv[10]==1 && hsv[6]==1 && hsv[2]==1) begin
-            end else if (hsv[11:9]==3'b111) begin
+            end else if (hsv[11:9]==3'b111) begin // blue
                 hsv_thresh_data_out <= 3;
             end else begin
                 hsv_thresh_data_out <= 0;
