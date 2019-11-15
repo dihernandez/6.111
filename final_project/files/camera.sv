@@ -38,13 +38,20 @@ module camera_read(
     // from hsv value, calculate hsv_thresh_data_out (if valid)
     // 0=no match; 1-3=match with color 1-3
     always_ff @(posedge p_clock_in) begin
+        // if hsv valid 
         if (hsv_valid_out) begin
-            if (hsv[11:9]==3'b00) begin // red
-                hsv_thresh_data_out <= 1; 
-            end else if (hsv[11:9]==3'b011) begin // green
-                hsv_thresh_data_out <= 2;
-            end else if (hsv[11:9]==3'b111) begin // blue
-                hsv_thresh_data_out <= 3;
+            // if saturation and value greater than some value
+            // (i.e. color is not close to white or black)
+            if (hsv[7:4]>3 && hsv[3:0]>3) begin
+                if (hsv[11:9]==3'b00) begin // red
+                    hsv_thresh_data_out <= 1; 
+                end else if (hsv[11:9]==3'b011) begin // green
+                    hsv_thresh_data_out <= 2;
+                end else if (hsv[11:9]==3'b111) begin // blue
+                    hsv_thresh_data_out <= 3;
+                end else begin
+                    hsv_thresh_data_out <= 0;
+                end
             end else begin
                 hsv_thresh_data_out <= 0;
             end
