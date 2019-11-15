@@ -27,7 +27,6 @@ module camera_read(
     // rgb to hsv module
     logic hsv_valid_out;
     logic [11:0] hsv;
-    logic [1:0] hsv_thresh;
     rgb_to_hsv rgb_to_hsv_uut(
             .clk_in(p_clock_in),
             .valid_in(rgb_pixel_valid_out),
@@ -36,17 +35,31 @@ module camera_read(
             .hsv(hsv)
         );
 
-    // from hsv value, calculate hsv_thresh 
+    // from hsv value, calculate hsv_thresh_data_out (if valid)
     // 0=no match; 1-3=match with color 1-3
-    always_comb begin
-        if (hsv[11:10]==2'b00 && hsv[7:6]==2'b11 && hsv[3:2]==2'b11) begin
-            hsv_thresh = 1; // red
-        end else if (hsv[11:10]==2'b01 && hsv[7:6]==2'b11 && hsv[3:2]==2'b11) begin
-            hsv_thresh = 2; // green
-        end else if (hsv[11:10]==2'b11 && hsv[7:6]==2'b11 && hsv[3:2]==2'b11) begin
-            hsv_thresh = 3; // blue
+    always_ff @(posedge p_clock_in) begin
+        if (hsv_valid_out) begin
+            //if (hsv[11:10]==2'b00 && hsv[7:6]==2'b11 && hsv[3:2]==2'b11) begin
+            //if (hsv[10]==0 && hsv[6]==1 && hsv[2]==1) begin
+            if (hsv[11:9]==3'b00) begin
+                hsv_thresh_data_out <= 1; 
+            //end else if (hsv[11:10]==2'b01 && hsv[7:6]==2'b11 && hsv[3:2]==2'b11) begin
+            //end else if (hsv[10]==1 && hsv[6]==0 && hsv[2]==1) begin
+            end else if (hsv[11:9]==3'b011) begin
+                hsv_thresh_data_out <= 2;
+            //end else if (hsv[11:10]==2'b11 && hsv[7:6]==2'b11 && hsv[3:2]==2'b11) begin
+            //end else if (hsv[10]==1 && hsv[6]==1 && hsv[2]==1) begin
+            end else if (hsv[11:9]==3'b111) begin
+                hsv_thresh_data_out <= 3;
+            end else begin
+                hsv_thresh_data_out <= 0;
+            end
+
+            // after hsv_thresh_data_out calculated, hsv_thresh_valid_out is true
+            hsv_thresh_valid_out <= 1;
         end else begin
-            hsv_thresh = 0;
+            // else hsv_thresh_valid_out is false
+            hsv_thresh_valid_out <= 0;
         end
     end
 
@@ -72,7 +85,6 @@ module camera_read(
                     if (pixel_half) begin
                         pixel_data_out[7:0] <= p_data_in;
                     end else begin
-                        //pixel_out_buffer[15:8] <= p_data_in;
                         pixel_data_out[15:8] <= p_data_in;
                     end
                 end
