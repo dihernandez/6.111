@@ -63,20 +63,34 @@ module camera_top_level(
     wire [10:0] hcount;    // pixel on current line
     wire [9:0] vcount;     // line number
     wire hsync, vsync, blank; // synchronized
-    wire hsync_prev, vsync_prev, blank_prev; // un-synchronized
+    // un-synchronized; outputs of screen module
+    wire hsync_prev, vsync_prev, blank_prev;
     wire [11:0] pixel;
     reg [11:0] rgb;    
 
     // synchronize hsync, vsync, blank (outputs of xvga)
     // synchronized outputs used for everything else
-    synchronize sync_uut(
-            .clock_in
+    synchronize sync_hsync(
+            .clk(clk_65mhz),
+            .in(hsync_prev),
+            .out(hsync)
+        );
+
+    synchronize sync_vsync(
+            .clk(clk_65mhz),
+            .in(vsync_prev),
+            .out(vsync)
+        );
+
+    synchronize sync_blank(
+            .clk(clk_65mhz),
+            .in(blank_prev),
+            .out(blank)
         );
 
     // screen module
     xvga xvga1(.vclock_in(clk_65mhz),.hcount_out(hcount),.vcount_out(vcount),
           .hsync_out(hsync_prev),.vsync_out(vsync_prev),.blank_out(blank_prev));
-
 
     // timing screen display variables
     logic pclk_buff, pclk_in;
