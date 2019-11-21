@@ -237,7 +237,7 @@ module camera_top_level(
     // only display target p2 if there are bright p2-colored pixels
     assign target_p2 = (final_num_pixels_for_p2 && 
             (hcount==x_coord_of_p2 || 
-             vcount==y_coord_of_p2)) ? 12'h0F0 : 12'h000;
+             vcount==y_coord_of_p2)) ? 12'hFFF : 12'h000;
     
     always_ff @(posedge clk_65mhz) begin
         // update buffer_frame_done_out
@@ -270,9 +270,8 @@ module camera_top_level(
             count_num_pixels_for_p1 <= count_num_pixels_for_p1 + 1;
             x_coord_sum_for_p1 <= x_coord_sum_for_p1 + hcount;
             y_coord_sum_for_p1 <= y_coord_sum_for_p1 + vcount;
-        end
-        // player 2 LED (GREEN)
-        if (valid_pixel && cam[11:8]<4 && cam[7:4]>10 && cam[3:0]<4) begin
+        // player 2 LED (IR LED (WHITE))
+        end else if (valid_pixel && cam[11:8]>12 && cam[7:4]>12 && cam[3:0]>12) begin
             count_num_pixels_for_p2 <= count_num_pixels_for_p2 + 1;
             x_coord_sum_for_p2 <= x_coord_sum_for_p2 + hcount;
             y_coord_sum_for_p2 <= y_coord_sum_for_p2 + vcount;
