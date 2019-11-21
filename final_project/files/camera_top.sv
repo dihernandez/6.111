@@ -61,12 +61,15 @@ module camera_top_level(
     end
 
     // screen display variables
-    wire [10:0] hcount;    // pixel on current line
-    wire [9:0] vcount;     // line number
-    wire hsync, vsync, blank; // synchronized
+    // x value of pixel being displayed (pixel on current line)
+    wire [10:0] hcount;
+    // y value of pixel being displayed (line number)
+    wire [9:0] vcount;
+    // keep track of whether (hcount,vcount) is on or off the screen
+    wire hsync, vsync, blank; // synchronized values
     // un-synchronized; outputs of screen module
     wire hsync_prev, vsync_prev, blank_prev;
-    wire [11:0] pixel;
+    //wire [11:0] pixel;
     reg [11:0] rgb;    
 
     // synchronize hsync, vsync, blank (outputs of xvga)
@@ -99,7 +102,7 @@ module camera_top_level(
     logic [7:0] pixel_buff, pixel_in;
     logic [15:0] output_pixels;
     //logic [15:0] old_output_pixels;
-    logic [12:0] processed_pixels;
+    logic [11:0] processed_pixels;
     assign processed_pixels = {output_pixels[15:12],
             output_pixels[10:7], output_pixels[4:1]};
     logic valid_pixel;
@@ -108,60 +111,171 @@ module camera_top_level(
     logic buffer_frame_done_out;
     logic after_frame_before_first_pixel;
     
-    // track IR LEDs
+    // TRACK LEDS
+
+    // track player 1 LED
     // num. lighted up pixels
-    logic [15:0] count_num_pixels_in_spot; // counts up
-    logic [15:0] final_num_pixels_in_spot; // final (valid) value
-    assign data = final_num_pixels_in_spot;
+    logic [15:0] count_num_pixels_for_p1; // counts up
+    logic [15:0] final_num_pixels_for_p1; // final (valid) value
+    // display num. of p1 pixels on hex display
+    assign data[15:0] = final_num_pixels_for_p1;
     // sum of x and y coordinates of lighted up pixels
-    logic [23:0] x_coord_sum, y_coord_sum;
+    logic [23:0] x_coord_sum_for_p1, y_coord_sum_for_p1;
+
+    // track player 2 LED
+    // num. lighted up pixels
+    logic [15:0] count_num_pixels_for_p2; // counts up
+    logic [15:0] final_num_pixels_for_p2; // final (valid) value
+    // display num. of p1 pixels on hex display
+    assign data[31:16] = final_num_pixels_for_p2;
+    // sum of x and y coordinates of lighted up pixels
+    logic [23:0] x_coord_sum_for_p2, y_coord_sum_for_p2;
 
     // divide sum of x and y coordinates by total # of coordinates
-    // inputs
-    logic x_num_valid, x_denom_valid, y_num_valid, y_denom_valid;
+    // div_inputs valid is true when x and y coord. sum and final 
+    // pixel count are valid 
+    logic div_inputs_valid;
 
-    // outputs
+    // player 1 outputs
     // output of divider is formatted so that first 24 bits
     // are the integer solution and the next 16 bits are the remainder
-    logic [39:0] x_div_and_remainder_out, y_div_and_remainder_out;
-    logic [23:0] x_div_out, y_div_out;
-    logic x_div_out_valid, y_div_out_valid;
+    logic [39:0] x_div_and_remainder_out_p1, y_div_and_remainder_out_p1;
+    logic [23:0] x_div_out_p1, y_div_out_p1;
+    logic x_div_out_valid_p1, y_div_out_valid_p1;
     // extract solutions (w/o remainder) from output of ip divider
-    assign x_div_out = x_div_and_remainder_out[39:16];
-    assign y_div_out = y_div_and_remainder_out[39:16];
+    assign x_div_out_p1 = x_div_and_remainder_out_p1[39:16];
+    assign y_div_out_p1 = y_div_and_remainder_out_p1[39:16];
 
-    // TODO make y div module
+    // player 2 outputs
+    // output of divider is formatted so that first 24 bits
+    // are the integer solution and the next 16 bits are the remainder
+    logic [39:0] x_div_and_remainder_out_p2, y_div_and_remainder_out_p2;
+    logic [23:0] x_div_out_p2, y_div_out_p2;
+    logic x_div_out_valid_p2, y_div_out_valid_p2;
+    // extract solutions (w/o remainder) from output of ip divider
+    assign x_div_out_p2 = x_div_and_remainder_out_p2[39:16];
+    assign y_div_out_p2 = y_div_and_remainder_out_p2[39:16];
 
-    // Instantiate the Unit Under Test (UUT)
+    // DIVIDERS
+    // ignore the output when final_num_pixels_in_spot is 0
+    // (i.e. division by 0)
+
+    // player 1 dividers
+    div_gen_y y_div_uut (
+        .aclk(clk_65mhz),
+        .s_axis_divisor_tdata(final_num_pixels_for_p1),
+        .s_axis_divisor_tvalid(div_inputs_valid),
+        .s_axis_dividend_tdata(y_coord_sum_for_p1),
+        .s_axis_dividend_tvalid(div_inputs_valid),
+        .m_axis_dout_tdata(y_div_and_remainder_out_p1),
+        .m_axis_dout_tvalid(y_div_out_valid_p1)
+    );
     div_gen_x x_div_uut (
-        .aclk(clk),
-        .s_axis_divisor_tdata(x_denom),
-        .s_axis_divisor_tvalid(x_denom_valid),
-        .s_axis_dividend_tdata(x_num),
-        .s_axis_dividend_tvalid(x_num_valid),
-        .m_axis_dout_tdata(x_div_and_remainder_out),
-        .m_axis_dout_tvalid(x_div_out_valid)
+        .aclk(clk_65mhz),
+        .s_axis_divisor_tdata(final_num_pixels_for_p1),
+        .s_axis_divisor_tvalid(div_inputs_valid),
+        .s_axis_dividend_tdata(x_coord_sum_for_p1),
+        .s_axis_dividend_tvalid(div_inputs_valid),
+        .m_axis_dout_tdata(x_div_and_remainder_out_p1),
+        .m_axis_dout_tvalid(x_div_out_valid_p1)
     );
 
+    // player 2 dividers
+    div_gen_y2 y2_div_uut (
+        .aclk(clk_65mhz),
+        .s_axis_divisor_tdata(final_num_pixels_for_p2),
+        .s_axis_divisor_tvalid(div_inputs_valid),
+        .s_axis_dividend_tdata(y_coord_sum_for_p2),
+        .s_axis_dividend_tvalid(div_inputs_valid),
+        .m_axis_dout_tdata(y_div_and_remainder_out_p2),
+        .m_axis_dout_tvalid(y_div_out_valid_p2)
+    );
+    div_gen_x2 x2_div_uut (
+        .aclk(clk_65mhz),
+        .s_axis_divisor_tdata(final_num_pixels_for_p2),
+        .s_axis_divisor_tvalid(div_inputs_valid),
+        .s_axis_dividend_tdata(x_coord_sum_for_p2),
+        .s_axis_dividend_tvalid(div_inputs_valid),
+        .m_axis_dout_tdata(x_div_and_remainder_out_p2),
+        .m_axis_dout_tvalid(x_div_out_valid_p2)
+    );
+
+    // target that tracks p1
+    logic [11:0] target_p1;
+    logic [8:0] x_coord_of_p1;
+    logic [7:0] y_coord_of_p1;
+
+    // target that tracks p2
+    logic [11:0] target_p2;
+    logic [8:0] x_coord_of_p2;
+    logic [7:0] y_coord_of_p2;
+
+    // update x coordinate of bright spot when output of div ip is valid
+    always_ff @(posedge clk_65mhz) begin
+        if (x_div_out_valid_p1) begin
+            x_coord_of_p1 <= x_div_out_p1;
+        end
+
+        if (y_div_out_valid_p1) begin
+            y_coord_of_p1 <= y_div_out_p1;
+        end
+
+        if (x_div_out_valid_p2) begin
+            x_coord_of_p2 <= x_div_out_p2;
+        end
+
+        if (y_div_out_valid_p2) begin
+            y_coord_of_p2 <= y_div_out_p2;
+        end
+    end
+
+    // only display target p1 if there are bright p1-colored pixels
+    assign target_p1 = (final_num_pixels_for_p1 && 
+            (hcount==x_coord_of_p1 || 
+             vcount==y_coord_of_p1)) ? 12'hF00 : 12'h000;
+
+    // only display target p2 if there are bright p2-colored pixels
+    assign target_p2 = (final_num_pixels_for_p2 && 
+            (hcount==x_coord_of_p2 || 
+             vcount==y_coord_of_p2)) ? 12'h0F0 : 12'h000;
+    
     always_ff @(posedge clk_65mhz) begin
         // update buffer_frame_done_out
         buffer_frame_done_out <= frame_done_out;
 
-        // on falling edge of frame_done_out, update final_num_pixels_in_spot
-        // and reset count_num_pixels_in_spot to 0
+        // on falling edge of frame_done_out, update final pixel count
+        // for p1 and p2 and set div_inputs_valid to true
         if (buffer_frame_done_out && !frame_done_out) begin
-            final_num_pixels_in_spot <= count_num_pixels_in_spot;
-            count_num_pixels_in_spot <= 0;
+            final_num_pixels_for_p1 <= count_num_pixels_for_p1;
+            final_num_pixels_for_p2 <= count_num_pixels_for_p2;
+            div_inputs_valid <= 1;
+        end else if (div_inputs_valid) begin
+            // reset values to 0 after calculating quotient
+            div_inputs_valid <= 0;
+            count_num_pixels_for_p1 <= 0;
+            count_num_pixels_for_p2 <= 0;
+            x_coord_sum_for_p1 <= 0;
+            y_coord_sum_for_p1 <= 0;
+            x_coord_sum_for_p2 <= 0;
+            y_coord_sum_for_p2 <= 0;
         end
 
-        // if valid pixel and (R,G,B) >= some threshhold,
-        // increment count_num_pixels_in_spot, add hcount to x_coord_sum,
-        // and add vcount to y_coord_sum
-        if (valid_pixel && processed_pixels[11:8]>10 && 
-                processed_pixels[7:4]>10 && processed_pixels[3:0]>10) begin
-            count_num_pixels_in_spot <= count_num_pixels_in_spot + 1;
-            x_coord_sum <= x_coord_sum + hcount;
-            y_coord_sum <= y_coord_sum + vcount;
+        // if valid pixel and (RGB value being displayed on screen at
+        // (hcount, vcount) > some threshhold), increment count_num_pixels_in_spot, 
+        // add hcount (x value of pixel being drawn on screen) to x_coord_sum, 
+        // and add vcount (y value of pixel being drawn on screen) to y_coord_sum
+
+        // player 1 LED (RED)
+        if (valid_pixel && cam[11:8]>12 && cam[7:4]<4 && cam[3:0]<4) begin
+            count_num_pixels_for_p1 <= count_num_pixels_for_p1 + 1;
+            x_coord_sum_for_p1 <= x_coord_sum_for_p1 + hcount;
+            y_coord_sum_for_p1 <= y_coord_sum_for_p1 + vcount;
+        end
+        // player 2 LED (GREEN)
+        if (valid_pixel && cam[11:8]<4 && cam[7:4]>10 && cam[3:0]<4) begin
+            count_num_pixels_for_p2 <= count_num_pixels_for_p2 + 1;
+            x_coord_sum_for_p2 <= x_coord_sum_for_p2 + hcount;
+            y_coord_sum_for_p2 <= y_coord_sum_for_p2 + vcount;
         end
     end
 
@@ -177,11 +291,6 @@ module camera_top_level(
     assign jbclk = xclk;
     assign jdclk = xclk;
 
-    // plus sign (draw blue pixel if at x and/or y coordinate
-    // of LED IR spot
-    logic [11:0] plus_target;
-    assign plus_target = 12'hF00 ? (hcount==50 || vcount==50) : 12'h000;
-    
     // memory holding the image from the camera
     blk_mem_gen_0 jojos_bram(.addra(pixel_addr_in), 
                              .clka(pclk_in),
@@ -240,9 +349,12 @@ module camera_top_level(
             // color bars
             rgb <= {{4{hcount[8]}}, {4{hcount[7]}}, {4{hcount[6]}}} ;
         end else begin
-            // if plus is there, display plus
-            if (plus_target != 0) begin
-                rgb <= plus_target;
+            // if target p1 is there, display 
+            if (target_p1 != 0) begin
+                rgb <= target_p1;
+            // else if target p2 is there, display 
+            end else if (target_p2 != 0) begin
+                rgb <= target_p2;
             // else display camera output
             end else begin
                 rgb <= cam;
