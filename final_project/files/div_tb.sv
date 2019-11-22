@@ -5,7 +5,8 @@ module div_tb;
 
     // Inputs
     logic clk;
-    logic [23:0] x_num;
+    //logic [23:0] x_num;
+    logic [15:0] x_num;
     logic x_num_valid;
     logic [15:0] x_denom;
     logic x_denom_valid;
@@ -13,14 +14,18 @@ module div_tb;
     // Outputs
     // output of divider is formatted so that first 24 bits
     // are the integer solution and the next 16 bits are the remainder
-    logic [39:0] x_div_and_remainder_out;
-    logic [23:0] x_div_out;
+    //logic [39:0] x_div_and_remainder_out;
+    logic [31:0] x_div_and_remainder_out;
+    //logic [23:0] x_div_out;
+    logic [15:0] x_div_out;
     // extract solution (w/o remainder) from output of ip divider
-    assign x_div_out = x_div_and_remainder_out[39:16];
+    //assign x_div_out = x_div_and_remainder_out[39:16];
+    assign x_div_out = x_div_and_remainder_out[31:16];
     logic x_div_out_valid;
 
     // Instantiate the Unit Under Test (UUT)
-    div_gen_x x_div_uut (
+    //div_gen_x x_div_uut (
+    hue_div_2 hue_div_2_uut (
         .aclk(clk),
         .s_axis_divisor_tdata(x_denom),
         .s_axis_divisor_tvalid(x_denom_valid),
@@ -49,7 +54,8 @@ module div_tb;
          
         // wait 25 more clk cycles because the
         // latency of div_gen_x is 26 clk cycles
-        #250;
+        //#250;
+        #170;
           
         assert (x_div_out == 6) $display("OK. 24/4 = 6"); 
             else $error("Expected 6, got ", x_div_out);
@@ -70,7 +76,8 @@ module div_tb;
          
         // wait 25 more clk cycles because the
         // latency of div_gen_x is 26 clk cycles
-        #250;
+        //#250;
+        #170;
           
         assert (x_div_out == 25) $display("OK. 200/8 = 25"); 
             else $error("Expected 25, got ", x_div_out);

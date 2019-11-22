@@ -33,8 +33,9 @@ module camera_top_module (
     // VARIABLES
 
     // state variables STATE VARIABLES
-    logic end_of_motion; // true at end of every 16 frames
     logic [3:0] frame_tally; // counts to 16 frames then resets
+    logic end_of_motion; // true at end of every 16 frames
+    assign end_of_motion = (frame_tally == 15);
     // displacement of p1 and p2 over 16 frames; signed variables
     logic [8:0] p1_dx, p1_dy, p2_dx, p2_dy; // sometimes invalid
     logic [8:0] final_p1_dx, final_p1_dy, final_p2_dx, final_p2_dy; // always valid
@@ -53,7 +54,8 @@ module camera_top_module (
 
     // screen display variables
     // x value of pixel being displayed (pixel on current line)
-    wire [10:0] hcount;
+    wire [10:0] hcount, hcount_mirror;
+    assign hcount_mirror = 319-hcount; // make camera display mirror image
     // y value of pixel being displayed (line number)
     wire [9:0] vcount;
     // keep track of whether (hcount,vcount) is on or off the screen
@@ -88,15 +90,15 @@ module camera_top_module (
     logic [39:0] x_div_and_remainder_out_p2, y_div_and_remainder_out_p2;
     logic [23:0] x_div_out_p2, y_div_out_p2;
     logic x_div_out_valid_p2, y_div_out_valid_p2;
-    // location of p1 and p2
+    // current + previous locations of p1 and p2
     // target that tracks p1
     logic [11:0] target_p1;
-    logic [8:0] x_coord_of_p1;
-    logic [7:0] y_coord_of_p1;
+    logic [8:0] x_coord_of_p1, prev_x_coord_of_p1;
+    logic [7:0] y_coord_of_p1, prev_y_coord_of_p1;
     // target that tracks p2
     logic [11:0] target_p2;
-    logic [8:0] x_coord_of_p2;
-    logic [7:0] y_coord_of_p2;
+    logic [8:0] x_coord_of_p2, prev_x_coord_of_p2;
+    logic [7:0] y_coord_of_p2, prev_y_coord_of_p2;
 
     // timer variables
     logic start;
@@ -220,12 +222,25 @@ module camera_top_module (
     assign x_div_out_p2 = x_div_and_remainder_out_p2[39:16];
     assign y_div_out_p2 = y_div_and_remainder_out_p2[39:16];
 
-    // update x + y coords of p1 + p2 when output of div ip is valid
+    // update coords of p1 + p2 & prev coords of p1 + p2
+    // when output of div ip is valid
     always_ff @(posedge clk_65mhz) begin
-        if (x_div_out_valid_p1) x_coord_of_p1 <= x_div_out_p1;
-        if (y_div_out_valid_p1) y_coord_of_p1 <= y_div_out_p1;
-        if (x_div_out_valid_p2) x_coord_of_p2 <= x_div_out_p2;
-        if (y_div_out_valid_p2) y_coord_of_p2 <= y_div_out_p2;
+        if (x_div_out_valid_p1) begin
+            x_coord_of_p1 <= x_div_out_p1;
+            prev_x_coord_of_p1 <= x_coord_of_p1;
+        end
+        if (y_div_out_valid_p1) begin
+            y_coord_of_p1 <= y_div_out_p1;
+            prev_y_coord_of_p1 <= y_coord_of_p1;
+        end
+        if (x_div_out_valid_p2) begin
+            x_coord_of_p2 <= x_div_out_p2;
+            prev_x_coord_of_p2 <= x_coord_of_p2;
+        end
+        if (y_div_out_valid_p2) begin
+            y_coord_of_p2 <= y_div_out_p2;
+            prev_y_coord_of_p2 <= y_coord_of_p2;
+        end
     end
 
     // DIVIDERS
@@ -274,22 +289,17 @@ module camera_top_module (
 
     // only display target p1 if there are bright p1-colored pixels
     assign target_p1 = (final_num_pixels_for_p1 && 
-            (hcount==x_coord_of_p1 || 
+            (hcount_mirror==x_coord_of_p1 || 
              vcount==y_coord_of_p1)) ? 12'hF00 : 12'h000;
 
     // only display target p2 if there are bright p2-colored pixels
     assign target_p2 = (final_num_pixels_for_p2 && 
-            (hcount==x_coord_of_p2 || 
+            (hcount_mirror==x_coord_of_p2 || 
              vcount==y_coord_of_p2)) ? 12'hFFF : 12'h000;
     
-    // after every 16 frames, use p1_dx, etc. variables to determine
-    // the action of p1 and p2
-    assign end_of_motion = (frame_tally == 15);
-
     always_ff @(posedge clk_65mhz) begin
         buffer_frame_done_out <= frame_done_out;
-
-        if (frame_done_out) frame_tally <= 1;
+        if (frame_done_out) frame_tally <= frame_tally + 1;
 
         // delta values valid after every 16 frames
         if (end_of_motion) begin
@@ -301,6 +311,12 @@ module camera_top_module (
             p1_dy <= 0;
             p2_dx <= 0;
             p2_dy <= 0;
+        // else update p1_dx, etc.
+        end else begin
+            p1_dx <= p1_dx + (x_coord_of_p1 - prev_x_coord_of_p1);
+            p1_dy <= p1_dy + (y_coord_of_p1 - prev_y_coord_of_p1);
+            p2_dx <= p2_dx + (x_coord_of_p2 - prev_x_coord_of_p2);
+            p2_dy <= p2_dy + (y_coord_of_p2 - prev_y_coord_of_p2);
         end
 
         // on falling edge of frame_done_out, update final pixel count
@@ -328,12 +344,12 @@ module camera_top_module (
         // player 1 LED (RED)
         if (valid_pixel && cam[11:8]>13 && cam[7:4]<3 && cam[3:0]<3) begin
             count_num_pixels_for_p1 <= count_num_pixels_for_p1 + 1;
-            x_coord_sum_for_p1 <= x_coord_sum_for_p1 + hcount;
+            x_coord_sum_for_p1 <= x_coord_sum_for_p1 + hcount_mirror;
             y_coord_sum_for_p1 <= y_coord_sum_for_p1 + vcount;
         // player 2 LED (IR LED (WHITE))
         end else if (valid_pixel && cam[11:8]>12 && cam[7:4]>12 && cam[3:0]>12) begin
             count_num_pixels_for_p2 <= count_num_pixels_for_p2 + 1;
-            x_coord_sum_for_p2 <= x_coord_sum_for_p2 + hcount;
+            x_coord_sum_for_p2 <= x_coord_sum_for_p2 + hcount_mirror;
             y_coord_sum_for_p2 <= y_coord_sum_for_p2 + vcount;
         end
     end
@@ -379,8 +395,8 @@ module camera_top_module (
     /*assign pixel_addr_out = sw[2]?((hcount>>1)+(vcount>>1)*32'd320):hcount+vcount*32'd320;
     assign cam = sw[2]&&((hcount<640)&&(vcount<480)) ? frame_buff_out :
         ~sw[2]&&((hcount<320)&&(vcount<240)) ? frame_buff_out : 12'h000;*/
-    assign pixel_addr_out = hcount+vcount*32'd320;
-    assign cam = ((hcount<320)&&(vcount<240)) ? frame_buff_out : 12'h000;
+    assign pixel_addr_out = hcount_mirror+vcount*32'd320;
+    assign cam = ((hcount_mirror<320)&&(vcount<240)) ? frame_buff_out : 12'h000;
                                         
     // camera module
     camera_read  my_camera(
