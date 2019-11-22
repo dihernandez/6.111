@@ -32,22 +32,6 @@ module camera_top_module (
 
     // VARIABLES
 
-    // state variables STATE VARIABLES
-    logic [3:0] frame_tally; // counts to 16 frames then resets
-    logic end_of_motion; // true at end of every 16 frames
-    assign end_of_motion = (frame_tally == 15);
-    // displacement of p1 and p2 over 16 frames; signed variables
-    // 14 bits b/c log_2(num_frames=15) + log_2(max_coordinate=320) = 14
-    logic [13:0] p1_dx, p1_dy, p2_dx, p2_dy; // sometimes invalid
-    // always valid; magnitudes (unsigned values)
-    logic [13:0] final_unsigned_p1_dx, final_unsigned_p1_dy; 
-    logic [13:0] final_unsigned_p2_dx, final_unsigned_p2_dy;
-    // always valid; 1=negative; 0=positive
-    logic final_p1_dx_sign, final_p1_dy_sign;
-    logic final_p2_dx_sign, final_p2_dy_sign;
-    // true when p1_dx, etc., are valid
-    logic delta_values_valid;
-
     // camera variables
     logic [11:0] cam;
     logic [11:0] frame_buff_out;
@@ -80,6 +64,21 @@ module camera_top_module (
     logic xclk;
     logic[1:0] xclk_count;
 
+    // state variables STATE VARIABLES
+    logic [3:0] frame_tally; // counts to 16 frames then resets
+    logic end_of_motion; // true at end of every 16 frames
+    assign end_of_motion = (frame_tally == 15);
+    // displacement of p1 and p2 over 2 frames
+    logic [8:0] p1_2frame_dx, p1_2frame_dy, p2_2frame_dx, p2_2frame_dy;
+    logic p1_2frame_dx_sign, p1_2frame_dy_sign; // 1=neg; 0=pos
+    logic p2_2frame_dx_sign, p2_2frame_dy_sign; // 1=neg; 0=pos
+    // displacement of p1 and p2 over 16 frames
+    logic [12:0] p1_16frame_dx, p1_16frame_dy, p2_16frame_dx, p2_16frame_dy;
+    logic p1_16frame_dx_sign, p1_16frame_dy_sign; // 1=neg; 0=pos
+    logic p2_16frame_dx_sign, p2_16frame_dy_sign; // 1=neg; 0=pos
+    // true when vars for p1 and p2 displacement over 15 frames are valid
+    logic delta_16frame_values_valid;
+
     // track player 1 LED 
     logic [15:0] count_num_pixels_for_p1; // sometimes invalid
     logic [15:0] final_num_pixels_for_p1; // final (valid) value
@@ -102,6 +101,8 @@ module camera_top_module (
     // current + previous locations of p1 and p2
     // target that tracks p1
     logic [11:0] target_p1;
+    // x + y coordinates must be same size as signed p#_dx and p#_dy
+    // signed variables
     logic [8:0] x_coord_of_p1, prev_x_coord_of_p1;
     logic [7:0] y_coord_of_p1, prev_y_coord_of_p1;
     // target that tracks p2
@@ -122,57 +123,25 @@ module camera_top_module (
     logic [31:0] display_data; // 8 hex display
     logic [6:0] segments; // 7-segment display
     logic [15:0] hold_led_vals;
+    assign led = hold_led_vals;
 
     // LOGIC
 
-    // display change in (x,y) of p2 + p1 on left + right hex sides of hex display
-    assign display_data = {final_unsigned_p2_dx[7:0], final_unsigned_p2_dy[7:0],
-            final_unsigned_p1_dx[7:0], final_unsigned_p1_dy[7:0]};
-    // display change in num pixels of p2 + p1 on left + right hex sides of hex display
-    //assign display_data = {final_num_pixels_for_p2, final_num_pixels_for_p1};
+    always_comb begin
+        if (delta_16frame_values_valid) begin
+            // display change in (x,y) of p2 + p1 on left + right 
+            // hex sides of hex display
+            display_data = {p2_16frame_dx[7:0], p2_16frame_dy[7:0],
+                    p1_16frame_dx[7:0], p1_16frame_dy[7:0]};
 
-    // light up if positive
-    assign led[13:12] = ~final_p2_dx_sign ? 2'b11 : 2'b00;
-    assign led[11:9] = ~final_p2_dy_sign ? 3'b111 : 3'b000;
-    assign led[8:7] = ~final_p1_dx_sign ? 2'b11 : 2'b00;
-    assign led[6:4] = ~final_p2_dy_sign ? 3'b111 : 3'b000;
-
-    // set final delta values when p1_dx, etc. are valid
-    // negative numbers converted to positive numbers for display
-    // if val positive, leds under hex value lit up; otherwise dark
-    always @(posedge clk_65mhz) begin
-        if (delta_values_valid) begin
-            if (p2_dx[13]) begin // if p2 moved left 
-                final_unsigned_p2_dx <= ~(p2_dx - 1);
-                final_p2_dx_sign <= 1;
-            end else begin // if p2 moved right
-                final_unsigned_p2_dx <= p2_dx;
-                final_p2_dx_sign <= 0;
-            end
-            if (p2_dy[13]) begin // if p2 moved up (y decr.)
-                final_unsigned_p2_dy <= ~(p2_dy - 1);
-                final_p2_dy_sign <= 1;
-            end else begin // if p2 moved down (y incr.)
-                final_unsigned_p2_dy <= p2_dy;
-                final_p2_dy_sign <= 0;
-            end
-            if (p1_dx[13]) begin // if p1 moved left
-                final_unsigned_p1_dx <= ~(p1_dx - 1);
-                final_p1_dx_sign <= 1;
-            end else begin // if p1 moved right
-                final_unsigned_p1_dx <= p1_dx;
-                final_p1_dx_sign <= 0;
-            end
-            if (p1_dy[13]) begin // if p1 moved up (y decr.)
-                final_unsigned_p1_dy <= ~(p1_dy - 1);
-                final_p1_dy_sign <= 1;
-            end else begin // if p1 moved down (y incr.)
-                final_unsigned_p1_dy <= p1_dy;
-                final_p1_dy_sign <= 0;
-            end
+            // light up leds under delta values if positive
+            hold_led_vals[13:12] = ~p2_16frame_dx_sign ? 2'b11 : 2'b00;
+            hold_led_vals[11:9] = ~p2_16frame_dy_sign ? 3'b111 : 3'b000;
+            hold_led_vals[8:7] = ~p1_16frame_dx_sign ? 2'b11 : 2'b00;
+            hold_led_vals[6:4] = ~p2_16frame_dy_sign ? 3'b111 : 3'b000;
         end
     end
-    
+
     // hex display 
     assign {cg, cf, ce, cd, cc, cb, ca} = segments[6:0];
     assign dp = 1'b1;  // turn off the period
@@ -194,7 +163,7 @@ module camera_top_module (
             .count_out(count_out)
         );
     logic one_second_pulse;
-    assign led16_b = one_second_pulse;
+    //assign led16_b = one_second_pulse;
         
     always_ff @(posedge clk_65mhz) begin
         if (one_hz) begin
@@ -324,26 +293,108 @@ module camera_top_module (
         end
     end*/
 
+    // calc. sign and delta over 2 frames
+    // p1_2frame_dx
+    always_comb begin
+        // signs
+        if (prev_x_coord_of_p1 > x_coord_of_p1) p1_2frame_dx_sign = 1;
+        else p1_2frame_dx_sign = 0;
+        if (prev_y_coord_of_p1 > y_coord_of_p1) p1_2frame_dy_sign = 1;
+        else p1_2frame_dy_sign = 0;
+        if (prev_x_coord_of_p2 > x_coord_of_p1) p1_2frame_dx_sign = 1;
+        else p2_2frame_dx_sign = 0;
+        if (prev_y_coord_of_p2 > y_coord_of_p1) p1_2frame_dy_sign = 1;
+        else p2_2frame_dy_sign = 0;
+
+        // 2frame_dx and 2frame_dys
+        if (p1_2frame_dx_sign) p1_2frame_dx = prev_x_coord_of_p1 - x_coord_of_p1;
+        else p1_2frame_dx = x_coord_of_p1 - prev_x_coord_of_p1;
+        // p1_2frame_dy
+        p1_2frame_dy = p1_2frame_dy_sign ? prev_y_coord_of_p1 - y_coord_of_p1 :
+                y_coord_of_p1 - prev_y_coord_of_p1;
+        // p2_2frame_dx
+        p2_2frame_dx = p2_2frame_dx_sign ? prev_x_coord_of_p2 - x_coord_of_p2 :
+                x_coord_of_p2 - prev_x_coord_of_p2;
+        // p2_2frame_dy
+        p2_2frame_dy = p2_2frame_dy_sign ? prev_y_coord_of_p2 - y_coord_of_p2 :
+                y_coord_of_p2 - prev_y_coord_of_p2;
+    end
+
     always_ff @(posedge clk_65mhz) begin
         buffer_frame_done_out <= frame_done_out;
         if (frame_done_out) frame_tally <= frame_tally + 1;
 
         // delta values valid after every 16 frames
         if (end_of_motion) begin
-            delta_values_valid <= 1;
+            delta_16frame_values_valid <= 1;
         // reset values to 0 after extracting final delta values
-        end else if (delta_values_valid) begin
-            delta_values_valid <= 0;
-            p1_dx <= 0;
-            p1_dy <= 0;
-            p2_dx <= 0;
-            p2_dy <= 0;
-        // else update p1_dx, etc.
+        end else if (delta_16frame_values_valid) begin
+            delta_16frame_values_valid <= 0;
+            p1_16frame_dx <= 0;
+            p1_16frame_dy <= 0;
+            p2_16frame_dx <= 0;
+            p2_16frame_dy <= 0;
+        // else update p1 and p2 (x,y) deltas over 15 frames
         end else begin
-            p1_dx <= p1_dx + (x_coord_of_p1 - prev_x_coord_of_p1);
-            p1_dy <= p1_dy + (y_coord_of_p1 - prev_y_coord_of_p1);
-            p2_dx <= p2_dx + (x_coord_of_p2 - prev_x_coord_of_p2);
-            p2_dy <= p2_dy + (y_coord_of_p2 - prev_y_coord_of_p2);
+            // update p1_16frame_dx
+            if (p1_16frame_dx_sign==p1_2frame_dx_sign) begin
+                // same sign => add
+                p1_16frame_dx <= p1_16frame_dx + p1_2frame_dx;
+                p1_16frame_dx_sign <= p1_16frame_dx_sign;
+            end else 
+                // diff. sign => subtract
+                if (p1_16frame_dx > p1_2frame_dx) begin
+                    p1_16frame_dx <= p1_16frame_dx - p1_2frame_dx;
+                    p1_16frame_dx_sign <= p1_16frame_dx_sign;
+                end else begin
+                    p1_16frame_dx <= p1_2frame_dx - p1_16frame_dx;
+                    p1_16frame_dx_sign <= p1_2frame_dx_sign;
+                end
+            end
+                    
+            // update p1_16frame_dy
+            if (p1_16frame_dy_sign==p1_2frame_dy_sign) begin
+                p1_16frame_dy <= p1_16frame_dy + p1_2frame_dy;
+                p1_16frame_dy_sign <= p1_16frame_dy_sign;
+            end else 
+                if (p1_16frame_dy > p1_2frame_dy) begin
+                    p1_16frame_dy <= p1_16frame_dy - p1_2frame_dy;
+                    p1_16frame_dy_sign <= p1_16frame_dy_sign;
+                end else begin
+                    p1_16frame_dy <= p1_2frame_dy - p1_16frame_dy;
+                    p1_16frame_dy_sign <= p1_2frame_dy_sign;
+                end
+            end
+            
+            // update p2_16frame_dx
+            if (p2_16frame_dx_sign==p2_2frame_dx_sign) begin
+                // same sign => add
+                p2_16frame_dx <= p2_16frame_dx + p2_2frame_dx;
+                p2_16frame_dx_sign <= p2_16frame_dx_sign;
+            end else 
+                // diff. sign => subtract
+                if (p2_16frame_dx > p2_2frame_dx) begin
+                    p2_16frame_dx <= p2_16frame_dx - p2_2frame_dx;
+                    p2_16frame_dx_sign <= p2_16frame_dx_sign;
+                end else begin
+                    p2_16frame_dx <= p2_2frame_dx - p2_16frame_dx;
+                    p2_16frame_dx_sign <= p2_2frame_dx_sign;
+                end
+            end
+                    
+            // update p2_16frame_dy
+            if (p2_16frame_dy_sign==p2_2frame_dy_sign) begin
+                p2_16frame_dy <= p2_16frame_dy + p2_2frame_dy;
+                p2_16frame_dy_sign <= p2_16frame_dy_sign;
+            end else 
+                if (p2_16frame_dy > p2_2frame_dy) begin
+                    p2_16frame_dy <= p2_16frame_dy - p2_2frame_dy;
+                    p2_16frame_dy_sign <= p2_16frame_dy_sign;
+                end else begin
+                    p2_16frame_dy <= p2_2frame_dy - p2_16frame_dy;
+                    p2_16frame_dy_sign <= p2_2frame_dy_sign;
+                end
+            end
         end
 
         // on falling edge of frame_done_out, update final pixel count
