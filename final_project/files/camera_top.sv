@@ -38,8 +38,14 @@ module camera_top_module (
     assign end_of_motion = (frame_tally == 15);
     // displacement of p1 and p2 over 16 frames; signed variables
     logic [8:0] p1_dx, p1_dy, p2_dx, p2_dy; // sometimes invalid
-    logic [8:0] final_p1_dx, final_p1_dy, final_p2_dx, final_p2_dy; // always valid
-    logic delta_values_valid; // true when p1_dx, etc. are valid
+    // always valid; magnitudes (unsigned values)
+    logic [8:0] final_unsigned_p1_dx, final_unsigned_p1_dy; 
+    logic [8:0] final_unsigned_p2_dx, final_unsigned_p2_dy;
+    // always valid; 1=negative; 0=positive
+    logic final_p1_dx_sign, final_p1_dy_sign;
+    logic final_p2_dx_sign, final_p2_dy_sign;
+    // true when p1_dx, etc., are valid
+    logic delta_values_valid;
 
     // camera variables
     logic [11:0] cam;
@@ -106,58 +112,57 @@ module camera_top_module (
     logic counting, expired_pulse, one_hz;
     logic [3:0] count_out;
 
-    // hex display: (p2_dx, p2_dy, p1_dx, p1_dy)
-    logic [31:0] display_data;
-    // 7-segment display; display (8) 4-bit hex
-    logic [6:0] segments;
+    logic [31:0] display_data; // 8 hex display
+    logic [6:0] segments; // 7-segment display
     logic [15:0] hold_led_vals;
 
     // LOGIC
 
+    assign display_data = {final_unsigned_p2_dx, final_unsigned_p2_dy,
+            final_unsigned_p1_dx, final_unsigned_p1_dy};
+
+    // light up if positive
+    assign led[13:12] = ~final_p2_dx_sign ? 2'b11 : 2'b00;
+    assign led[11:9] = ~final_p2_dy_sign ? 3'b111 : 3'b000;
+    assign led[8:7] = ~final_p1_dx_sign ? 2'b11 : 2'b00;
+    assign led[6:4] = ~final_p2_dy_sign ? 3'b111 : 3'b000;
+
     // set final delta values when p1_dx, etc. are valid
+    // negative numbers converted to positive numbers for display
+    // if val positive, leds under hex value lit up; otherwise dark
     always @(posedge clk_65mhz) begin
         if (delta_values_valid) begin
-            final_p1_dx <= p1_dx;
-            final_p1_dy <= p1_dy;
-            final_p2_dx <= p2_dx;
-            final_p2_dy <= p2_dy;
+            if (p2_dx[8]) begin // if p2 moved left 
+                final_unsigned_p2_dx <= ~(p2_dx - 1);
+                final_p2_dx_sign <= 1;
+            end else begin // if p2 moved right
+                final_unsigned_p2_dx <= p2_dx;
+                final_p2_dx_sign <= 0;
+            end
+            if (p2_dy[8]) begin // if p2 moved up (y decr.)
+                final_unsigned_p2_dy <= ~(p2_dy - 1);
+                final_p2_dy_sign <= 1;
+            end else begin // if p2 moved down (y incr.)
+                final_unsigned_p2_dy <= p2_dy;
+                final_p2_dy_sign <= 0;
+            end
+            if (p1_dx[8]) begin // if p1 moved left
+                final_unsigned_p1_dx <= ~(p1_dx - 1);
+                final_p1_dx_sign <= 1;
+            end else begin // if p1 moved right
+                final_unsigned_p1_dx <= p1_dx;
+                final_p1_dx_sign <= 0;
+            end
+            if (p1_dy[8]) begin // if p1 moved up (y decr.)
+                final_unsigned_p1_dy <= ~(p1_dy - 1);
+                final_p1_dy_sign <= 1;
+            end else begin // if p1 moved down (y incr.)
+                final_unsigned_p1_dy <= p1_dy;
+                final_p1_dy_sign <= 0;
+            end
         end
     end
     
-    // negative numbers converted to positive numbers for display
-    // if val positive, leds under hex value lit up; otherwise dark
-    assign led = hold_led_vals;
-    always_comb begin
-        if (final_p2_dx[8]) begin // if p2 moved left 
-            hold_led_vals[13:12] = 2'b00;
-            display_data[31:24] = ~(final_p2_dx - 1);
-        end else begin // if p2 moved right
-            hold_led_vals[13:12] = 2'b11;
-            display_data[31:24] = final_p2_dx;
-        end
-        if (final_p2_dy[8]) begin // if p2 moved up (y decr.)
-            hold_led_vals[11:9] = 3'b000;
-            display_data[23:16] = ~(final_p2_dy - 1);
-        end else begin // if p2 moved down (y incr.)
-            hold_led_vals[11:9] = 3'b111;
-            display_data[23:16] = final_p2_dy;
-        end
-        if (final_p1_dx[8]) begin // if p1 moved left
-            hold_led_vals[8:7] = 2'b00;
-            display_data[15:8] = ~(final_p1_dx - 1);
-        end else begin // if p1 moved right
-            hold_led_vals[8:7] = 2'b11;
-            display_data[15:8] = final_p1_dx;
-        end
-        if (final_p1_dy[8]) begin // if p1 moved up (y decr.)
-            hold_led_vals[6:4] = 3'b000;
-            display_data[7:0] = ~(final_p1_dy - 1);
-        end else begin // if p1 moved down (y incr.)
-            hold_led_vals[6:4] = 3'b111;
-            display_data[7:0] = final_p1_dy;
-        end
-    end
-
     // hex display 
     assign {cg, cf, ce, cd, cc, cb, ca} = segments[6:0];
     assign dp = 1'b1;  // turn off the period
