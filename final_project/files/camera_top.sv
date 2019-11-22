@@ -37,10 +37,11 @@ module camera_top_module (
     logic end_of_motion; // true at end of every 16 frames
     assign end_of_motion = (frame_tally == 15);
     // displacement of p1 and p2 over 16 frames; signed variables
-    logic [8:0] p1_dx, p1_dy, p2_dx, p2_dy; // sometimes invalid
+    // 14 bits b/c log_2(num_frames=15) + log_2(max_coordinate=320) = 14
+    logic [13:0] p1_dx, p1_dy, p2_dx, p2_dy; // sometimes invalid
     // always valid; magnitudes (unsigned values)
-    logic [8:0] final_unsigned_p1_dx, final_unsigned_p1_dy; 
-    logic [8:0] final_unsigned_p2_dx, final_unsigned_p2_dy;
+    logic [13:0] final_unsigned_p1_dx, final_unsigned_p1_dy; 
+    logic [13:0] final_unsigned_p2_dx, final_unsigned_p2_dy;
     // always valid; 1=negative; 0=positive
     logic final_p1_dx_sign, final_p1_dy_sign;
     logic final_p2_dx_sign, final_p2_dy_sign;
@@ -52,11 +53,13 @@ module camera_top_module (
     logic [11:0] frame_buff_out;
     logic [7:0] pixel_buff, pixel_in;
     logic [15:0] output_pixels;
-    logic [11:0] processed_pixels;
-    logic valid_pixel;
+    logic [11:0] rgb_pixel;
+    logic rgb_pixel_valid;
     logic frame_done_out;
     logic buffer_frame_done_out; // delayed frame_done_out
     logic after_frame_before_first_pixel;
+    //logic [11:0] hsv_pixel;
+    //logic hsv_pixel_valid;
 
     // screen display variables
     // x value of pixel being displayed (pixel on current line)
@@ -68,7 +71,7 @@ module camera_top_module (
     wire hsync, vsync, blank; // synchronized values
     // un-synchronized; outputs of screen module
     wire hsync_prev, vsync_prev, blank_prev;
-    reg [11:0] rgb;    
+    reg [11:0] pixel_out;    
     logic pclk_buff, pclk_in;
     logic vsync_buff, vsync_in;
     logic href_buff, href_in;
@@ -77,11 +80,11 @@ module camera_top_module (
     logic xclk;
     logic[1:0] xclk_count;
 
-    // track player 1 LED (RED)
+    // track player 1 LED 
     logic [15:0] count_num_pixels_for_p1; // sometimes invalid
     logic [15:0] final_num_pixels_for_p1; // final (valid) value
     logic [23:0] x_coord_sum_for_p1, y_coord_sum_for_p1;
-    // track player 2 LED (IR LED)
+    // track player 2 LED
     logic [15:0] count_num_pixels_for_p2; // sometimes invalid
     logic [15:0] final_num_pixels_for_p2; // final (valid) value
     logic [23:0] x_coord_sum_for_p2, y_coord_sum_for_p2;
@@ -105,6 +108,10 @@ module camera_top_module (
     logic [11:0] target_p2;
     logic [8:0] x_coord_of_p2, prev_x_coord_of_p2;
     logic [7:0] y_coord_of_p2, prev_y_coord_of_p2;
+    // target that tracks sw
+    //logic [11:0] target_sw;
+    // hold pixel value under sw coord.
+    //logic [11:0] sw_pixel_value;
 
     // timer variables
     logic start;
@@ -118,8 +125,11 @@ module camera_top_module (
 
     // LOGIC
 
-    assign display_data = {final_unsigned_p2_dx, final_unsigned_p2_dy,
-            final_unsigned_p1_dx, final_unsigned_p1_dy};
+    // display change in (x,y) of p2 + p1 on left + right hex sides of hex display
+    assign display_data = {final_unsigned_p2_dx[7:0], final_unsigned_p2_dy[7:0],
+            final_unsigned_p1_dx[7:0], final_unsigned_p1_dy[7:0]};
+    // display change in num pixels of p2 + p1 on left + right hex sides of hex display
+    //assign display_data = {final_num_pixels_for_p2, final_num_pixels_for_p1};
 
     // light up if positive
     assign led[13:12] = ~final_p2_dx_sign ? 2'b11 : 2'b00;
@@ -132,28 +142,28 @@ module camera_top_module (
     // if val positive, leds under hex value lit up; otherwise dark
     always @(posedge clk_65mhz) begin
         if (delta_values_valid) begin
-            if (p2_dx[8]) begin // if p2 moved left 
+            if (p2_dx[13]) begin // if p2 moved left 
                 final_unsigned_p2_dx <= ~(p2_dx - 1);
                 final_p2_dx_sign <= 1;
             end else begin // if p2 moved right
                 final_unsigned_p2_dx <= p2_dx;
                 final_p2_dx_sign <= 0;
             end
-            if (p2_dy[8]) begin // if p2 moved up (y decr.)
+            if (p2_dy[13]) begin // if p2 moved up (y decr.)
                 final_unsigned_p2_dy <= ~(p2_dy - 1);
                 final_p2_dy_sign <= 1;
             end else begin // if p2 moved down (y incr.)
                 final_unsigned_p2_dy <= p2_dy;
                 final_p2_dy_sign <= 0;
             end
-            if (p1_dx[8]) begin // if p1 moved left
+            if (p1_dx[13]) begin // if p1 moved left
                 final_unsigned_p1_dx <= ~(p1_dx - 1);
                 final_p1_dx_sign <= 1;
             end else begin // if p1 moved right
                 final_unsigned_p1_dx <= p1_dx;
                 final_p1_dx_sign <= 0;
             end
-            if (p1_dy[8]) begin // if p1 moved up (y decr.)
+            if (p1_dy[13]) begin // if p1 moved up (y decr.)
                 final_unsigned_p1_dy <= ~(p1_dy - 1);
                 final_p1_dy_sign <= 1;
             end else begin // if p1 moved down (y incr.)
@@ -215,7 +225,7 @@ module camera_top_module (
           .hsync_out(hsync_prev),.vsync_out(vsync_prev),.blank_out(blank_prev));
     
     // CAMERA
-    assign processed_pixels = {output_pixels[15:12],
+    assign rgb_pixel = {output_pixels[15:12],
             output_pixels[10:7], output_pixels[4:1]};
     
     // TRACK LEDS
@@ -249,7 +259,7 @@ module camera_top_module (
     end
 
     // DIVIDERS
-    // ignore the output when final_num_pixels_in_spot is 0
+    // ignore the output when final_num_pixels_for_p# is 0
     // (i.e. division by 0)
 
     // player 1 dividers
@@ -292,6 +302,7 @@ module camera_top_module (
         .m_axis_dout_tvalid(x_div_out_valid_p2)
     );
 
+    // move targets to follow p1 led & p2 led
     // only display target p1 if there are bright p1-colored pixels
     assign target_p1 = (final_num_pixels_for_p1 && 
             (hcount_mirror==x_coord_of_p1 || 
@@ -301,7 +312,18 @@ module camera_top_module (
     assign target_p2 = (final_num_pixels_for_p2 && 
             (hcount_mirror==x_coord_of_p2 || 
              vcount==y_coord_of_p2)) ? 12'hFFF : 12'h000;
+
+    // move target to follow sw & display pixel value under target
+    /*assign target_sw = (hcount_mirror==sw[7:0] || vcount==sw[15:8]) ?
+            12'hFFF : 12'h000;
+    assign display_data = sw_pixel_value;
     
+    always_comb begin
+        if (sw[15:8]==hcount_mirror && sw[7:0]==vcount) begin
+            sw_pixel_value = cam;
+        end
+    end*/
+
     always_ff @(posedge clk_65mhz) begin
         buffer_frame_done_out <= frame_done_out;
         if (frame_done_out) frame_tally <= frame_tally + 1;
@@ -346,13 +368,16 @@ module camera_top_module (
         // add hcount (x value of pixel being drawn on screen) to x_coord_sum, 
         // and add vcount (y value of pixel being drawn on screen) to y_coord_sum
 
-        // player 1 LED (RED)
-        if (valid_pixel && cam[11:8]>13 && cam[7:4]<3 && cam[3:0]<3) begin
+        // TODO HERE
+
+        // detect LEDS
+        // player 1 LED (red LED)
+        if (rgb_pixel_valid && cam[11:8]>12 && cam[7:4]<3 && cam[3:0]<3) begin
             count_num_pixels_for_p1 <= count_num_pixels_for_p1 + 1;
             x_coord_sum_for_p1 <= x_coord_sum_for_p1 + hcount_mirror;
             y_coord_sum_for_p1 <= y_coord_sum_for_p1 + vcount;
-        // player 2 LED (IR LED (WHITE))
-        end else if (valid_pixel && cam[11:8]>12 && cam[7:4]>12 && cam[3:0]>12) begin
+        // player 2 LED (IR LED (white))
+        end else if (rgb_pixel_valid && cam[11:8]>12 && cam[7:4]>12 && cam[3:0]>12) begin
             count_num_pixels_for_p2 <= count_num_pixels_for_p2 + 1;
             x_coord_sum_for_p2 <= x_coord_sum_for_p2 + hcount_mirror;
             y_coord_sum_for_p2 <= y_coord_sum_for_p2 + vcount;
@@ -360,24 +385,24 @@ module camera_top_module (
     end
 
     // screen display
-    assign xclk = (xclk_count >2'b01);
+    assign xclk = (xclk_count > 2'b01);
     assign jbclk = xclk;
     assign jdclk = xclk;
 
     // memory holding the image from the camera
     blk_mem_gen_0 jojos_bram(.addra(pixel_addr_in), 
                              .clka(pclk_in),
-                             .dina(processed_pixels),
-                             .wea(valid_pixel),
+                             .dina(rgb_pixel),
+                             .wea(rgb_pixel_valid),
                              .addrb(pixel_addr_out),
                              .clkb(clk_65mhz),
                              .doutb(frame_buff_out));
     
     // update pixel address as displaying pixels across the screen
-    always_ff @(posedge pclk_in)begin
+    always_ff @(posedge pclk_in) begin
         if (frame_done_out)begin
             pixel_addr_in <= 17'b0;  
-        end else if (valid_pixel)begin
+        end else if (rgb_pixel_valid)begin
             pixel_addr_in <= pixel_addr_in +1;  
         end
     end
@@ -402,6 +427,15 @@ module camera_top_module (
         ~sw[2]&&((hcount<320)&&(vcount<240)) ? frame_buff_out : 12'h000;*/
     assign pixel_addr_out = hcount_mirror+vcount*32'd320;
     assign cam = ((hcount_mirror<320)&&(vcount<240)) ? frame_buff_out : 12'h000;
+
+    // rgb to hsv module
+    /*rgb2hsv rgb2hsv_unit (
+            .clock(clk_65mhz),
+            .rgb_inputs_valid(rgb_pixel_valid), 
+            .r(rgb_pixel[11:8]), .g(rgb_pixel[7:4]), .b(rgb_pixel[3:0]),
+            .h(hsv_pixel[11:8]), .s(hsv_pixel[7:4]), .v(hsv_pixel[3:0]),
+            .hsv_valid(hsv_pixel_valid)
+        );*/
                                         
     // camera module
     camera_read  my_camera(
@@ -410,7 +444,7 @@ module camera_top_module (
           .href_in(href_in),
           .p_data_in(pixel_in),
           .pixel_data_out(output_pixels),
-          .pixel_valid_out(valid_pixel),
+          .pixel_valid_out(rgb_pixel_valid),
           .frame_done_out(frame_done_out)
         );
 
@@ -420,22 +454,27 @@ module camera_top_module (
 
     // set pixel_out
     always_ff @(posedge clk_65mhz) begin
+        /*
         // debugging: make sure screen is working
         if (sw[1:0] == 2'b01) begin
             // 1 pixel outline of visible area (white)
-            rgb <= {12{border}};
+            pixel_out <= {12{border}};
         end else if (sw[1:0] == 2'b10) begin
             // color bars
-            rgb <= {{4{hcount[8]}}, {4{hcount[7]}}, {4{hcount[6]}}} ;
-        // else if target p1 is there, display 
-        end else if (target_p1 != 0) begin
-            rgb <= target_p1;
+            pixel_out <= {{4{hcount[8]}}, {4{hcount[7]}}, {4{hcount[6]}}} ;
+        */
+        // if target sw is there, display 
+        /*if (target_sw != 0) begin
+            pixel_out <= target_sw;
+        // else if target p1 is there, display*/
+        if (target_p1 != 0) begin
+            pixel_out <= target_p1;
         // else if target p2 is there, display 
         end else if (target_p2 != 0) begin
-            rgb <= target_p2;
+            pixel_out <= target_p2;
         // else display camera output
         end else begin
-            rgb <= cam;
+            pixel_out <= cam;
         end
     end
 
@@ -445,9 +484,9 @@ module camera_top_module (
     assign vs = vsync;
     assign b = blank;
 
-    assign vga_r = ~b ? rgb[11:8]: 0;
-    assign vga_g = ~b ? rgb[7:4] : 0;
-    assign vga_b = ~b ? rgb[3:0] : 0;
+    assign vga_r = ~b ? pixel_out[11:8]: 0;
+    assign vga_g = ~b ? pixel_out[7:4] : 0;
+    assign vga_b = ~b ? pixel_out[3:0] : 0;
 
     assign vga_hs = ~hs;
     assign vga_vs = ~vs;
