@@ -78,6 +78,7 @@ module camera_top_module (
     logic p2_16frame_dx_sign, p2_16frame_dy_sign; // 1=neg; 0=pos
     // true when vars for p1 and p2 displacement over 15 frames are valid
     logic delta_16frame_values_valid;
+    logic reset_16frame_delta_values;
 
     // track player 1 LED 
     logic [15:0] count_num_pixels_for_p1; // sometimes invalid
@@ -131,14 +132,17 @@ module camera_top_module (
         if (delta_16frame_values_valid) begin
             // display change in (x,y) of p2 + p1 on left + right 
             // hex sides of hex display
-            display_data = {p2_16frame_dx[7:0], p2_16frame_dy[7:0],
-                    p1_16frame_dx[7:0], p1_16frame_dy[7:0]};
+            //display_data = {p2_16frame_dx[7:0], p2_16frame_dy[7:0],
+            //        p1_16frame_dx[7:0], p1_16frame_dy[7:0]};
+            // debugging
+            display_data[31:16] = p1_16frame_dx;
+            display_data[15:0] = p1_16frame_dy;
 
             // light up leds under delta values if positive
             hold_led_vals[13:12] = ~p2_16frame_dx_sign ? 2'b11 : 2'b00;
             hold_led_vals[11:9] = ~p2_16frame_dy_sign ? 3'b111 : 3'b000;
             hold_led_vals[8:7] = ~p1_16frame_dx_sign ? 2'b11 : 2'b00;
-            hold_led_vals[6:4] = ~p2_16frame_dy_sign ? 3'b111 : 3'b000;
+            hold_led_vals[6:4] = ~p1_16frame_dy_sign ? 3'b111 : 3'b000;
         end
     end
 
@@ -273,12 +277,12 @@ module camera_top_module (
 
     // move targets to follow p1 led & p2 led
     // only display target p1 if there are bright p1-colored pixels
-    assign target_p1 = (final_num_pixels_for_p1 && 
+    assign target_p1 = (final_num_pixels_for_p1>5 && 
             (hcount_mirror==x_coord_of_p1 || 
              vcount==y_coord_of_p1)) ? 12'hF00 : 12'h000;
 
     // only display target p2 if there are bright p2-colored pixels
-    assign target_p2 = (final_num_pixels_for_p2 && 
+    assign target_p2 = (final_num_pixels_for_p2>5 && 
             (hcount_mirror==x_coord_of_p2 || 
              vcount==y_coord_of_p2)) ? 12'hFFF : 12'h000;
 
@@ -296,28 +300,25 @@ module camera_top_module (
     // calc. sign and delta over 2 frames
     // p1_2frame_dx
     always_comb begin
-        // signs
-        if (prev_x_coord_of_p1 > x_coord_of_p1) p1_2frame_dx_sign = 1;
-        else p1_2frame_dx_sign = 0;
-        if (prev_y_coord_of_p1 > y_coord_of_p1) p1_2frame_dy_sign = 1;
-        else p1_2frame_dy_sign = 0;
-        if (prev_x_coord_of_p2 > x_coord_of_p1) p1_2frame_dx_sign = 1;
-        else p2_2frame_dx_sign = 0;
-        if (prev_y_coord_of_p2 > y_coord_of_p1) p1_2frame_dy_sign = 1;
-        else p2_2frame_dy_sign = 0;
+        // 2frame delta signs (1=neg., 0=pos.)
+        p1_2frame_dx_sign = (prev_x_coord_of_p1 > x_coord_of_p1);
+        p1_2frame_dy_sign = (prev_y_coord_of_p1 > y_coord_of_p1);
+        p2_2frame_dx_sign = (prev_x_coord_of_p2 > x_coord_of_p2);
+        p2_2frame_dy_sign = (prev_y_coord_of_p2 > y_coord_of_p2);
 
         // 2frame_dx and 2frame_dys
+        // p1_2frame_dx
         if (p1_2frame_dx_sign) p1_2frame_dx = prev_x_coord_of_p1 - x_coord_of_p1;
         else p1_2frame_dx = x_coord_of_p1 - prev_x_coord_of_p1;
         // p1_2frame_dy
-        p1_2frame_dy = p1_2frame_dy_sign ? prev_y_coord_of_p1 - y_coord_of_p1 :
-                y_coord_of_p1 - prev_y_coord_of_p1;
+        if (p1_2frame_dy_sign) p1_2frame_dy = prev_y_coord_of_p1 - y_coord_of_p1;
+        else p1_2frame_dy = y_coord_of_p1 - prev_y_coord_of_p1;
         // p2_2frame_dx
-        p2_2frame_dx = p2_2frame_dx_sign ? prev_x_coord_of_p2 - x_coord_of_p2 :
-                x_coord_of_p2 - prev_x_coord_of_p2;
+        if (p2_2frame_dx_sign) p2_2frame_dx = prev_x_coord_of_p2 - x_coord_of_p2;
+        else p2_2frame_dx = x_coord_of_p2 - prev_x_coord_of_p2;
         // p2_2frame_dy
-        p2_2frame_dy = p2_2frame_dy_sign ? prev_y_coord_of_p2 - y_coord_of_p2 :
-                y_coord_of_p2 - prev_y_coord_of_p2;
+        if (p2_2frame_dy_sign) p2_2frame_dy = prev_y_coord_of_p2 - y_coord_of_p2;
+        else p2_2frame_dy = y_coord_of_p2 - prev_y_coord_of_p2;
     end
 
     always_ff @(posedge clk_65mhz) begin
@@ -329,7 +330,10 @@ module camera_top_module (
             delta_16frame_values_valid <= 1;
         // reset values to 0 after extracting final delta values
         end else if (delta_16frame_values_valid) begin
+            reset_16frame_delta_values <= 1;
             delta_16frame_values_valid <= 0;
+        end else if (reset_16frame_delta_values) begin
+            reset_16frame_delta_values <= 0;
             p1_16frame_dx <= 0;
             p1_16frame_dy <= 0;
             p2_16frame_dx <= 0;
@@ -341,7 +345,7 @@ module camera_top_module (
                 // same sign => add
                 p1_16frame_dx <= p1_16frame_dx + p1_2frame_dx;
                 p1_16frame_dx_sign <= p1_16frame_dx_sign;
-            end else 
+            end else begin
                 // diff. sign => subtract
                 if (p1_16frame_dx > p1_2frame_dx) begin
                     p1_16frame_dx <= p1_16frame_dx - p1_2frame_dx;
@@ -356,7 +360,7 @@ module camera_top_module (
             if (p1_16frame_dy_sign==p1_2frame_dy_sign) begin
                 p1_16frame_dy <= p1_16frame_dy + p1_2frame_dy;
                 p1_16frame_dy_sign <= p1_16frame_dy_sign;
-            end else 
+            end else begin
                 if (p1_16frame_dy > p1_2frame_dy) begin
                     p1_16frame_dy <= p1_16frame_dy - p1_2frame_dy;
                     p1_16frame_dy_sign <= p1_16frame_dy_sign;
@@ -371,7 +375,7 @@ module camera_top_module (
                 // same sign => add
                 p2_16frame_dx <= p2_16frame_dx + p2_2frame_dx;
                 p2_16frame_dx_sign <= p2_16frame_dx_sign;
-            end else 
+            end else begin
                 // diff. sign => subtract
                 if (p2_16frame_dx > p2_2frame_dx) begin
                     p2_16frame_dx <= p2_16frame_dx - p2_2frame_dx;
@@ -386,7 +390,7 @@ module camera_top_module (
             if (p2_16frame_dy_sign==p2_2frame_dy_sign) begin
                 p2_16frame_dy <= p2_16frame_dy + p2_2frame_dy;
                 p2_16frame_dy_sign <= p2_16frame_dy_sign;
-            end else 
+            end else begin
                 if (p2_16frame_dy > p2_2frame_dy) begin
                     p2_16frame_dy <= p2_16frame_dy - p2_2frame_dy;
                     p2_16frame_dy_sign <= p2_16frame_dy_sign;
@@ -418,8 +422,6 @@ module camera_top_module (
         // (hcount, vcount) > some threshhold), increment count_num_pixels_in_spot, 
         // add hcount (x value of pixel being drawn on screen) to x_coord_sum, 
         // and add vcount (y value of pixel being drawn on screen) to y_coord_sum
-
-        // TODO HERE
 
         // detect LEDS
         // player 1 LED (red LED)
