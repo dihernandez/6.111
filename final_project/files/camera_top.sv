@@ -129,6 +129,12 @@ module camera_top_module (
     logic [6:0] segments; // 7-segment display
     logic [15:0] hold_led_vals;
     assign led = hold_led_vals;
+    // determine if player made action
+    logic p1_punch, p1_kick, p2_punch, p2_kick;
+    assign led16_r = p1_punch;
+    assign led16_g = p1_kick;
+    assign led17_r = p1_punch;
+    assign led17_g = p1_kick;
 
     // LOGIC
 
@@ -136,17 +142,20 @@ module camera_top_module (
         if (delta_16frame_values_valid) begin
             // display change in (x,y) of p2 + p1 on left + right 
             // hex sides of hex display
-            //display_data = {p2_16frame_dx[7:0], p2_16frame_dy[7:0],
-            //        p1_16frame_dx[7:0], p1_16frame_dy[7:0]};
-            // debugging
-            display_data[31:16] = p1_16frame_dx;
-            display_data[15:0] = p1_16frame_dy;
+            display_data = {p2_16frame_dx[7:0], p2_16frame_dy[7:0],
+                    p1_16frame_dx[7:0], p1_16frame_dy[7:0]};
 
             // light up leds under delta values if positive
             hold_led_vals[13:12] = ~p2_16frame_dx_sign ? 2'b11 : 2'b00;
             hold_led_vals[11:9] = ~p2_16frame_dy_sign ? 3'b111 : 3'b000;
             hold_led_vals[8:7] = ~p1_16frame_dx_sign ? 2'b11 : 2'b00;
             hold_led_vals[6:4] = ~p1_16frame_dy_sign ? 3'b111 : 3'b000;
+
+            // get kick, punch actions
+            p1_punch = p2_16frame_dx > 'h20;
+            p1_kick = p2_16frame_dy > 'h20;
+            p2_punch = p2_16frame_dx > 'h20;
+            p2_kick = p2_16frame_dy > 'h20;
         end
     end
 
