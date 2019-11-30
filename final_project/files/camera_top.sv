@@ -302,7 +302,6 @@ module camera_top_module (
     end*/
 
     // calc. sign and delta over 2 frames
-    // p1_2frame_dx
     always_comb begin
         // 2frame delta signs (1=neg., 0=pos.)
         p1_2frame_dx_sign = (prev_x_coord_of_p1 > x_coord_of_p1);
@@ -310,7 +309,6 @@ module camera_top_module (
         p2_2frame_dx_sign = (prev_x_coord_of_p2 > x_coord_of_p2);
         p2_2frame_dy_sign = (prev_y_coord_of_p2 > y_coord_of_p2);
 
-        // 2frame_dx and 2frame_dys
         // p1_2frame_dx
         if (p1_2frame_dx_sign) p1_2frame_dx = prev_x_coord_of_p1 - x_coord_of_p1;
         else p1_2frame_dx = x_coord_of_p1 - prev_x_coord_of_p1;
