@@ -133,8 +133,8 @@ module camera_top_module (
     logic p1_punch, p1_kick, p2_punch, p2_kick;
     assign led16_r = p1_punch;
     assign led16_g = p1_kick;
-    assign led17_r = p1_punch;
-    assign led17_g = p1_kick;
+    assign led17_r = p2_punch;
+    assign led17_g = p2_kick;
 
     // LOGIC
 
