@@ -41,6 +41,10 @@ module camera_top_module (
     logic rgb_pixel_valid;
     logic frame_done_out;
     logic buffer_frame_done_out; // delayed frame_done_out
+    logic rising_edge_frame_done_out;
+    logic falling_edge_frame_done_out;
+    assign rising_edge_frame_done_out = !buffer_frame_done_out && frame_done_out;
+    assign falling_edge_frame_done_out= buffer_frame_done_out && !frame_done_out;
     logic after_frame_before_first_pixel;
     //logic [11:0] hsv_pixel;
     //logic hsv_pixel_valid;
@@ -323,7 +327,7 @@ module camera_top_module (
 
     always_ff @(posedge clk_65mhz) begin
         buffer_frame_done_out <= frame_done_out;
-        if (frame_done_out) frame_tally <= frame_tally + 1;
+        if (rising_edge_frame_done_out) frame_tally <= frame_tally + 1;
 
         // delta values valid after every 16 frames
         if (end_of_motion) begin
@@ -338,15 +342,15 @@ module camera_top_module (
             p1_16frame_dy <= 0;
             p2_16frame_dx <= 0;
             p2_16frame_dy <= 0;
-        // else update p1 and p2 (x,y) deltas over 15 frames
-        end else begin
+        // else if new frame, update p1 and p2 (x,y) total deltas over 15 frames
+        end else if (rising_edge_frame_done_out) begin
             // update p1_16frame_dx
             if (p1_16frame_dx_sign==p1_2frame_dx_sign) begin
                 // same sign => add
                 p1_16frame_dx <= p1_16frame_dx + p1_2frame_dx;
                 p1_16frame_dx_sign <= p1_16frame_dx_sign;
             end else begin
-                // diff. sign => subtract
+                // diff. sign => subtract smaller value
                 if (p1_16frame_dx > p1_2frame_dx) begin
                     p1_16frame_dx <= p1_16frame_dx - p1_2frame_dx;
                     p1_16frame_dx_sign <= p1_16frame_dx_sign;
@@ -358,9 +362,11 @@ module camera_top_module (
                     
             // update p1_16frame_dy
             if (p1_16frame_dy_sign==p1_2frame_dy_sign) begin
+                // same sign => add
                 p1_16frame_dy <= p1_16frame_dy + p1_2frame_dy;
                 p1_16frame_dy_sign <= p1_16frame_dy_sign;
             end else begin
+                // diff. sign => subtract smaller value
                 if (p1_16frame_dy > p1_2frame_dy) begin
                     p1_16frame_dy <= p1_16frame_dy - p1_2frame_dy;
                     p1_16frame_dy_sign <= p1_16frame_dy_sign;
@@ -403,7 +409,7 @@ module camera_top_module (
 
         // on falling edge of frame_done_out, update final pixel count
         // for p1 and p2 and set div_inputs_valid to true
-        if (buffer_frame_done_out && !frame_done_out) begin
+        if (falling_edge_frame_done_out) begin
             final_num_pixels_for_p1 <= count_num_pixels_for_p1;
             final_num_pixels_for_p2 <= count_num_pixels_for_p2;
             div_inputs_valid <= 1;
@@ -453,7 +459,7 @@ module camera_top_module (
     
     // update pixel address as displaying pixels across the screen
     always_ff @(posedge pclk_in) begin
-        if (frame_done_out)begin
+        if (frame_done_out) begin
             pixel_addr_in <= 17'b0;  
         end else if (rgb_pixel_valid)begin
             pixel_addr_in <= pixel_addr_in +1;  
@@ -462,6 +468,8 @@ module camera_top_module (
     
     // update screen variables
     always_ff @(posedge clk_65mhz) begin
+        // flow of data: jb[1] => vsync_buff => vsync_in
+        // jb[0] => pclk_buff => pclk_in
         pclk_buff <= jb[0];
         vsync_buff <= jb[1];
         href_buff <= jb[2];

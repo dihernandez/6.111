@@ -29,15 +29,16 @@ module camera_read(
             end
             
             ROW_CAPTURE: begin 
-               FSM_state <= vsync_in ? WAIT_FRAME_START : ROW_CAPTURE;
-               frame_done_out <= vsync_in ? 1 : 0;
-               pixel_valid_out <= (href_in && pixel_half) ? 1 : 0; 
-               if (href_in) begin
+                FSM_state <= vsync_in ? WAIT_FRAME_START : ROW_CAPTURE;
+                // frame done on falling edge of vsync
+                frame_done_out <= vsync_in;
+                pixel_valid_out <= (href_in && pixel_half) ? 1 : 0; 
+                if (href_in) begin
                    // pixel data (16 bits) comes in two halves
                    pixel_half <= ~ pixel_half;
                    if (pixel_half) pixel_data_out[7:0] <= p_data_in;
                    else pixel_data_out[15:8] <= p_data_in;
-               end
+                end
             end
         endcase
     end
