@@ -152,10 +152,10 @@ module camera_top_module (
             hold_led_vals[6:4] = ~p1_16frame_dy_sign ? 3'b111 : 3'b000;
 
             // get kick, punch actions
-            p1_punch = p2_16frame_dx > 'h20;
-            p1_kick = p2_16frame_dy > 'h20;
-            p2_punch = p2_16frame_dx > 'h20;
-            p2_kick = p2_16frame_dy > 'h20;
+            p1_punch = (p1_16frame_dx > 'h20);
+            p1_kick = (p1_16frame_dy > 'h20);
+            p2_punch = (p2_16frame_dx > 'h20);
+            p2_kick = (p2_16frame_dy > 'h20);
         end
     end
 
