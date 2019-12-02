@@ -6,7 +6,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 module camera_top_module (
-        input clk_100mhz,
+        input clk_65mhz,
         input[15:0] sw,
         input btnc, btnu, btnl, btnr, btnd,
         input [7:0] ja,
@@ -27,12 +27,7 @@ module camera_top_module (
         // 1=user action true; 0=user action false
         output logic p1_punch, p1_kick, 
         output logic p2_punch, p2_kick
-        
     );
-
-    // create 65mhz system clock, happens to match 1024 x 768 XVGA timing
-    logic clk_65mhz;
-    clk_wiz_65mhz clkdivider(.clk_in1(clk_100mhz), .clk_out1(clk_65mhz));
 
     // VARIABLES
 
@@ -128,13 +123,17 @@ module camera_top_module (
     logic [15:0] hold_led_vals;
     assign led = hold_led_vals;
     // determine if player made action
+    // RED = punch; GREEN = kick
     assign led16_r = p1_punch;
     assign led16_g = p1_kick;
     assign led17_r = p2_punch;
     assign led17_g = p2_kick;
 
     // LOGIC
-    parameter ACTION_TRESHHOLD = 'h20;
+    parameter PUNCH_DX_MIN = 'hA0;
+    parameter PUNCH_DY_MAX = 'h30;
+    parameter KICK_DY_MIN = 'h40;
+    parameter KICK_DX_MAX = 'h30;
 
     always_comb begin
         if (delta_8frame_values_valid) begin
@@ -150,12 +149,33 @@ module camera_top_module (
             hold_led_vals[6:4] = ~p1_8frame_dy_sign ? 3'b111 : 3'b000;
 
             // get kick, punch actions
-            p1_punch = (p1_8frame_dx > ACTION_TRESHHOLD) && (p1_8frame_dy < ACTION_TRESHHOLD);
-            p1_kick = (p1_8frame_dy > ACTION_TRESHHOLD) && (p1_8frame_dx < ACTION_TRESHHOLD);
-            p2_punch = (p2_8frame_dx > ACTION_TRESHHOLD) && (p2_8frame_dy < ACTION_TRESHHOLD);
-            p2_kick = (p2_8frame_dy > ACTION_TRESHHOLD) && (p2_8frame_dx < ACTION_TRESHHOLD);
+            p1_punch = (p1_8frame_dx > PUNCH_DX_MIN) && (p1_8frame_dy < PUNCH_DY_MAX);
+            p1_kick = (p1_8frame_dy > KICK_DY_MIN) && (p1_8frame_dx < KICK_DX_MAX);
+            p2_punch = (p2_8frame_dx > PUNCH_DX_MIN) && (p2_8frame_dy < PUNCH_DY_MAX);
+            p2_kick = (p2_8frame_dy > KICK_DY_MIN) && (p2_8frame_dx < KICK_DX_MAX);
         end
     end
+
+    // draw squares
+    logic [11:0] p1_square_pixel;
+    logic [11:0] p2_square_pixel;
+    square sq_p1 (
+            .player(1), // 1 = player 1
+            .kick(p1_kick),
+            .punch(p1_punch),
+            .hcount_in(hcount),
+            .vcount_in(vcount),
+            .pixel_out(p1_square_pixel)
+        );
+
+    square sq_p2 (
+            .player(0), // 0 = player 2
+            .kick(p2_kick),
+            .punch(p2_punch),
+            .hcount_in(hcount),
+            .vcount_in(vcount),
+            .pixel_out(p2_square_pixel)
+        );
 
     // hex display 
     assign {cg, cf, ce, cd, cc, cb, ca} = segments[6:0];
@@ -178,7 +198,6 @@ module camera_top_module (
             .count_out(count_out)
         );
     logic one_second_pulse;
-    //assign led16_b = one_second_pulse;
         
     always_ff @(posedge clk_65mhz) begin
         if (one_hz) begin
@@ -503,8 +522,14 @@ module camera_top_module (
         end else if (target_p2 != 0) begin
             pixel_out <= target_p2;
         // else display camera output
-        end else begin
+        end else if (cam != 0) begin
             pixel_out <= cam;
+        // else draw p1 square
+        end else if (p1_square_pixel) begin
+            pixel_out <= p1_square_pixel;
+        // else draw p2 square
+        end else begin
+            pixel_out <= p2_square_pixel;
         end
     end
 
