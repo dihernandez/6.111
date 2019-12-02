@@ -103,8 +103,6 @@ module camera_top_module (
     // current + previous locations of p1 and p2
     // target that tracks p1
     logic [11:0] target_p1;
-    // x + y coordinates must be same size as signed p#_dx and p#_dy
-    // signed variables
     logic [8:0] x_coord_of_p1, prev_x_coord_of_p1;
     logic [7:0] y_coord_of_p1, prev_y_coord_of_p1;
     // target that tracks p2
