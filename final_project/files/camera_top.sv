@@ -6,25 +6,28 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 module camera_top_module (
-       input clk_100mhz,
-       input[15:0] sw,
-       input btnc, btnu, btnl, btnr, btnd,
-       input [7:0] ja,
-       input [2:0] jb,
-       output   jbclk,
-       input [2:0] jd,
-       output   jdclk,
-       output[3:0] vga_r,
-       output[3:0] vga_b,
-       output[3:0] vga_g,
-       output vga_hs,
-       output vga_vs,
-       output led16_b, led16_g, led16_r,
-       output led17_b, led17_g, led17_r,
-       output[15:0] led,
-       output ca, cb, cc, cd, ce, cf, cg, dp,  // segments a-g, dp
-       output[7:0] an    // Display location 0-7
-        // TODO: add player action output
+        input clk_100mhz,
+        input[15:0] sw,
+        input btnc, btnu, btnl, btnr, btnd,
+        input [7:0] ja,
+        input [2:0] jb,
+        output   jbclk,
+        input [2:0] jd,
+        output   jdclk,
+        output[3:0] vga_r,
+        output[3:0] vga_b,
+        output[3:0] vga_g,
+        output vga_hs,
+        output vga_vs,
+        output led16_b, led16_g, led16_r,
+        output led17_b, led17_g, led17_r,
+        output[15:0] led,
+        output ca, cb, cc, cd, ce, cf, cg, dp,  // segments a-g, dp
+        output[7:0] an,    // Display location 0-7
+        // 1=user action true; 0=user action false
+        output logic p1_punch, p1_kick, 
+        output logic p2_punch, p2_kick
+        
     );
 
     // create 65mhz system clock, happens to match 1024 x 768 XVGA timing
@@ -125,13 +128,13 @@ module camera_top_module (
     logic [15:0] hold_led_vals;
     assign led = hold_led_vals;
     // determine if player made action
-    logic p1_punch, p1_kick, p2_punch, p2_kick;
     assign led16_r = p1_punch;
     assign led16_g = p1_kick;
     assign led17_r = p2_punch;
     assign led17_g = p2_kick;
 
     // LOGIC
+    parameter ACTION_TRESHHOLD = 'h20;
 
     always_comb begin
         if (delta_8frame_values_valid) begin
@@ -147,10 +150,10 @@ module camera_top_module (
             hold_led_vals[6:4] = ~p1_8frame_dy_sign ? 3'b111 : 3'b000;
 
             // get kick, punch actions
-            p1_punch = (p1_8frame_dx > 'h20);
-            p1_kick = (p1_8frame_dy > 'h20);
-            p2_punch = (p2_8frame_dx > 'h20);
-            p2_kick = (p2_8frame_dy > 'h20);
+            p1_punch = (p1_8frame_dx > ACTION_TRESHHOLD) && (p1_8frame_dy < ACTION_TRESHHOLD);
+            p1_kick = (p1_8frame_dy > ACTION_TRESHHOLD) && (p1_8frame_dx < ACTION_TRESHHOLD);
+            p2_punch = (p2_8frame_dx > ACTION_TRESHHOLD) && (p2_8frame_dy < ACTION_TRESHHOLD);
+            p2_kick = (p2_8frame_dy > ACTION_TRESHHOLD) && (p2_8frame_dx < ACTION_TRESHHOLD);
         end
     end
 
@@ -293,17 +296,6 @@ module camera_top_module (
     assign target_p2 = (final_num_pixels_for_p2>5 && 
             (hcount_mirror==x_coord_of_p2 || 
              vcount==y_coord_of_p2)) ? 12'hFFF : 12'h000;
-
-    // move target to follow sw & display pixel value under target
-    /*assign target_sw = (hcount_mirror==sw[7:0] || vcount==sw[15:8]) ?
-            12'hFFF : 12'h000;
-    assign display_data = sw_pixel_value;
-    
-    always_comb begin
-        if (sw[15:8]==hcount_mirror && sw[7:0]==vcount) begin
-            sw_pixel_value = cam;
-        end
-    end*/
 
     // calc. sign and delta over 2 frames
     always_comb begin
@@ -484,22 +476,9 @@ module camera_top_module (
         xclk_count <= xclk_count + 2'b01;
     end
 
-    // disable sw[2] making display larger // if sw[2] on, make display larger
-    /*assign pixel_addr_out = sw[2]?((hcount>>1)+(vcount>>1)*32'd320):hcount+vcount*32'd320;
-    assign cam = sw[2]&&((hcount<640)&&(vcount<480)) ? frame_buff_out :
-        ~sw[2]&&((hcount<320)&&(vcount<240)) ? frame_buff_out : 12'h000;*/
     assign pixel_addr_out = hcount_mirror+vcount*32'd320;
     assign cam = ((hcount_mirror<320)&&(vcount<240)) ? frame_buff_out : 12'h000;
 
-    // rgb to hsv module
-    /*rgb2hsv rgb2hsv_unit (
-            .clock(clk_65mhz),
-            .rgb_inputs_valid(rgb_pixel_valid), 
-            .r(rgb_pixel[11:8]), .g(rgb_pixel[7:4]), .b(rgb_pixel[3:0]),
-            .h(hsv_pixel[11:8]), .s(hsv_pixel[7:4]), .v(hsv_pixel[3:0]),
-            .hsv_valid(hsv_pixel_valid)
-        );*/
-                                        
     // camera module
     camera_read  my_camera(
           .p_clock_in(pclk_in),
@@ -517,19 +496,7 @@ module camera_top_module (
 
     // set pixel_out
     always_ff @(posedge clk_65mhz) begin
-        /*
-        // debugging: make sure screen is working
-        if (sw[1:0] == 2'b01) begin
-            // 1 pixel outline of visible area (white)
-            pixel_out <= {12{border}};
-        end else if (sw[1:0] == 2'b10) begin
-            // color bars
-            pixel_out <= {{4{hcount[8]}}, {4{hcount[7]}}, {4{hcount[6]}}} ;
-        */
-        // if target sw is there, display 
-        /*if (target_sw != 0) begin
-            pixel_out <= target_sw;
-        // else if target p1 is there, display*/
+        // if target p1 is there, display*/
         if (target_p1 != 0) begin
             pixel_out <= target_p1;
         // else if target p2 is there, display 
