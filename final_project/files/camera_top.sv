@@ -130,7 +130,7 @@ module camera_top_module (
     assign led17_g = p2_kick;
 
     // LOGIC
-    parameter PUNCH_DX_MIN = 'hA0;
+    parameter PUNCH_DX_MIN = 'h60;
     parameter PUNCH_DY_MAX = 'h30;
     parameter KICK_DY_MIN = 'h40;
     parameter KICK_DX_MAX = 'h30;
