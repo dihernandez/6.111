@@ -30,7 +30,7 @@ module top_level (
     logic clk_65mhz;
     clk_wiz_65mhz clkdivider(.clk_in1(clk_100mhz), .clk_out1(clk_65mhz));
 
-    // whether or not players 1 and 2 made the below actions
+    // ACTIONS
     logic p1_punch, p1_kick, p2_punch, p2_kick;
     camera_top_module ctm (
         .clk_65mhz(clk_65mhz),
