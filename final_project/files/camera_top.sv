@@ -442,7 +442,7 @@ module camera_top_module (
 
         // detect LEDS
         // player 1 LED (red LED)
-        if (rgb_pixel_valid && cam[11:8]>12 && cam[7:4]<2 && cam[3:0]<2) begin
+        if (rgb_pixel_valid && cam[11:8]>11 && cam[7:4]<2 && cam[3:0]<2) begin
             count_num_pixels_for_p1 <= count_num_pixels_for_p1 + 1;
             x_coord_sum_for_p1 <= x_coord_sum_for_p1 + hcount_mirror;
             y_coord_sum_for_p1 <= y_coord_sum_for_p1 + vcount;
