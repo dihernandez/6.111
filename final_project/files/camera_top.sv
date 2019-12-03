@@ -25,8 +25,8 @@ module camera_top_module (
         output ca, cb, cc, cd, ce, cf, cg, dp,  // segments a-g, dp
         output[7:0] an,    // Display location 0-7
         // 1=user action true; 0=user action false
-        output logic p1_punch, p1_kick, 
-        output logic p2_punch, p2_kick
+        output logic p1_punch, p1_kick, p1_move_forwards, p1_move_backwards,
+        output logic p2_punch, p2_kick, p2_move_forwards, p2_move_backwards
     );
 
     // VARIABLES
@@ -69,26 +69,30 @@ module camera_top_module (
     logic [2:0] frame_tally; // counts to 8 frames then resets
     logic end_of_motion; // true at end of every 8 frames
     assign end_of_motion = (frame_tally == 7);
-    // displacement of p1 and p2 over 2 frames
+
+    // track player 1 + player 2 LEDs
+    // calculate size of player LEDs
+    logic [15:0] count_num_pixels_for_p1, count_num_pixels_for_p2; // sometimes invalid
+    logic [15:0] final_num_pixels_for_p1, final_num_pixels_for_p2; // final (valid) value
+    logic [15:0] prev_final_num_pixels_for_p1, prev_final_num_pixels_for_p2;
+    logic [23:0] p1_x_coord_sum, p1_y_coord_sum, p2_x_coord_sum, p2_y_coord_sum;
+    // calculate LED size change over 2 frames
+    logic [8:0] p1_2frame_size_delta, p2_2frame_size_delta; // change in LED size over 2 frames
+    logic p1_2frame_size_delta_sign, p2_2frame_size_delta_sign; // 1=neg; 0=pos
+    // calculate LED size change over 8 frames
+    logic [12:0] p1_8frame_size_delta, p2_8frame_size_delta; // change in LED size over 8 frames
+    logic p1_8frame_size_delta_sign, p2_8frame_size_delta_sign; // 1=neg; 0=pos
+    // calculate LED displacement over 2 frames
     logic [8:0] p1_2frame_dx, p1_2frame_dy, p2_2frame_dx, p2_2frame_dy;
     logic p1_2frame_dx_sign, p1_2frame_dy_sign; // 1=neg; 0=pos
     logic p2_2frame_dx_sign, p2_2frame_dy_sign; // 1=neg; 0=pos
-    // displacement of p1 and p2 over 16 frames
+    // calculate LED displacement over 8 frames
     logic [12:0] p1_8frame_dx, p1_8frame_dy, p2_8frame_dx, p2_8frame_dy;
     logic p1_8frame_dx_sign, p1_8frame_dy_sign; // 1=neg; 0=pos
     logic p2_8frame_dx_sign, p2_8frame_dy_sign; // 1=neg; 0=pos
-    // true when vars for p1 and p2 displacement over 15 frames are valid
+    // true when LED size change and LED displacement over 8 frames are valid
     logic delta_8frame_values_valid;
     logic reset_8frame_delta_values;
-
-    // track player 1 LED 
-    logic [15:0] count_num_pixels_for_p1; // sometimes invalid
-    logic [15:0] final_num_pixels_for_p1; // final (valid) value
-    logic [23:0] x_coord_sum_for_p1, y_coord_sum_for_p1;
-    // track player 2 LED
-    logic [15:0] count_num_pixels_for_p2; // sometimes invalid
-    logic [15:0] final_num_pixels_for_p2; // final (valid) value
-    logic [23:0] x_coord_sum_for_p2, y_coord_sum_for_p2;
 
     // player 1 + player 2 variables
     logic div_inputs_valid;
@@ -135,22 +139,39 @@ module camera_top_module (
 
     always_comb begin
         if (delta_8frame_values_valid) begin
-            // display change in (x,y) of p2 + p1 on left + right 
-            // hex sides of hex display
-            display_data = {p2_8frame_dx[7:0], p2_8frame_dy[7:0],
-                    p1_8frame_dx[7:0], p1_8frame_dy[7:0]};
+            // for debugging: hex display and leds under hex display
+            // left=p2, right=p1
+            display_data = {3'b000, p2_8frame_size_delta[12:0], 3'b000, p1_8frame_size_delta[15:0]};
 
             // light up leds under delta values if positive
-            hold_led_vals[13:12] = ~p2_8frame_dx_sign ? 2'b11 : 2'b00;
-            hold_led_vals[11:9] = ~p2_8frame_dy_sign ? 3'b111 : 3'b000;
-            hold_led_vals[8:7] = ~p1_8frame_dx_sign ? 2'b11 : 2'b00;
-            hold_led_vals[6:4] = ~p1_8frame_dy_sign ? 3'b111 : 3'b000;
+            hold_led_vals[13:9] = ~p2_8frame_size_delta_sign ? 5'b11111 : 0;
+            hold_led_vals[8:4] = ~p1_8frame_dx_sign ? 5'b11111 : 0;
 
-            // get kick, punch actions
-            p1_punch = (p1_8frame_dx > PUNCH_DX_MIN) && (p1_8frame_dy < PUNCH_DY_MAX);
-            p1_kick = (p1_8frame_dy > KICK_DY_MIN) && (p1_8frame_dx < KICK_DX_MAX);
-            p2_punch = (p2_8frame_dx > PUNCH_DX_MIN) && (p2_8frame_dy < PUNCH_DY_MAX);
-            p2_kick = (p2_8frame_dy > KICK_DY_MIN) && (p2_8frame_dx < KICK_DX_MAX);
+            // get move forwards/backwards, kick, + punch actions
+            // player 1
+            if (p1_8frame_size_delta > 20) begin
+                p1_move_forwards = p1_8frame_size_delta_sign;
+                p1_move_backwards = !p1_8frame_size_delta_sign;
+                p1_punch = 0;
+                p1_kick = 0;
+            end else begin
+                p1_move_forwards = 0;
+                p1_move_backwards = 0;
+                p1_punch = (p1_8frame_dx > PUNCH_DX_MIN) && (p1_8frame_dy < PUNCH_DY_MAX);
+                p1_kick = (p1_8frame_dy > KICK_DY_MIN) && (p1_8frame_dx < KICK_DX_MAX);
+            end
+            // player 2
+            if (p2_8frame_size_delta > 20) begin
+                p2_move_forwards = p2_8frame_size_delta_sign;
+                p2_move_backwards = !p2_8frame_size_delta_sign;
+                p2_punch = 0;
+                p2_kick = 0;
+            end else begin
+                p2_move_forwards = 0;
+                p2_move_backwards = 0;
+                p2_punch = (p2_8frame_dx > PUNCH_DX_MIN) && (p2_8frame_dy < PUNCH_DY_MAX);
+                p2_kick = (p2_8frame_dy > KICK_DY_MIN) && (p2_8frame_dx < KICK_DX_MAX);
+            end
         end
     end
 
@@ -159,8 +180,10 @@ module camera_top_module (
     logic [11:0] p2_square_pixel;
     square sq_p1 (
             .player(1), // 1 = player 1
-            .kick(p1_kick),
             .punch(p1_punch),
+            .kick(p1_kick),
+            .forwards(p1_move_forwards),
+            .backwards(p1_move_backwards),
             .hcount_in(hcount),
             .vcount_in(vcount),
             .pixel_out(p1_square_pixel)
@@ -170,6 +193,8 @@ module camera_top_module (
             .player(0), // 0 = player 2
             .kick(p2_kick),
             .punch(p2_punch),
+            .forwards(p2_move_forwards),
+            .backwards(p2_move_backwards),
             .hcount_in(hcount),
             .vcount_in(vcount),
             .pixel_out(p2_square_pixel)
@@ -268,7 +293,7 @@ module camera_top_module (
         .aclk(clk_65mhz),
         .s_axis_divisor_tdata(final_num_pixels_for_p1),
         .s_axis_divisor_tvalid(div_inputs_valid),
-        .s_axis_dividend_tdata(y_coord_sum_for_p1),
+        .s_axis_dividend_tdata(p1_y_coord_sum),
         .s_axis_dividend_tvalid(div_inputs_valid),
         .m_axis_dout_tdata(y_div_and_remainder_out_p1),
         .m_axis_dout_tvalid(y_div_out_valid_p1)
@@ -277,7 +302,7 @@ module camera_top_module (
         .aclk(clk_65mhz),
         .s_axis_divisor_tdata(final_num_pixels_for_p1),
         .s_axis_divisor_tvalid(div_inputs_valid),
-        .s_axis_dividend_tdata(x_coord_sum_for_p1),
+        .s_axis_dividend_tdata(p1_x_coord_sum),
         .s_axis_dividend_tvalid(div_inputs_valid),
         .m_axis_dout_tdata(x_div_and_remainder_out_p1),
         .m_axis_dout_tvalid(x_div_out_valid_p1)
@@ -288,7 +313,7 @@ module camera_top_module (
         .aclk(clk_65mhz),
         .s_axis_divisor_tdata(final_num_pixels_for_p2),
         .s_axis_divisor_tvalid(div_inputs_valid),
-        .s_axis_dividend_tdata(y_coord_sum_for_p2),
+        .s_axis_dividend_tdata(p2_y_coord_sum),
         .s_axis_dividend_tvalid(div_inputs_valid),
         .m_axis_dout_tdata(y_div_and_remainder_out_p2),
         .m_axis_dout_tvalid(y_div_out_valid_p2)
@@ -297,7 +322,7 @@ module camera_top_module (
         .aclk(clk_65mhz),
         .s_axis_divisor_tdata(final_num_pixels_for_p2),
         .s_axis_divisor_tvalid(div_inputs_valid),
-        .s_axis_dividend_tdata(x_coord_sum_for_p2),
+        .s_axis_dividend_tdata(p2_x_coord_sum),
         .s_axis_dividend_tvalid(div_inputs_valid),
         .m_axis_dout_tdata(x_div_and_remainder_out_p2),
         .m_axis_dout_tvalid(x_div_out_valid_p2)
@@ -316,31 +341,44 @@ module camera_top_module (
 
     // calc. sign and delta over 2 frames
     always_comb begin
-        // 2frame delta signs (1=neg., 0=pos.)
+        // 2frame change in position 
+        // signs (1=neg., 0=pos.)
         p1_2frame_dx_sign = (prev_x_coord_of_p1 > x_coord_of_p1);
         p1_2frame_dy_sign = (prev_y_coord_of_p1 > y_coord_of_p1);
         p2_2frame_dx_sign = (prev_x_coord_of_p2 > x_coord_of_p2);
         p2_2frame_dy_sign = (prev_y_coord_of_p2 > y_coord_of_p2);
-
-        // p1_2frame_dx
+        // magnitudes
         if (p1_2frame_dx_sign) p1_2frame_dx = prev_x_coord_of_p1 - x_coord_of_p1;
         else p1_2frame_dx = x_coord_of_p1 - prev_x_coord_of_p1;
-        // p1_2frame_dy
         if (p1_2frame_dy_sign) p1_2frame_dy = prev_y_coord_of_p1 - y_coord_of_p1;
         else p1_2frame_dy = y_coord_of_p1 - prev_y_coord_of_p1;
-        // p2_2frame_dx
         if (p2_2frame_dx_sign) p2_2frame_dx = prev_x_coord_of_p2 - x_coord_of_p2;
         else p2_2frame_dx = x_coord_of_p2 - prev_x_coord_of_p2;
-        // p2_2frame_dy
         if (p2_2frame_dy_sign) p2_2frame_dy = prev_y_coord_of_p2 - y_coord_of_p2;
         else p2_2frame_dy = y_coord_of_p2 - prev_y_coord_of_p2;
+
+        // 2frame change in size 
+        // signs (1=neg., 0=pos.)
+        p1_2frame_size_delta_sign = (prev_final_num_pixels_for_p1 > final_num_pixels_for_p1);
+        p2_2frame_size_delta_sign = (prev_final_num_pixels_for_p2 > final_num_pixels_for_p2);
+        // magnitudes
+        if (p1_2frame_size_delta_sign) begin
+            p1_2frame_size_delta = prev_final_num_pixels_for_p1 - final_num_pixels_for_p1;
+        end else begin
+            p1_2frame_size_delta = final_num_pixels_for_p1 - prev_final_num_pixels_for_p1;
+        end
+        if (p2_2frame_size_delta_sign) begin
+            p2_2frame_size_delta = prev_final_num_pixels_for_p2 - final_num_pixels_for_p2;
+        end else begin
+            p2_2frame_size_delta = final_num_pixels_for_p2 - prev_final_num_pixels_for_p2;
+        end
     end
 
     always_ff @(posedge clk_65mhz) begin
         buffer_frame_done_out <= frame_done_out;
         if (rising_edge_frame_done_out) frame_tally <= frame_tally + 1;
 
-        // delta values valid after every 16 frames
+        // delta values valid after every 8 frames
         if (end_of_motion) begin
             delta_8frame_values_valid <= 1;
         // reset values to 0 after extracting final delta values
@@ -353,9 +391,11 @@ module camera_top_module (
             p1_8frame_dy <= 0;
             p2_8frame_dx <= 0;
             p2_8frame_dy <= 0;
-        // else if new frame, update p1 and p2 (x,y) total deltas over 15 frames
+            p1_8frame_size_delta <= 0;
+            p2_8frame_size_delta <= 0;
+        // else if new frame, calculate change in LED pos. and size over 8 frames
         end else if (rising_edge_frame_done_out) begin
-            // update p1_8frame_dx
+            // update dx of p1 LED over 8 frames 
             if (p1_8frame_dx_sign==p1_2frame_dx_sign) begin
                 // same sign => add
                 p1_8frame_dx <= p1_8frame_dx + p1_2frame_dx;
@@ -371,7 +411,7 @@ module camera_top_module (
                 end
             end
                     
-            // update p1_8frame_dy
+            // update dy of p1 LED over 8 frames 
             if (p1_8frame_dy_sign==p1_2frame_dy_sign) begin
                 // same sign => add
                 p1_8frame_dy <= p1_8frame_dy + p1_2frame_dy;
@@ -387,7 +427,7 @@ module camera_top_module (
                 end
             end
             
-            // update p2_8frame_dx
+            // update dx of p2 LED over 8 frames 
             if (p2_8frame_dx_sign==p2_2frame_dx_sign) begin
                 // same sign => add
                 p2_8frame_dx <= p2_8frame_dx + p2_2frame_dx;
@@ -403,7 +443,7 @@ module camera_top_module (
                 end
             end
                     
-            // update p2_8frame_dy
+            // update dy of p2 LED over 8 frames 
             if (p2_8frame_dy_sign==p2_2frame_dy_sign) begin
                 p2_8frame_dy <= p2_8frame_dy + p2_2frame_dy;
                 p2_8frame_dy_sign <= p2_8frame_dy_sign;
@@ -416,11 +456,43 @@ module camera_top_module (
                     p2_8frame_dy_sign <= p2_2frame_dy_sign;
                 end
             end
+
+            // update size change of p1 LED over 8 frames
+            if (p1_2frame_size_delta_sign==p1_8frame_size_delta_sign) begin
+                p1_8frame_size_delta <= p1_8frame_size_delta + p1_2frame_size_delta; 
+                p1_8frame_size_delta_sign <= p1_8frame_size_delta_sign;
+            end else begin
+                if (p1_8frame_size_delta > p1_2frame_size_delta) begin
+                    p1_8frame_size_delta <= p1_8frame_size_delta - p1_2frame_size_delta; 
+                    p1_8frame_size_delta_sign <= p1_8frame_size_delta_sign;
+                end else begin
+                    p1_8frame_size_delta <= p1_2frame_size_delta - p1_8frame_size_delta; 
+                    p1_8frame_size_delta_sign <= p1_2frame_size_delta_sign;
+                end
+            end
+
+            // update size change of p2 LED over 8 frames
+            if (p2_2frame_size_delta_sign==p2_8frame_size_delta_sign) begin
+                p2_8frame_size_delta <= p2_8frame_size_delta + p2_2frame_size_delta; 
+                p2_8frame_size_delta_sign <= p2_8frame_size_delta_sign;
+            end else begin
+                if (p2_8frame_size_delta > p2_2frame_size_delta) begin
+                    p2_8frame_size_delta <= p2_8frame_size_delta - p2_2frame_size_delta; 
+                    p2_8frame_size_delta_sign <= p2_8frame_size_delta_sign;
+                end else begin
+                    p2_8frame_size_delta <= p2_2frame_size_delta - p2_8frame_size_delta; 
+                    p2_8frame_size_delta_sign <= p2_2frame_size_delta_sign;
+                end
+            end
         end
 
         // on falling edge of frame_done_out, update final pixel count
         // for p1 and p2 and set div_inputs_valid to true
         if (falling_edge_frame_done_out) begin
+            // update prev values
+            prev_final_num_pixels_for_p1 <= final_num_pixels_for_p1;
+            prev_final_num_pixels_for_p2 <= final_num_pixels_for_p2;
+            // update current values
             final_num_pixels_for_p1 <= count_num_pixels_for_p1;
             final_num_pixels_for_p2 <= count_num_pixels_for_p2;
             div_inputs_valid <= 1;
@@ -429,10 +501,10 @@ module camera_top_module (
             div_inputs_valid <= 0;
             count_num_pixels_for_p1 <= 0;
             count_num_pixels_for_p2 <= 0;
-            x_coord_sum_for_p1 <= 0;
-            y_coord_sum_for_p1 <= 0;
-            x_coord_sum_for_p2 <= 0;
-            y_coord_sum_for_p2 <= 0;
+            p1_x_coord_sum <= 0;
+            p1_y_coord_sum <= 0;
+            p2_x_coord_sum <= 0;
+            p2_y_coord_sum <= 0;
         end
 
         // if valid pixel and (RGB value being displayed on screen at
@@ -444,13 +516,13 @@ module camera_top_module (
         // player 1 LED (red LED)
         if (rgb_pixel_valid && cam[11:8]>11 && cam[7:4]<2 && cam[3:0]<2) begin
             count_num_pixels_for_p1 <= count_num_pixels_for_p1 + 1;
-            x_coord_sum_for_p1 <= x_coord_sum_for_p1 + hcount_mirror;
-            y_coord_sum_for_p1 <= y_coord_sum_for_p1 + vcount;
+            p1_x_coord_sum <= p1_x_coord_sum + hcount_mirror;
+            p1_y_coord_sum <= p1_y_coord_sum + vcount;
         // player 2 LED (IR LED (white))
         end else if (rgb_pixel_valid && cam[11:8]>13 && cam[7:4]>13 && cam[3:0]>13) begin
             count_num_pixels_for_p2 <= count_num_pixels_for_p2 + 1;
-            x_coord_sum_for_p2 <= x_coord_sum_for_p2 + hcount_mirror;
-            y_coord_sum_for_p2 <= y_coord_sum_for_p2 + vcount;
+            p2_x_coord_sum <= p2_x_coord_sum + hcount_mirror;
+            p2_y_coord_sum <= p2_y_coord_sum + vcount;
         end
     end
 
