@@ -128,7 +128,7 @@ module camera_top_module (
     assign led17_g = p2_kick;
 
     // LOGIC
-    parameter PUNCH_DX_MIN = 'h60;
+    parameter PUNCH_DX_MIN = 'h40;
     parameter PUNCH_DY_MAX = 'h30;
     parameter KICK_DY_MIN = 'h40;
     parameter KICK_DX_MAX = 'h30;
@@ -442,12 +442,12 @@ module camera_top_module (
 
         // detect LEDS
         // player 1 LED (red LED)
-        if (rgb_pixel_valid && cam[11:8]>12 && cam[7:4]<3 && cam[3:0]<3) begin
+        if (rgb_pixel_valid && cam[11:8]>11 && cam[7:4]<2 && cam[3:0]<2) begin
             count_num_pixels_for_p1 <= count_num_pixels_for_p1 + 1;
             x_coord_sum_for_p1 <= x_coord_sum_for_p1 + hcount_mirror;
             y_coord_sum_for_p1 <= y_coord_sum_for_p1 + vcount;
         // player 2 LED (IR LED (white))
-        end else if (rgb_pixel_valid && cam[11:8]>12 && cam[7:4]>12 && cam[3:0]>12) begin
+        end else if (rgb_pixel_valid && cam[11:8]>13 && cam[7:4]>13 && cam[3:0]>13) begin
             count_num_pixels_for_p2 <= count_num_pixels_for_p2 + 1;
             x_coord_sum_for_p2 <= x_coord_sum_for_p2 + hcount_mirror;
             y_coord_sum_for_p2 <= y_coord_sum_for_p2 + vcount;
