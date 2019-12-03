@@ -74,12 +74,15 @@ module camera_top_module (
     // calculate size of player LEDs
     logic [15:0] count_num_pixels_for_p1, count_num_pixels_for_p2; // sometimes invalid
     logic [15:0] final_num_pixels_for_p1, final_num_pixels_for_p2; // final (valid) value
-    // sizes: 0=[x0,x50), 1=[x50,x100), 2=[x100,x400), 3=[x400,x800)
-    logic [1:0] p1_final_size, p1_prev_final_size, p2_final_size, p2_prev_final_size; 
+    // size grades: 0=[x0,x50), 1=[x50,x100), 2=[x100,x150), 3=[x150,x200),
+    // 4=[x200,x250), 5=[x250,x300), 6=[x300,x350), 7=[x350,x400), 8=[x400,x450),
+    // 9=[x450,x500), 10=[x500,x550), 11=[x550,x600), 12=[x600,x650), 13=[x650,x700),
+    // 14=[x700,x750), 15=[x750,x800)
+    logic [3:0] p1_final_size, p1_prev_final_size, p2_final_size, p2_prev_final_size; 
     // change in LED size over 2 and 8 frames
-    logic [1:0] p1_2frame_size_delta, p2_2frame_size_delta;
+    logic [4:0] p1_2frame_size_delta, p2_2frame_size_delta;
     logic p1_2frame_size_delta_sign, p2_2frame_size_delta_sign; // 1=neg; 0=pos
-    logic [1:0] p1_8frame_size_delta, p2_8frame_size_delta;
+    logic [6:0] p1_8frame_size_delta, p2_8frame_size_delta;
     logic p1_8frame_size_delta_sign, p2_8frame_size_delta_sign; // 1=neg; 0=pos
     // x and y coordinate sum for calculating centers of LEDs
     logic [23:0] p1_x_coord_sum, p1_y_coord_sum, p2_x_coord_sum, p2_y_coord_sum;
@@ -133,10 +136,14 @@ module camera_top_module (
     assign led17_g = p2_kick;
 
     // LOGIC
-    parameter PUNCH_DX_MIN = 'h40;
-    parameter PUNCH_DY_MAX = 'h30;
-    parameter KICK_DY_MIN = 'h40;
-    parameter KICK_DX_MAX = 'h30;
+    // treshholds
+    logic [7:0] PUNCH_DX_MIN, PUNCH_DY_MAX, KICK_DX_MAX, KICK_DY_MIN;
+    logic [2:0] MIN_SIZE_DELTA;
+    assign PUNCH_DX_MIN = 'h40 + 'h5 * sw[15:13]; //'h40;
+    assign PUNCH_DY_MAX = 'h10 + 'h5 * sw[12:11]; //'h30;
+    assign KICK_DX_MAX = 'h40 + 'h5 * sw[15:13]; //'h40;
+    assign KICK_DY_MIN = 'h10 + 'h5 * sw[12:11]; //'h30;
+    assign MIN_SIZE_DELTA = 1 + sw[10:9];
 
     always_comb begin
         if (delta_8frame_values_valid) begin
@@ -147,14 +154,17 @@ module camera_top_module (
                              count_num_pixels_for_p2[7:0],
                              3'b000, p1_8frame_size_delta_sign, 
                              2'b00, p1_8frame_size_delta, 
-                             3'b000, p2_8frame_size_delta_sign,
-                             2'b00, p2_8frame_size_delta};
+                             //3'b000, p2_8frame_size_delta_sign,
+                             //2'b00, p2_8frame_size_delta };
+                             3'b000, p1_move_forwards,
+                             3'b000, p1_move_backwards };
+                             
 
             // get move forwards/backwards, kick, + punch actions
             // player 1
             if (p1_8frame_size_delta > 1) begin
-                p1_move_forwards = p1_8frame_size_delta_sign;
-                p1_move_backwards = !p1_8frame_size_delta_sign;
+                p1_move_forwards = !p1_8frame_size_delta_sign; //0=pos=forwards
+                p1_move_backwards = p1_8frame_size_delta_sign; //1=neg=backwards
                 p1_punch = 0;
                 p1_kick = 0;
             end else begin
@@ -165,8 +175,8 @@ module camera_top_module (
             end
             // player 2
             if (p2_8frame_size_delta > 1) begin
-                p2_move_forwards = p2_8frame_size_delta_sign;
-                p2_move_backwards = !p2_8frame_size_delta_sign;
+                p2_move_forwards = !p2_8frame_size_delta_sign; //0=pos=forwards
+                p2_move_backwards = p2_8frame_size_delta_sign; //1=neg=backwards
                 p2_punch = 0;
                 p2_kick = 0;
             end else begin
@@ -360,16 +370,71 @@ module camera_top_module (
         if (p2_2frame_dy_sign) p2_2frame_dy = prev_y_coord_of_p2 - y_coord_of_p2;
         else p2_2frame_dy = y_coord_of_p2 - prev_y_coord_of_p2;
 
+        // size grades: 0=[x0,x50), 1=[x50,x100), 2=[x100,x150), 3=[x150,x200),
+        // 4=[x200,x250), 5=[x250,x300), 6=[x300,x350), 7=[x350,x400), 8=[x400,x450),
+        // 9=[x450,x500), 10=[x500,x550), 11=[x550,x600), 12=[x600,x650), 13=[x650,x700),
+        // 14=[x700,x750), 15=[x750,x800)
+
         // calculate size grade from num. pixels
-        if (final_num_pixels_for_p1 < 'h50) begin
-            p1_final_size = 0;
-        end else if (final_num_pixels_for_p1 < 'h100) begin
-            p1_final_size = 1;
-        end else if (final_num_pixels_for_p1 < 'h400) begin
-            p1_final_size = 2;
-        end else begin
-            p1_final_size = 3;
-        end
+        case (final_num_pixels_for_p1) inside
+            ['h0:'h49] : p1_final_size = 0;
+            ['h50:'h99] : p1_final_size = 1;
+            ['h100:'h149] : p1_final_size = 2;
+            ['h150:'h199] : p1_final_size = 3;
+            ['h200:'h249] : p1_final_size = 4;
+            ['h250:'h299] : p1_final_size = 5;
+            ['h300:'h349] : p1_final_size = 6;
+            ['h350:'h399] : p1_final_size = 7;
+            ['h400:'h449] : p1_final_size = 8;
+            ['h450:'h499] : p1_final_size = 9;
+            ['h500:'h549] : p1_final_size = 10;
+            ['h550:'h599] : p1_final_size = 11;
+            ['h600:'h649] : p1_final_size = 12;
+            ['h650:'h699] : p1_final_size = 13;
+            ['h700:'h749] : p1_final_size = 14;
+            default : p1_final_size = 15;
+        endcase
+
+        case (final_num_pixels_for_p2) inside
+            ['h0:'h49] : p2_final_size = 0;
+            ['h50:'h99] : p2_final_size = 1;
+            ['h100:'h149] : p2_final_size = 2;
+            ['h150:'h199] : p2_final_size = 3;
+            ['h200:'h249] : p2_final_size = 4;
+            ['h250:'h299] : p2_final_size = 5;
+            ['h300:'h349] : p2_final_size = 6;
+            ['h350:'h399] : p2_final_size = 7;
+            ['h400:'h449] : p2_final_size = 8;
+            ['h450:'h499] : p2_final_size = 9;
+            ['h500:'h549] : p2_final_size = 10;
+            ['h550:'h599] : p2_final_size = 11;
+            ['h600:'h649] : p2_final_size = 12;
+            ['h650:'h699] : p2_final_size = 13;
+            ['h700:'h749] : p2_final_size = 14;
+            default : p2_final_size = 15;
+        endcase
+
+        /*
+        if (final_num_pixels_for_p1 < 'h50) p1_final_size = 0;
+        else if (final_num_pixels_for_p1 < 'h100) p1_final_size = 1;
+        else if (final_num_pixels_for_p1 < 'h150) p1_final_size = 2;
+        else if (final_num_pixels_for_p1 < 'h200) p1_final_size = 3;
+        else if (final_num_pixels_for_p1 < 'h250) p1_final_size = 4;
+        else if (final_num_pixels_for_p1 < 'h300) p1_final_size = 5;
+        else if (final_num_pixels_for_p1 < 'h350) p1_final_size = 6;
+        else if (final_num_pixels_for_p1 < 'h400) p1_final_size = 7;
+        else if (final_num_pixels_for_p1 < 'h450) p1_final_size = 8;
+        else if (final_num_pixels_for_p1 < 'h500) p1_final_size = 9;
+        else if (final_num_pixels_for_p1 < 'h550) p1_final_size = 10;
+        else if (final_num_pixels_for_p1 < 'h600) p1_final_size = 11;
+        else if (final_num_pixels_for_p1 < 'h650) p1_final_size = 12;
+        else if (final_num_pixels_for_p1 < 'h700) p1_final_size = 13;
+        else if (final_num_pixels_for_p1 < 'h750) p1_final_size = 14;
+        else p1_final_size = 15;
+        */
+
+
+        /*
         if (final_num_pixels_for_p2 < 'h50) begin
             p2_final_size = 0;
         end else if (final_num_pixels_for_p2 < 'h100) begin
@@ -379,6 +444,7 @@ module camera_top_module (
         end else begin
             p2_final_size = 3;
         end
+        */
 
         // change in size grade over 2 frames
         // signs (1=neg., 0=pos.)
@@ -390,6 +456,16 @@ module camera_top_module (
         if (p2_2frame_size_delta_sign) p2_2frame_size_delta=p2_prev_final_size-p2_final_size;
         else p2_2frame_size_delta = p2_final_size - p2_prev_final_size;
     end
+
+    // led threshholds
+    logic [4:0] RED_MIN_R, RED_MAX_G, RED_MAX_B;
+    logic [4:0] IR_MIN_R, IR_MIN_G, IR_MIN_B;
+    assign RED_MIN_R = 8 + sw[8:6];
+    assign RED_MAX_G = 1 + sw[5:4];
+    assign RED_MAX_B = 1 + sw[5:4];
+    assign IR_MIN_R = 8 + sw[3:1];
+    assign IR_MIN_G = 8 + sw[3:1];
+    assign IR_MIN_B = 8 + sw[3:1];
 
     always_ff @(posedge clk_65mhz) begin
         buffer_frame_done_out <= frame_done_out;
@@ -531,12 +607,14 @@ module camera_top_module (
 
         // detect LEDS
         // player 1 LED (red LED)
-        if (rgb_pixel_valid && cam[11:8]>11 && cam[7:4]<2 && cam[3:0]<2) begin
+        if (rgb_pixel_valid && cam[11:8]>RED_MIN_R && cam[7:4]<RED_MAX_G 
+                && cam[3:0]<RED_MAX_B) begin
             count_num_pixels_for_p1 <= count_num_pixels_for_p1 + 1;
             p1_x_coord_sum <= p1_x_coord_sum + hcount_mirror;
             p1_y_coord_sum <= p1_y_coord_sum + vcount;
         // player 2 LED (IR LED (white))
-        end else if (rgb_pixel_valid && cam[11:8]>13 && cam[7:4]>13 && cam[3:0]>13) begin
+        end else if (rgb_pixel_valid && cam[11:8]>IR_MIN_R && cam[7:4]>IR_MIN_G 
+                && cam[3:0]>IR_MIN_B) begin
             count_num_pixels_for_p2 <= count_num_pixels_for_p2 + 1;
             p2_x_coord_sum <= p2_x_coord_sum + hcount_mirror;
             p2_y_coord_sum <= p2_y_coord_sum + vcount;
