@@ -61,8 +61,8 @@ module top_level (
 	//outputs
     	.cat({cg, cf, ce, cd, cd, cc, cb, ca}),
     	.an(an),	//flicker the lights of the player taking damage?
-    	.speaker(jb[0]),
+	.p1_hp(p1_hp), .p2_points(p2_hp)
 	.p1_dead(p1_dead), .p2_dead(p2_dead),
-    	.p1_hp(p1_hp), .p2_points(p2_hp)
+    	.speaker(jb[0])
     );
 endmodule

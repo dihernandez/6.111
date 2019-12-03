@@ -29,9 +29,9 @@ module HP(
     
     output [7:0] cat,
     output [7:0] an,	//flicker the lights of the player taking damage?
-    output logic speaker,
+    output [6:0] p1_hp, p2_points,
     output logic p1_dead, p2_dead,
-    output [6:0] p1_hp, p2_points
+    output logic speaker
     );
 ///*   // commented out in order to synthesize top_level.sv
     parameter arm_len = 3'd5;	//arms be long
