@@ -25,32 +25,72 @@ module HP(
     input clk,  reset_in,	//I can't remember what the proper clk for the lights is
     input logic p1_punch, p1_kick,  //player 1 made an attack
     input logic p2_punch, p2_kick,  //player 2 made an attack
-    input logic p1_x, p2_x,	//location of player 1 and player 2
+    input logic [11:0] p1_x, p2_x,	//location of player 1 and player 2
     
     output [7:0] cat,
     output [7:0] an,	//flicker the lights of the player taking damage?
-    output logic jb
+    output logic speaker,
+    output logic p1_dead, p2_dead,
+    output [6:0] p1_hp, p2_points
     );
-/*   // commented out in order to synthesize top_level.sv
-    parameter arm_len;
-    parameter leg_len;
-    parameter punch_pts;
-    parameter kick_pts;
+///*   // commented out in order to synthesize top_level.sv
+    parameter arm_len = 3'd5;	//arms be long
+    parameter leg_len = 3'd6;	//legs be longer
+    parameter punch_pts = 5;	//punches are weak
+    parameter kick_pts = 10;	//kicks are strong-ish
 
     logic [7:0] kitty;
-    logic [3:0] p1_hp, p2_hp;
-	//setup for display of p1_hp | p2_hp
+    logic [6:0] p1_hp = 7'b110_0100, p2_hp = 7'b110_0100;	//start hp of 100
+    
+    //setup for display of p1_hp | p2_hp
     seven_seg_controller	points( .clk_in(clk), .rst_in(reset_in), 
-							.val_in({p1_h, p2_hp}),
+							.val_in({p1_hp, p2_hp}),
 							.cat_out(kitty), .an_out(an) );
-	//
+    //points logic
     always @(posedge clk) begin
-	if (p1_hp <= 3'b0) begin
-		cat <= 7'b0
-    	end else if (p1_punch & (p1_x + arm_len <= p2_x)) begin
-		p2_hp <= p2_hp - punch_pts;
-		
+	if (p1_hp <= 7'b0) begin	//player 1 has died
+		p1_hp <= 7'b0;		//hp shows up as "0000"
+		p1_dead <= 1'b1;	//dead
+    	end else if (~p1_dead) begin 	//player 1 is not dead
+		if (p1_punch & (p1_x + arm_len <= p2_x)) begin	//p1 punches p2
+			p2_hp <= p2_hp - punch_pts;	//drop p2's hp
+			//p2 may get shoved back at some point, but not now
+		end else if (p1_kick & (p1_x + leg_len <= p2_x)) begin	//p1 punches p2
+			p2_hp <= p2_hp - kick_pts;	//drop p2's hp
+		end
+	end
+
+	if (p2_hp <= 7'b0) begin	//player 2 has died
+		p2_hp <= 7'b0;		//hp shows up as "0000"
+		p2_dead <= 1'b1;	//dead
+    	end else if (~p2_dead) begin 	//player 2 is not dead
+		if (p2_punch & (p2_x + arm_len <= p1_x)) begin	//p1 punches p2
+			p1_hp <= p1_hp - punch_pts;	//drop p2's hp
+			//p2 may get shoved back at some point, but not now
+		end else if (p2_kick & (p2_x + leg_len <= p1_x)) begin	//p1 punches p2
+			p1_hp <= p1_hp - kick_pts;	//drop p2's hp
+		end
 	end
     end
-    */
+//    */
 endmodule
+
+/////////////////////////////////////////////////////////////////
+//	converts hex to dec
+/////////////////////////////////////////////////////////////////
+/*module HP(
+	input [6:0] 	hex_hp,
+	output [11:0]	dec_hp
+);
+
+	always_comb begin
+		case (hex_hp)
+			4'b1010:	dec_hp = 
+			4'b1011:	dec_hp = 		
+			4'b1100:
+			4'b1101:
+			4'b1110:
+			4'b1111:
+			default;
+endmodule
+*/
