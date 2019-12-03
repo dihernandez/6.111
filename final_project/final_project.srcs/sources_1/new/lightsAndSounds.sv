@@ -31,7 +31,7 @@ module HP(
     output [7:0] an,	//flicker the lights of the player taking damage?
     output logic jb
     );
-
+/*   // commented out in order to synthesize top_level.sv
     parameter arm_len;
     parameter leg_len;
     parameter punch_pts;
@@ -52,5 +52,5 @@ module HP(
 		
 	end
     end
-    
+    */
 endmodule

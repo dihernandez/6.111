@@ -30,14 +30,14 @@ module square (
             y_in = 600;        
         end
 
-        if (punch) begin // punch=red
-            color = 12'hF00;
-        end else if (kick) begin //kick=green
-            color = 12'h0F0;
-        end else if (forwards) begin //forwards=cyan
+        if (forwards) begin //forwards=cyan
             color = 12'h0FF;
         end else if (backwards) begin //backwards=magenta
             color = 12'hF0F;
+        end else if (punch) begin // punch=red
+            color = 12'hF00;
+        end else if (kick) begin //kick=green
+            color = 12'h0F0;
         end else begin //none=black
             color = 12'h000;
         end
