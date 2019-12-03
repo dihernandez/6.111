@@ -51,9 +51,8 @@ module top_level (
     logic [11:0] p1_loc, p2_loc;	//locations of players
     logic [6:0] p1_points, p2_points;	//health points of players
     logic p1_dead, p2_dead;		//which players, if any, are dead
-    HP	health_points(
-	//.clk(clk_100mhz),
-	.clk(clk_65mhz),
+    HP_display	health_points(
+	.clk(clk_100mhz),
 	.reset_in(btnc),	//I can't remember what the proper clk for the lights is
     	.p1_punch(p1_punch), .p1_kick(p1_kick),  //player 1 made an attack
     	.p2_punch(p2_punch), .p2_kick(p2_kick),  //player 2 made an attack
