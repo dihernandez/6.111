@@ -141,15 +141,19 @@ module camera_top_module (
         if (delta_8frame_values_valid) begin
             // for debugging: hex display and leds under hex display
             // left=p2, right=p1
-            display_data = {3'b000, p2_8frame_size_delta[12:0], 3'b000, p1_8frame_size_delta[15:0]};
+            /*display_data = {p2_move_forwards, p2_move_backwards, 2'b00,
+                            p2_8frame_size_delta[11:0], 
+                            p1_move_forwards, p1_move_backwards, 2'b00,
+                            p1_8frame_size_delta[11:0]};*/
+            display_data = {count_num_pixels_for_p1, count_num_pixels_for_p2};
 
             // light up leds under delta values if positive
             hold_led_vals[13:9] = ~p2_8frame_size_delta_sign ? 5'b11111 : 0;
-            hold_led_vals[8:4] = ~p1_8frame_dx_sign ? 5'b11111 : 0;
+            hold_led_vals[8:4] = ~p1_8frame_size_delta_sign ? 5'b11111 : 0;
 
             // get move forwards/backwards, kick, + punch actions
             // player 1
-            if (p1_8frame_size_delta > 20) begin
+            if (p1_8frame_size_delta > 'h30) begin
                 p1_move_forwards = p1_8frame_size_delta_sign;
                 p1_move_backwards = !p1_8frame_size_delta_sign;
                 p1_punch = 0;
@@ -161,7 +165,7 @@ module camera_top_module (
                 p1_kick = (p1_8frame_dy > KICK_DY_MIN) && (p1_8frame_dx < KICK_DX_MAX);
             end
             // player 2
-            if (p2_8frame_size_delta > 20) begin
+            if (p2_8frame_size_delta > 'h30) begin
                 p2_move_forwards = p2_8frame_size_delta_sign;
                 p2_move_backwards = !p2_8frame_size_delta_sign;
                 p2_punch = 0;
