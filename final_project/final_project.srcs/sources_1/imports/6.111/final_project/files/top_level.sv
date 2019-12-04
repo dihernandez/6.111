@@ -32,19 +32,20 @@ module top_level (
 
     // ACTIONS
     logic p1_punch, p1_kick, p2_punch, p2_kick;
+<<<<<<< HEAD
     logic p1_fwd, p2_fwd;
+=======
+    wire hsync, vsync, blank;
+    logic [11:0] pixel_out;
+    logic [31:0] debugging_display_data;
+>>>>>>> b47ffcda3f6e8ace024f986152e7c15863962b98
     camera_top_module ctm (
         .clk_65mhz(clk_65mhz),
         .sw(sw),
-        .btnc(btnc), .btnu(btnu), .btnl(btnl), .btnr(btnr), .btnd(btnd),
         .ja(ja), .jb(jb), .jbclk(jbclk), .jd(jd), .jdclk(jdclk),
-        .vga_r(vga_r), .vga_g(vga_g), .vga_hs(vga_hs), .vga_vs(vga_vs),
-        .led16_b(led16_b), .led16_g(led16_g), .led16_r(led16_r),
-        .led17_b(led17_b), .led17_g(led17_g), .led17_r(led17_r),
-        .led(led),
-        // segments a-g, dp
-        .ca(ca), .cb(cb), .cc(cc), .cd(cd), .ce(ce), .cf(cf), .cg(cg), .dp(dp),  
-        .an(an),    // Display location 0-7
+        .hsync(hsync), .vsync(vsync), .blank(blank),
+        .pixel_out(pixel_out),
+        .display_data(debugging_display_data),
         .p1_punch(p1_punch), .p1_kick(p1_kick),
         .p2_punch(p2_punch), .p2_kick(p2_kick),
         .p1_move_forwards(p1_fwd),
@@ -60,20 +61,59 @@ module top_level (
     
     logic [6:0] p1_points, p2_points;	//health points of players
     logic p1_dead, p2_dead;		//which players, if any, are dead
+<<<<<<< HEAD
     
+=======
+    logic p1_hp, p2_hp; // hit points
+    logic [31:0] hp_display_data;
+>>>>>>> b47ffcda3f6e8ace024f986152e7c15863962b98
     HP	health_points(
-	//.clk(clk_100mhz),
-	.clk(clk_65mhz),
-	.reset_in(btnc),	//I can't remember what the proper clk for the lights is
+        .clk(clk_65mhz),
+        .reset_in(btnc),	//I can't remember what the proper clk for the lights is
     	.p1_punch(p1_punch), .p1_kick(p1_kick),  //player 1 made an attack
     	.p2_punch(p2_punch), .p2_kick(p2_kick),  //player 2 made an attack
     	.p1_x(p1_loc), .p2_x(p2_loc),	//location of player 1 and player 2
     	
-	//outputs
+        //outputs
+        .hit_points(hp_display_data),
+        /*
     	.cat({cg, cf, ce, cd, cd, cc, cb, ca}),
     	.an(an),	//flicker the lights of the player taking damage?
+        */
     	.speaker(jb[0]),
         .p1_dead(p1_dead), .p2_dead(p2_dead),
+<<<<<<< HEAD
     	.p1_hp(p1_points), .p2_hp(p2_points)
+=======
+    	.p1_hp_output(p1_hp), .p2_hp_output(p2_hp)
+>>>>>>> b47ffcda3f6e8ace024f986152e7c15863962b98
     );
+
+    // hex display
+    logic [31:0] display_data;
+    // if left button pressed, display debugging output
+    // else display hit points
+    assign display_data = btnl ? debugging_display_data : hp_display_data;
+    logic [6:0] segments; // 7-segment display
+    assign {cg, cf, ce, cd, cc, cb, ca} = segments[6:0];
+    assign dp = 1'b1; // turn off the period
+    display_8hex display (
+        .clk_in(clk_65mhz),
+        .data_in(display_data),
+        .seg_out(segments),
+        .strobe_out(an)
+    );
+
+    // the following lines are required for the Nexys4 VGA circuit - do not change
+    reg b,hs,vs;
+    assign hs = hsync;
+    assign vs = vsync;
+    assign b = blank;
+
+    assign vga_r = ~b ? pixel_out[11:8]: 0;
+    assign vga_g = ~b ? pixel_out[7:4] : 0;
+    assign vga_b = ~b ? pixel_out[3:0] : 0;
+
+    assign vga_hs = ~hs;
+    assign vga_vs = ~vs;
 endmodule
