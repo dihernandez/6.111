@@ -121,6 +121,8 @@ module camera_top_module (
     // kick: move LED in y direction
     assign KICK_DY_MIN = 'h40 + 'h5 * sw[15:13];
     assign KICK_DX_MAX = 'h10 + 'h5 * sw[12:11];
+    // min change in size grade to indicate forward/backward movement
+    assign MIN_SIZE_DELTA = sw[10:9];
 
     always_comb begin
         if (delta_8frame_values_valid) begin
