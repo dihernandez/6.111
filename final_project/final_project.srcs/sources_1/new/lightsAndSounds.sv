@@ -52,8 +52,8 @@ module HP (
     //points logic
     always_ff @(posedge clk) begin
         if (reset_in) begin     //RESTART
-            p1_hp <= 10'd1000;  //start hp of 1000
-            p2_hp <= 10'd1000;	//start hp of 1000
+            p1_hp <= 7'd100;  //start hp of 1000
+            p2_hp <= 7'd100;	//start hp of 1000
         end else begin  //in game logic
         
             //Player 1 hp logic
