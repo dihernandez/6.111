@@ -33,10 +33,10 @@ module HP (
     output logic speaker        //potential sounds
     );
 
-    parameter arm_len = 3'd5;	//arms be long
-    parameter leg_len = 3'd6;	//legs be longer
-    parameter punch_pts = 3'd5;	//punches are weak
-    parameter kick_pts = 4'd10;	//kicks are strong-ish
+    parameter arm_len = 50;	//arms be long
+    parameter leg_len = 60;	//legs be longer
+    parameter punch_pts = 5;	//punches are weak
+    parameter kick_pts = 10;	//kicks are strong-ish
 
     /*excessive variables?
     assign p1_hp_output = p1_hp;
@@ -52,7 +52,7 @@ module HP (
     //points logic
     always_ff @(posedge clk) begin
         if (reset_in) begin     //RESTART
-            p1_hp <= 7'd100;  //start hp of 1000
+            p1_hp <= 7'd100;    //start hp of 1000
             p2_hp <= 7'd100;	//start hp of 1000
         end else begin  //in game logic
         

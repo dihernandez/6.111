@@ -33,6 +33,7 @@ module top_level (
     // ACTIONS
     logic p1_punch, p1_kick, p2_punch, p2_kick; //hit action being taken 
     logic p1_fwd, p2_fwd;   //is the player moving forward?
+    logic p1_bwd, p2_bwd;   //is the player moving backward?
 
     wire hsync, vsync, blank;
     logic [11:0] pixel_out;
@@ -48,7 +49,9 @@ module top_level (
         .p1_punch(p1_punch), .p1_kick(p1_kick),
         .p2_punch(p2_punch), .p2_kick(p2_kick),
         .p1_move_forwards(p1_fwd),
-        .p2_move_forwards(p2_fwd)
+        .p2_move_forwards(p2_fwd),
+        .p1_move_backwards(p1_bwd),
+        .p2_move_backwards(p2_bwd)
     );
 
 
@@ -75,7 +78,11 @@ module top_level (
     //TODO: finish logic for to control this
     logic [11:0] p1_loc, p2_loc;	//locations of players
     movement    player_motion(
-        .p1_move_forwards(p1_fwd), .p2_move_forwards(p2_fwd),
+        .p1_dead(p1_dead), .p2_dead(p2_dead),
+        .p1_mvfwd(p1_fwd), .p2_mvfwd(p2_fwd),
+        .p1_mvbwd(p1_bwd), .p2_mvbwd(p2_bwd),
+        .p1_hp(p1_points), .p2_hp(p2_points),
+        //outputs
         .p1_x(p1_loc), .p2_x(p2_loc)
     );
     
