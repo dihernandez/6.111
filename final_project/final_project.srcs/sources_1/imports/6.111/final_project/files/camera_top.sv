@@ -189,7 +189,7 @@ module camera_top_module (
             .pixel_out(p2_square_pixel)
         );
 
-<<<<<<< HEAD
+
     // hex display 
 //    assign {cg, cf, ce, cd, cc, cb, ca} = segments[6:0];
     assign dp = 1'b1;  // turn off the period
@@ -200,8 +200,6 @@ module camera_top_module (
             .strobe_out(an)
     ); */
     
-=======
->>>>>>> b47ffcda3f6e8ace024f986152e7c15863962b98
     // timer
     timer timer_uut (
             .clock(clk_65mhz),

@@ -31,14 +31,13 @@ module top_level (
     clk_wiz_65mhz clkdivider(.clk_in1(clk_100mhz), .clk_out1(clk_65mhz));
 
     // ACTIONS
-    logic p1_punch, p1_kick, p2_punch, p2_kick;
-<<<<<<< HEAD
-    logic p1_fwd, p2_fwd;
-=======
+    logic p1_punch, p1_kick, p2_punch, p2_kick; //hit action being taken 
+    logic p1_fwd, p2_fwd;   //is the player moving forward?
+
     wire hsync, vsync, blank;
     logic [11:0] pixel_out;
     logic [31:0] debugging_display_data;
->>>>>>> b47ffcda3f6e8ace024f986152e7c15863962b98
+
     camera_top_module ctm (
         .clk_65mhz(clk_65mhz),
         .sw(sw),
@@ -52,6 +51,27 @@ module top_level (
         .p2_move_forwards(p2_fwd)
     );
 
+
+    // hex display
+    logic [31:0] display_data;
+    logic [31:0] hp_display_data;
+    
+    // if left button pressed, display debugging output
+    // else display hit points
+    assign display_data = btnl ? debugging_display_data : hp_display_data;
+    logic [6:0] segments; // 7-segment display
+    assign {cg, cf, ce, cd, cc, cb, ca} = segments[6:0];
+    logic [6:0] segs_temp;  //dummy var to prevent conflicts
+    logic [6:0] an_temp;    //dummy var to prevent conflicts
+    assign dp = 1'b1; // turn off the period
+    
+    display_8hex display (
+        .clk_in(clk_65mhz),
+        .data_in(display_data), //uses either debugging stuff or hp
+        .seg_out(segments),    //dummy var to prevent conflicts: segs_temp
+        .strobe_out(an)    //dummy var to prevent conflicts: an_temp
+    );
+    
     //TODO: finish logic for to control this
     logic [11:0] p1_loc, p2_loc;	//locations of players
     movement    player_motion(
@@ -59,14 +79,10 @@ module top_level (
         .p1_x(p1_loc), .p2_x(p2_loc)
     );
     
+    
     logic [6:0] p1_points, p2_points;	//health points of players
     logic p1_dead, p2_dead;		//which players, if any, are dead
-<<<<<<< HEAD
-    
-=======
     logic p1_hp, p2_hp; // hit points
-    logic [31:0] hp_display_data;
->>>>>>> b47ffcda3f6e8ace024f986152e7c15863962b98
     HP	health_points(
         .clk(clk_65mhz),
         .reset_in(btnc),	//I can't remember what the proper clk for the lights is
@@ -75,35 +91,13 @@ module top_level (
     	.p1_x(p1_loc), .p2_x(p2_loc),	//location of player 1 and player 2
     	
         //outputs
-        .hit_points(hp_display_data),
-        /*
-    	.cat({cg, cf, ce, cd, cd, cc, cb, ca}),
-    	.an(an),	//flicker the lights of the player taking damage?
-        */
+        .hit_points(hp_display_data),   //hp vals
     	.speaker(jb[0]),
         .p1_dead(p1_dead), .p2_dead(p2_dead),
-<<<<<<< HEAD
-    	.p1_hp(p1_points), .p2_hp(p2_points)
-=======
+    	.p1_hp(p1_points), .p2_hp(p2_points),
     	.p1_hp_output(p1_hp), .p2_hp_output(p2_hp)
->>>>>>> b47ffcda3f6e8ace024f986152e7c15863962b98
     );
-
-    // hex display
-    logic [31:0] display_data;
-    // if left button pressed, display debugging output
-    // else display hit points
-    assign display_data = btnl ? debugging_display_data : hp_display_data;
-    logic [6:0] segments; // 7-segment display
-    assign {cg, cf, ce, cd, cc, cb, ca} = segments[6:0];
-    assign dp = 1'b1; // turn off the period
-    display_8hex display (
-        .clk_in(clk_65mhz),
-        .data_in(display_data),
-        .seg_out(segments),
-        .strobe_out(an)
-    );
-
+   
     // the following lines are required for the Nexys4 VGA circuit - do not change
     reg b,hs,vs;
     assign hs = hsync;
