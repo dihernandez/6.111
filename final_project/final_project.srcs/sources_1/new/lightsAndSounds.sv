@@ -27,7 +27,7 @@ module HP (
     input logic p2_punch, p2_kick,  //player 2 made an attack
     input logic [11:0] p1_x, p2_x,	//location of player 1 and player 2
     
-    output logic [9:0] p1_hp, p2_hp,
+    output logic [6:0] p1_hp, p2_hp,
     output [31:0] hit_points, // data for hex display
     output logic p1_dead, p2_dead, // are they dead
     output logic speaker        //potential sounds
@@ -47,7 +47,7 @@ module HP (
     end*/
     
     //setup for display of p1_hp | p2_hp
-    assign hit_points = {6'b0, p1_hp, 6'b0, p2_hp};
+    assign hit_points = {9'b0, p1_hp, 9'b0, p2_hp};   //9+7+9+7 = 32
     /*seven_seg_controller	points( .clk_in(clk), .rst_in(reset_in), 
                                     .val_in(hit_points),
     						        .cat_out(cat_out), .an_out(an_out) );*/
