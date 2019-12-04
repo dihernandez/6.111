@@ -82,20 +82,20 @@ module top_level (
     
     logic [6:0] p1_points, p2_points;	//health points of players
     logic p1_dead, p2_dead;		//which players, if any, are dead
-    logic p1_hp, p2_hp; // hit points
     HP	health_points(
+        //INPUTS
         .clk(clk_65mhz),
         .reset_in(btnc),	//I can't remember what the proper clk for the lights is
     	.p1_punch(p1_punch), .p1_kick(p1_kick),  //player 1 made an attack
     	.p2_punch(p2_punch), .p2_kick(p2_kick),  //player 2 made an attack
     	.p1_x(p1_loc), .p2_x(p2_loc),	//location of player 1 and player 2
     	
-        //outputs
+        //OUTPUTS
         .hit_points(hp_display_data),   //hp vals
-    	.speaker(jb[0]),
-        .p1_dead(p1_dead), .p2_dead(p2_dead),
     	.p1_hp(p1_points), .p2_hp(p2_points),
-    	.p1_hp_output(p1_hp), .p2_hp_output(p2_hp)
+    	.p1_dead(p1_dead), .p2_dead(p2_dead),
+    	.speaker(jb[0])
+        
     );
    
     // the following lines are required for the Nexys4 VGA circuit - do not change

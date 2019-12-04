@@ -21,8 +21,8 @@
 
 
 module movement(
-    input clk, rst,
-    input logic p1_mvfwd,
+    input clk, reset_in,
+    input logic p1_mvfwd,   //
     input logic p2_mvfwd,
     
     output logic [7:0] p1_x,
