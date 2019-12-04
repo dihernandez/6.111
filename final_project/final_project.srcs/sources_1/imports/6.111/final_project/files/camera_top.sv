@@ -137,8 +137,8 @@ module camera_top_module (
             // get move forwards/backwards, kick, + punch actions
             // player 1
             if (p1_8frame_size_delta > MIN_SIZE_DELTA) begin
-                p1_move_forwards = p1_8frame_size_delta_sign;
-                p1_move_backwards = !p1_8frame_size_delta_sign;
+                p1_move_forwards = !p1_8frame_size_delta_sign; //0=pos=forwards
+                p1_move_backwards = p1_8frame_size_delta_sign; //1=neg=backwards
                 p1_punch = 0;
                 p1_kick = 0;
             end else begin
@@ -149,8 +149,8 @@ module camera_top_module (
             end
             // player 2
             if (p2_8frame_size_delta > MIN_SIZE_DELTA) begin
-                p2_move_forwards = p2_8frame_size_delta_sign;
-                p2_move_backwards = !p2_8frame_size_delta_sign;
+                p2_move_forwards = !p2_8frame_size_delta_sign; //0=pos=forwards
+                p2_move_backwards = p2_8frame_size_delta_sign; //1=neg=backwards
                 p2_punch = 0;
                 p2_kick = 0;
             end else begin
