@@ -21,31 +21,43 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 // controls the hit points logic and player feedback
-module HP(
+module HP (
     input clk,  reset_in,	//I can't remember what the proper clk for the lights is
     input logic p1_punch, p1_kick,  //player 1 made an attack
     input logic p2_punch, p2_kick,  //player 2 made an attack
     input logic [11:0] p1_x, p2_x,	//location of player 1 and player 2
-    
-    output [7:0] cat,
-    output [7:0] an,	//flicker the lights of the player taking damage?
-    output [6:0] p1_hp, p2_points,
-    output logic p1_dead, p2_dead,
+    output [31:0] hit_points, // data for hex display
+    //output [7:0] cat,
+    //output [7:0] an,	//flicker the lights of the player taking damage?
+    output [6:0] p1_hp_output, p2_hp_output, // hit points
+    output logic p1_dead, p2_dead, // are they dead
     output logic speaker
     );
+
 ///*   // commented out in order to synthesize top_level.sv
+
     parameter arm_len = 3'd5;	//arms be long
     parameter leg_len = 3'd6;	//legs be longer
     parameter punch_pts = 5;	//punches are weak
     parameter kick_pts = 10;	//kicks are strong-ish
 
-    logic [7:0] kitty;
-    logic [6:0] p1_hp = 7'b110_0100, p2_hp = 7'b110_0100;	//start hp of 100
+    //logic [7:0] kitty;
+    logic [6:0] p1_hp, p2_hp; 
+    assign p1_hp_output = p1_hp;
+    assign p2_hp_output = p2_hp;
+    initial begin
+        p1_hp = 7'b110_0100;
+        p2_hp = 7'b110_0100;	//start hp of 100
+    end
     
     //setup for display of p1_hp | p2_hp
+    assign hit_points = {p1_hp, p2_hp};
+    /*
     seven_seg_controller	points( .clk_in(clk), .rst_in(reset_in), 
 							.val_in({p1_hp, p2_hp}),
 							.cat_out(kitty), .an_out(an) );
+    */
+
     //points logic
     always @(posedge clk) begin
 	if (p1_hp <= 7'b0) begin	//player 1 has died

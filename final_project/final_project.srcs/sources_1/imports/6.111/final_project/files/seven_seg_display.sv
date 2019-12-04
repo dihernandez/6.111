@@ -8,10 +8,10 @@
 ///////////////////////////////////////////////////////////////
 
 module display_8hex (
-    input clk_in,                 // system clock
-    input [31:0] data_in,         // 8 hex numbers, msb first
-    output reg [6:0] seg_out,     // seven segment display output
-    output reg [7:0] strobe_out   // digit strobe
+        input clk_in,                 // system clock
+        input [31:0] data_in,         // 8 hex numbers, msb first
+        output reg [6:0] seg_out,     // seven segment display output
+        output reg [7:0] strobe_out   // digit strobe
     );
 
     localparam bits = 13;

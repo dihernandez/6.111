@@ -8,22 +8,14 @@
 module camera_top_module (
         input clk_65mhz,
         input[15:0] sw,
-        input btnc, btnu, btnl, btnr, btnd,
         input [7:0] ja,
         input [2:0] jb,
-        output   jbclk,
         input [2:0] jd,
-        output   jdclk,
-        output[3:0] vga_r,
-        output[3:0] vga_b,
-        output[3:0] vga_g,
-        output vga_hs,
-        output vga_vs,
-        output led16_b, led16_g, led16_r,
-        output led17_b, led17_g, led17_r,
-        output[15:0] led,
-        output ca, cb, cc, cd, ce, cf, cg, dp,  // segments a-g, dp
-        output[7:0] an,    // Display location 0-7
+        output logic jbclk,
+        output logic jdclk,
+        output logic hsync, vsync, blank,
+        output logic [11:0] pixel_out,
+        output logic [31:0] display_data, // goes to hex display; for debugging
         // 1=user action true; 0=user action false
         output logic p1_punch, p1_kick, p1_move_forwards, p1_move_backwards,
         output logic p2_punch, p2_kick, p2_move_forwards, p2_move_backwards
@@ -53,10 +45,8 @@ module camera_top_module (
     // y value of pixel being displayed (line number)
     wire [9:0] vcount;
     // keep track of whether (hcount,vcount) is on or off the screen
-    wire hsync, vsync, blank; // synchronized values
     // un-synchronized; outputs of screen module
     wire hsync_prev, vsync_prev, blank_prev;
-    reg [11:0] pixel_out;    
     logic pclk_buff, pclk_in;
     logic vsync_buff, vsync_in;
     logic href_buff, href_in;
@@ -121,26 +111,20 @@ module camera_top_module (
     logic counting, expired_pulse, one_hz;
     logic [3:0] count_out;
 
-    logic [31:0] display_data; // 8 hex display
-    logic [6:0] segments; // 7-segment display
-    logic [15:0] hold_led_vals;
-    assign led = hold_led_vals;
-    // determine if player made action
-    // RED = punch; GREEN = kick
-    assign led16_r = p1_punch;
-    assign led16_g = p1_kick;
-    assign led17_r = p2_punch;
-    assign led17_g = p2_kick;
-
     // LOGIC
-    parameter PUNCH_DX_MIN = 'h40;
-    parameter PUNCH_DY_MAX = 'h30;
-    parameter KICK_DY_MIN = 'h40;
-    parameter KICK_DX_MAX = 'h30;
+    // treshholds
+    logic [7:0] PUNCH_DX_MIN, PUNCH_DY_MAX, KICK_DX_MAX, KICK_DY_MIN;
+    logic [2:0] MIN_SIZE_DELTA;
+    // punch: move LED in x direction
+    assign PUNCH_DX_MIN = 'h40 + 'h5 * sw[15:13];
+    assign PUNCH_DY_MAX = 'h10 + 'h5 * sw[12:11];
+    // kick: move LED in y direction
+    assign KICK_DY_MIN = 'h40 + 'h5 * sw[15:13];
+    assign KICK_DX_MAX = 'h10 + 'h5 * sw[12:11];
 
     always_comb begin
         if (delta_8frame_values_valid) begin
-            // for debugging: hex display and leds under hex display
+            // for debugging
             // left=p2, right=p1
             //display_data = {count_num_pixels_for_p1, count_num_pixels_for_p2};
             display_data = { count_num_pixels_for_p1[7:0],
@@ -152,7 +136,7 @@ module camera_top_module (
 
             // get move forwards/backwards, kick, + punch actions
             // player 1
-            if (p1_8frame_size_delta > 1) begin
+            if (p1_8frame_size_delta > MIN_SIZE_DELTA) begin
                 p1_move_forwards = p1_8frame_size_delta_sign;
                 p1_move_backwards = !p1_8frame_size_delta_sign;
                 p1_punch = 0;
@@ -164,7 +148,7 @@ module camera_top_module (
                 p1_kick = (p1_8frame_dy > KICK_DY_MIN) && (p1_8frame_dx < KICK_DX_MAX);
             end
             // player 2
-            if (p2_8frame_size_delta > 1) begin
+            if (p2_8frame_size_delta > MIN_SIZE_DELTA) begin
                 p2_move_forwards = p2_8frame_size_delta_sign;
                 p2_move_backwards = !p2_8frame_size_delta_sign;
                 p2_punch = 0;
@@ -203,16 +187,6 @@ module camera_top_module (
             .pixel_out(p2_square_pixel)
         );
 
-    // hex display 
-    assign {cg, cf, ce, cd, cc, cb, ca} = segments[6:0];
-    assign dp = 1'b1;  // turn off the period
-    display_8hex display(
-            .clk_in(clk_65mhz),
-            .data_in(display_data), 
-            .seg_out(segments), 
-            .strobe_out(an)
-    );
-    
     // timer
     timer timer_uut (
             .clock(clk_65mhz),
@@ -391,6 +365,16 @@ module camera_top_module (
         else p2_2frame_size_delta = p2_final_size - p2_prev_final_size;
     end
 
+    // led threshholds
+    logic [4:0] RED_MIN_R, RED_MAX_G, RED_MAX_B;
+    logic [4:0] IR_MIN_R, IR_MIN_G, IR_MIN_B;
+    assign RED_MIN_R = 8 + sw[8:6];
+    assign RED_MAX_G = 1 + sw[5:4];
+    assign RED_MAX_B = 1 + sw[5:4];
+    assign IR_MIN_R = 8 + sw[3:1];
+    assign IR_MIN_G = 8 + sw[3:1];
+    assign IR_MIN_B = 8 + sw[3:1];
+
     always_ff @(posedge clk_65mhz) begin
         buffer_frame_done_out <= frame_done_out;
         if (rising_edge_frame_done_out) frame_tally <= frame_tally + 1;
@@ -531,12 +515,14 @@ module camera_top_module (
 
         // detect LEDS
         // player 1 LED (red LED)
-        if (rgb_pixel_valid && cam[11:8]>11 && cam[7:4]<2 && cam[3:0]<2) begin
+        if (rgb_pixel_valid && cam[11:8]>RED_MIN_R && cam[7:4]<RED_MAX_G 
+                && cam[3:0]<RED_MAX_B) begin
             count_num_pixels_for_p1 <= count_num_pixels_for_p1 + 1;
             p1_x_coord_sum <= p1_x_coord_sum + hcount_mirror;
             p1_y_coord_sum <= p1_y_coord_sum + vcount;
         // player 2 LED (IR LED (white))
-        end else if (rgb_pixel_valid && cam[11:8]>13 && cam[7:4]>13 && cam[3:0]>13) begin
+        end else if (rgb_pixel_valid && cam[11:8]>IR_MIN_R && cam[7:4]>IR_MIN_G 
+                && cam[3:0]>IR_MIN_B) begin
             count_num_pixels_for_p2 <= count_num_pixels_for_p2 + 1;
             p2_x_coord_sum <= p2_x_coord_sum + hcount_mirror;
             p2_y_coord_sum <= p2_y_coord_sum + vcount;
@@ -619,18 +605,4 @@ module camera_top_module (
             pixel_out <= p2_square_pixel;
         end
     end
-
-    // the following lines are required for the Nexys4 VGA circuit - do not change
-    reg b,hs,vs;
-    assign hs = hsync;
-    assign vs = vsync;
-    assign b = blank;
-
-    assign vga_r = ~b ? pixel_out[11:8]: 0;
-    assign vga_g = ~b ? pixel_out[7:4] : 0;
-    assign vga_b = ~b ? pixel_out[3:0] : 0;
-
-    assign vga_hs = ~hs;
-    assign vga_vs = ~vs;
-
 endmodule
