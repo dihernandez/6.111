@@ -204,14 +204,14 @@ module camera_top_module (
         );
 
     // hex display 
-    assign {cg, cf, ce, cd, cc, cb, ca} = segments[6:0];
+//    assign {cg, cf, ce, cd, cc, cb, ca} = segments[6:0];
     assign dp = 1'b1;  // turn off the period
-    display_8hex display(
+/*    display_8hex display(
             .clk_in(clk_65mhz),
             .data_in(display_data), 
             .seg_out(segments), 
             .strobe_out(an)
-    );
+    ); */
     
     // timer
     timer timer_uut (

@@ -29,7 +29,7 @@ module HP(
     
     output [7:0] cat,
     output [7:0] an,	//flicker the lights of the player taking damage?
-    output [6:0] p1_hp, p2_points,
+    output logic [6:0] p1_hp, p2_hp,
     output logic p1_dead, p2_dead,
     output logic speaker
     );
@@ -40,7 +40,6 @@ module HP(
     parameter kick_pts = 10;	//kicks are strong-ish
 
     logic [7:0] kitty;
-    logic [6:0] p1_hp = 7'b110_0100, p2_hp = 7'b110_0100;	//start hp of 100
     
     //setup for display of p1_hp | p2_hp
     seven_seg_controller	points( .clk_in(clk), .rst_in(reset_in), 
@@ -48,10 +47,14 @@ module HP(
 							.cat_out(kitty), .an_out(an) );
     //points logic
     always @(posedge clk) begin
-	if (p1_hp <= 7'b0) begin	//player 1 has died
-		p1_hp <= 7'b0;		//hp shows up as "0000"
-		p1_dead <= 1'b1;	//dead
+        if (reset_in) begin
+            p1_hp = 7'b110_0100;
+            p2_hp <= 7'b110_0100;	//start hp of 100
+        end else if (p1_hp <= 7'b0) begin	//player 1 has died
+            p1_hp <= 7'b0;		//hp shows up as "0000"
+            p1_dead <= 1'b1;	//dead
     	end else if (~p1_dead) begin 	//player 1 is not dead
+		
 		if (p1_punch & (p1_x + arm_len <= p2_x)) begin	//p1 punches p2
 			p2_hp <= p2_hp - punch_pts;	//drop p2's hp
 			//p2 may get shoved back at some point, but not now

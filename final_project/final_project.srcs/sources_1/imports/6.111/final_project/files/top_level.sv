@@ -32,6 +32,7 @@ module top_level (
 
     // ACTIONS
     logic p1_punch, p1_kick, p2_punch, p2_kick;
+    logic p1_fwd, p2_fwd;
     camera_top_module ctm (
         .clk_65mhz(clk_65mhz),
         .sw(sw),
@@ -45,12 +46,21 @@ module top_level (
         .ca(ca), .cb(cb), .cc(cc), .cd(cd), .ce(ce), .cf(cf), .cg(cg), .dp(dp),  
         .an(an),    // Display location 0-7
         .p1_punch(p1_punch), .p1_kick(p1_kick),
-        .p2_punch(p2_punch), .p2_kick(p2_kick)
+        .p2_punch(p2_punch), .p2_kick(p2_kick),
+        .p1_move_forwards(p1_fwd),
+        .p2_move_forwards(p2_fwd)
     );
 
+    //TODO: finish logic for to control this
     logic [11:0] p1_loc, p2_loc;	//locations of players
+    movement    player_motion(
+        .p1_move_forwards(p1_fwd), .p2_move_forwards(p2_fwd),
+        .p1_x(p1_loc), .p2_x(p2_loc)
+    );
+    
     logic [6:0] p1_points, p2_points;	//health points of players
     logic p1_dead, p2_dead;		//which players, if any, are dead
+    
     HP	health_points(
 	//.clk(clk_100mhz),
 	.clk(clk_65mhz),
@@ -63,7 +73,7 @@ module top_level (
     	.cat({cg, cf, ce, cd, cd, cc, cb, ca}),
     	.an(an),	//flicker the lights of the player taking damage?
     	.speaker(jb[0]),
-	.p1_dead(p1_dead), .p2_dead(p2_dead),
-    	.p1_hp(p1_hp), .p2_points(p2_hp)
+        .p1_dead(p1_dead), .p2_dead(p2_dead),
+    	.p1_hp(p1_points), .p2_hp(p2_points)
     );
 endmodule
