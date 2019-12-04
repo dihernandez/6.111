@@ -77,6 +77,8 @@ module top_level (
     
     //TODO: finish logic for to control this
     logic [11:0] p1_loc, p2_loc;	//locations of players
+    logic [6:0] p1_points, p2_points;	//health points of players
+    logic p1_dead, p2_dead;		//which players, if any, are dead
     movement    player_motion(
         .p1_dead(p1_dead), .p2_dead(p2_dead),
         .p1_mvfwd(p1_fwd), .p2_mvfwd(p2_fwd),
@@ -86,9 +88,6 @@ module top_level (
         .p1_x(p1_loc), .p2_x(p2_loc)
     );
     
-    
-    logic [6:0] p1_points, p2_points;	//health points of players
-    logic p1_dead, p2_dead;		//which players, if any, are dead
     HP	health_points(
         //INPUTS
         .clk(clk_65mhz),

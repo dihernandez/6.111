@@ -35,25 +35,29 @@ module movement(
     // y_total =  768 pixels             384-64= 320     768-240= 528
     
     always_ff @(posedge clk) begin
-        if (~p1_dead) begin
-            //change 25s to hp level later
-            if (p1_mvfwd && (p1_x + 25 <= p2_x) ) begin  //don't run into p2
-                p1_x <= p1_x + 25;
-            end else if (p1_mvbwd && (p1_x - 25 >= 100))  begin   //as is, p1 cant run into p2 going backwards, 
-                                                                //but can run into the wall... 
-                p1_x <= p1_x - 25;
-            end 
-        end
-
-        if (~p2_dead) begin
-            if (p2_mvfwd && (p2_x - 25 >= p1_x) ) begin  //don't run into p2
-                p2_x <= p2_x - 25;
-            end else if (p2_mvbwd && (p1_x + 25 <= 924))  begin   //as is, p1 cant run into p2 going backwards,
-                                                                   //but can run into the wall... 
-                p2_x <= p2_x + 25;
-            end 
-        end
+        if (reset_in) begin
+            p1_x <= 400;
+            p2_x <= 624;
+        end else begin    
+            if (~p1_dead) begin
+                //change 25s to hp level later
+                if (p1_mvfwd && (p1_x + 25 <= p2_x) ) begin  //don't run into p2
+                    p1_x <= p1_x + 25;
+                end else if (p1_mvbwd && (p1_x - 25 >= 100))  begin   //as is, p1 cant run into p2 going backwards, 
+                                                                    //but can run into the wall... 
+                    p1_x <= p1_x - 25;
+                end 
+            end
     
+            if (~p2_dead) begin
+                if (p2_mvfwd && (p2_x - 25 >= p1_x) ) begin  //don't run into p2
+                    p2_x <= p2_x - 25;
+                end else if (p2_mvbwd && (p1_x + 25 <= 924))  begin   //as is, p1 cant run into p2 going backwards,
+                                                                       //but can run into the wall... 
+                    p2_x <= p2_x + 25;
+                end 
+            end
+        end
     end //always
     
 endmodule
