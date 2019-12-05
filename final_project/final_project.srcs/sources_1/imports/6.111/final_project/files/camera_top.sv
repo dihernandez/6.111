@@ -18,7 +18,9 @@ module camera_top_module (
         output logic [31:0] display_data, // goes to hex display; for debugging
         // 1=user action true; 0=user action false
         output logic p1_punch, p1_kick, p1_move_forwards, p1_move_backwards,
-        output logic p2_punch, p2_kick, p2_move_forwards, p2_move_backwards
+        output logic p2_punch, p2_kick, p2_move_forwards, p2_move_backwards,
+        output logic [10:0] hcount,
+        output logic [9:0] vcount
     );
 
     // VARIABLES
@@ -40,10 +42,10 @@ module camera_top_module (
 
     // screen display variables
     // x value of pixel being displayed (pixel on current line)
-    wire [10:0] hcount, hcount_mirror;
+    wire [10:0] hcount_mirror;  //,hcount //CHANGED
     assign hcount_mirror = 319-hcount; // make camera display mirror image
     // y value of pixel being displayed (line number)
-    wire [9:0] vcount;
+//    wire [9:0] vcount;
     // keep track of whether (hcount,vcount) is on or off the screen
     // un-synchronized; outputs of screen module
     wire hsync_prev, vsync_prev, blank_prev;

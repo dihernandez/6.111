@@ -38,6 +38,8 @@ module top_level (
     wire hsync, vsync, blank;
     logic [11:0] user_output;   //pixels from camera and motions
     logic [31:0] debugging_display_data;
+    logic [10:0] h_count;
+    logic [9:0] v_count;
 
     camera_top_module ctm (
         .clk_65mhz(clk_65mhz),
@@ -51,7 +53,9 @@ module top_level (
         .p1_move_forwards(p1_fwd),
         .p2_move_forwards(p2_fwd),
         .p1_move_backwards(p1_bwd),
-        .p2_move_backwards(p2_bwd)
+        .p2_move_backwards(p2_bwd),
+        .hcount(h_count),
+        .vcount(v_count)
     );
 
 
@@ -85,6 +89,7 @@ module top_level (
         .p1_mvfwd(p1_fwd), .p2_mvfwd(p2_fwd),
         .p1_mvbwd(p1_bwd), .p2_mvbwd(p2_bwd),
         .p1_hp(p1_points), .p2_hp(p2_points),
+        .hcount(h_count), .vcount(v_count),
         //outputs
         .p1_x(p1_loc), .p2_x(p2_loc),
         .pixel_out(game_output) /////////////////////////////////new
@@ -108,7 +113,7 @@ module top_level (
    
     //screen output
     logic [11:0] pixel_out;
-    assign pixel_out = game_output;//(user_output > 0)? user_output:game_output;
+    assign pixel_out = user_output | game_output;  //hopefully allows all things to show up
     
        
     // the following lines are required for the Nexys4 VGA circuit - do not change

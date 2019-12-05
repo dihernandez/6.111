@@ -26,6 +26,8 @@ module movement(
     input logic p1_mvbwd, p2_mvbwd,
     input logic p1_dead, p2_dead,
     input logic [6:0] p1_hp, p2_hp,
+    input logic [10:0] hcount,
+    input logic [9:0] vcount,
     
     output logic [7:0] p1_x,
     output logic [7:0] p2_x,
@@ -39,18 +41,18 @@ module movement(
     //player starter sprites
     logic[11:0] p1_pix, p2_pix;     //squares for now 
     blob #(.WIDTH(128), .HEIGHT(128), .COLOR(12'H609)) //mine is approximately "dark orchid"
-        player1(.x_in(400), .y_in(320), //p1 starts on right side
-                    .hcount_in(p1_x), .vcount_in(320), 
+        player1(.x_in(p1_x), .y_in(320), //p1 starts on right side
+                    .hcount_in(hcount), .vcount_in(vcount), 
                     .pixel_out(p1_pix)
                     );
         
     blob #(.WIDTH(128), .HEIGHT(128), .COLOR(12'H906)) //mine is approximately "dark orchid"
-        player2(.x_in(624), .y_in(320), //p2 starts on left side
-                    .hcount_in(p2_x), .vcount_in(320), 
+        player2(.x_in(p2_x), .y_in(320), //p2 starts on left side
+                    .hcount_in(hcount), .vcount_in(vcount), 
                     .pixel_out(p2_pix)
                     );
         
-    assign pixel_out = p1_pix + p2_pix;
+    assign pixel_out = p1_pix + p2_pix;     //squares are one top of each other??????
     
     always_ff @(posedge clk) begin
         if (reset_in) begin
