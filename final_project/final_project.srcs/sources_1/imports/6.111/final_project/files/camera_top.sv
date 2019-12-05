@@ -132,24 +132,24 @@ module camera_top_module (
         if (end_of_8_frames) begin
             display_data = { count_num_pixels_for_p1[7:0],
                              count_num_pixels_for_p2[7:0],
-                             3'b000, p1_16frame_size_delta_sign, 
-                             2'b00, p1_16frame_size_delta, 
-                             3'b000, p2_16frame_size_delta_sign,
-                             2'b00, p2_16frame_size_delta};
+                             3'b000, p1_8frame_size_delta_sign, 
+                             2'b00, p1_8frame_size_delta, 
+                             3'b000, p2_8frame_size_delta_sign,
+                             2'b00, p2_8frame_size_delta};
 
             // get move forwards/backwards
             // player 1
-            if (p1_16frame_size_delta > MIN_SIZE_DELTA) begin
-                p1_move_forwards = !p1_16frame_size_delta_sign; //0=pos=forwards
-                p1_move_backwards = p1_16frame_size_delta_sign; //1=neg=backwards
+            if (p1_8frame_size_delta > MIN_SIZE_DELTA) begin
+                p1_move_forwards = !p1_8frame_size_delta_sign; //0=pos=forwards
+                p1_move_backwards = p1_8frame_size_delta_sign; //1=neg=backwards
             end else begin
                 p1_move_forwards = 0; 
                 p1_move_backwards = 0;
             end
             // player 2
-            if (p2_16frame_size_delta > MIN_SIZE_DELTA) begin
-                p2_move_forwards = !p2_16frame_size_delta_sign; //0=pos=forwards
-                p2_move_backwards = p2_16frame_size_delta_sign; //1=neg=backwards
+            if (p2_8frame_size_delta > MIN_SIZE_DELTA) begin
+                p2_move_forwards = !p2_8frame_size_delta_sign; //0=pos=forwards
+                p2_move_backwards = p2_8frame_size_delta_sign; //1=neg=backwards
             end else begin
                 p2_move_forwards = 0; 
                 p2_move_backwards = 0;
@@ -395,7 +395,7 @@ module camera_top_module (
 
     always_ff @(posedge clk_65mhz) begin
         buffer_frame_done_out <= frame_done_out;
-        if (rising_edge_frame_done_out) sixteen_frame_tally <= sixteen_frame_tally + 1;
+        if (rising_edge_frame_done_out) eight_frame_tally <= eight_frame_tally + 1;
 
         // at end_of_8_frames, extract delta values then reset to 0
         if (end_of_8_frames) begin
