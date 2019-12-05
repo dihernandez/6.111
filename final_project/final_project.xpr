@@ -3,7 +3,7 @@
 <!--                                                         -->
 <!-- Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.   -->
 
-<Project Version="7" Minor="40" Path="/afs/athena.mit.edu/user/p/e/petrah/6_111_final_project/6.111/final_project/final_project.xpr">
+<Project Version="7" Minor="40" Path="/afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/final_project.xpr">
   <DefaultLaunch Dir="$PRUNDIR"/>
   <Configuration>
     <Option Name="Id" Val="8ceb4b2ed19240c9a5c94d1d1941f4fd"/>
