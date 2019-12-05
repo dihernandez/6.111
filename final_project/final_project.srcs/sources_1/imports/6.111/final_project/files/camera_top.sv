@@ -147,11 +147,17 @@ module camera_top_module (
             if (p1_16frame_size_delta > MIN_SIZE_DELTA) begin
                 p1_move_forwards = !p1_16frame_size_delta_sign; //0=pos=forwards
                 p1_move_backwards = p1_16frame_size_delta_sign; //1=neg=backwards
+            end else begin
+                p1_move_forwards = 0; 
+                p1_move_backwards = 0;
             end
             // player 2
             if (p2_16frame_size_delta > MIN_SIZE_DELTA) begin
                 p2_move_forwards = !p2_16frame_size_delta_sign; //0=pos=forwards
                 p2_move_backwards = p2_16frame_size_delta_sign; //1=neg=backwards
+            end else begin
+                p2_move_forwards = 0; 
+                p2_move_backwards = 0;
             end
         end
 
