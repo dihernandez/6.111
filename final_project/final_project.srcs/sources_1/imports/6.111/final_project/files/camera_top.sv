@@ -116,13 +116,17 @@ module camera_top_module (
     logic [7:0] PUNCH_DX_MIN, PUNCH_DY_MAX, KICK_DX_MAX, KICK_DY_MIN;
     logic [2:0] MIN_SIZE_DELTA;
     // punch: move LED in x direction
-    assign PUNCH_DX_MIN = 'h40 + 'h5 * sw[15:13];
-    assign PUNCH_DY_MAX = 'h10 + 'h5 * sw[12:11];
+    /*assign PUNCH_DX_MIN = 'h40 + 'h5 * sw[15:13]; // use sw to calibrate threshholds
+    assign PUNCH_DY_MAX = 'h10 + 'h5 * sw[12:11];*/
+    assign PUNCH_DX_MIN = 80;
+    assign PUNCH_DY_MAX = 30;
     // kick: move LED in y direction
-    assign KICK_DY_MIN = 'h40 + 'h5 * sw[15:13];
-    assign KICK_DX_MAX = 'h10 + 'h5 * sw[12:11];
+    /*assign KICK_DY_MIN = 'h40 + 'h5 * sw[15:13]; // use sw to calibrate threshholds
+    assign KICK_DX_MAX = 'h10 + 'h5 * sw[12:11];*/
+    assign KICK_DY_MIN = 80;
+    assign KICK_DX_MAX = 30;
     // min change in size grade to indicate forward/backward movement
-    assign MIN_SIZE_DELTA = sw[10:9];
+    assign MIN_SIZE_DELTA = sw[15:13]; // use sw to calibrate threshhold
 
     always_comb begin
         if (delta_8frame_values_valid) begin
@@ -381,12 +385,18 @@ module camera_top_module (
     // led threshholds
     logic [4:0] RED_MIN_R, RED_MAX_G, RED_MAX_B;
     logic [4:0] IR_MIN_R, IR_MIN_G, IR_MIN_B;
-    assign RED_MIN_R = 8 + sw[8:6];
+    /*assign RED_MIN_R = 8 + sw[8:6]; // use switches to calibrate threshholds
     assign RED_MAX_G = 1 + sw[5:4];
     assign RED_MAX_B = 1 + sw[5:4];
     assign IR_MIN_R = 8 + sw[3:1];
     assign IR_MIN_G = 8 + sw[3:1];
-    assign IR_MIN_B = 8 + sw[3:1];
+    assign IR_MIN_B = 8 + sw[3:1];*/
+    assign RED_MIN_R = 11;
+    assign RED_MAX_G = 3;
+    assign RED_MAX_B = 3;
+    assign IR_MIN_R = 12;
+    assign IR_MIN_G = 12;
+    assign IR_MIN_B = 12;
 
     always_ff @(posedge clk_65mhz) begin
         buffer_frame_done_out <= frame_done_out;
