@@ -56,11 +56,9 @@ module camera_top_module (
     logic[1:0] xclk_count;
 
     // state variables STATE VARIABLES
-    logic [3:0] sixteen_frame_tally; // counts to 16 frames then resets
-    logic end_of_16_frames; // true at end of every 16 frames
-    assign end_of_16_frames = (sixteen_frame_tally == 15);
+    logic [2:0] eight_frame_tally; // counts to 8 frames then resets
     logic end_of_8_frames; // true at end of every 8 frames
-    assign end_of_8_frames = (sixteen_frame_tally == 7 || sixteen_frame_tally == 15);
+    assign end_of_8_frames = (eight_frame_tally == 7);
 
     // track player 1 + player 2 LEDs
     // calculate size of player LEDs
@@ -71,8 +69,8 @@ module camera_top_module (
     // change in LED size over 2 and 8 frames
     logic [2:0] p1_2frame_size_delta, p2_2frame_size_delta;
     logic p1_2frame_size_delta_sign, p2_2frame_size_delta_sign; // 1=neg; 0=pos
-    logic [5:0] p1_16frame_size_delta, p2_16frame_size_delta;
-    logic p1_16frame_size_delta_sign, p2_16frame_size_delta_sign; // 1=neg; 0=pos
+    logic [5:0] p1_8frame_size_delta, p2_8frame_size_delta;
+    logic p1_8frame_size_delta_sign, p2_8frame_size_delta_sign; // 1=neg; 0=pos
     // x and y coordinate sum for calculating centers of LEDs
     logic [23:0] p1_x_coord_sum, p1_y_coord_sum, p2_x_coord_sum, p2_y_coord_sum;
     // calculate LED displacement over 2 frames
@@ -85,8 +83,6 @@ module camera_top_module (
     logic p2_8frame_dx_sign, p2_8frame_dy_sign; // 1=neg; 0=pos
     // reset LED displacement values after 8 frames
     logic reset_8frame_delta_values;
-    // reset LED change in size values after 16 frames
-    logic reset_16frame_delta_values;
 
     // player 1 + player 2 variables
     logic div_inputs_valid;
@@ -132,9 +128,8 @@ module camera_top_module (
     assign MIN_SIZE_DELTA = sw[15:13]; // use sw to calibrate threshhold
 
     always_comb begin
-        // after 16 frames get move forward / backward states
-        if (end_of_16_frames) begin
-            // left=p2, right=p1
+        // after 8 frames get forward, backward, kick, punch states
+        if (end_of_8_frames) begin
             display_data = { count_num_pixels_for_p1[7:0],
                              count_num_pixels_for_p2[7:0],
                              3'b000, p1_16frame_size_delta_sign, 
@@ -159,15 +154,10 @@ module camera_top_module (
                 p2_move_forwards = 0; 
                 p2_move_backwards = 0;
             end
-        end
 
-        // after 8 frames get punch / kick states
-        if (end_of_8_frames) begin
-            // p1 punch, kick
+            // get punch, kick
             p1_punch = (p1_8frame_dx > PUNCH_DX_MIN) && (p1_8frame_dy < PUNCH_DY_MAX);
             p1_kick = (p1_8frame_dy > KICK_DY_MIN) && (p1_8frame_dx < KICK_DX_MAX);
-
-            // p2 punch, kick
             p2_punch = (p2_8frame_dx > PUNCH_DX_MIN) && (p2_8frame_dy < PUNCH_DY_MAX);
             p2_kick = (p2_8frame_dy > KICK_DY_MIN) && (p2_8frame_dx < KICK_DX_MAX);
         end
@@ -407,45 +397,7 @@ module camera_top_module (
         buffer_frame_done_out <= frame_done_out;
         if (rising_edge_frame_done_out) sixteen_frame_tally <= sixteen_frame_tally + 1;
 
-        // at end_of_16_frames, extract size delta values then reset to 0
-        if (end_of_16_frames) begin
-            reset_16frame_delta_values <= 1;
-        end else if (reset_16frame_delta_values) begin
-            reset_16frame_delta_values <= 0;
-            p1_16frame_size_delta <= 0;
-            p2_16frame_size_delta <= 0;
-        // else if new frame, calculate change in LED size over 16 frames
-        end else if (rising_edge_frame_done_out) begin
-            // update size change of p1 LED over 16 frames
-            if (p1_2frame_size_delta_sign==p1_16frame_size_delta_sign) begin
-                p1_16frame_size_delta <= p1_16frame_size_delta + p1_2frame_size_delta; 
-                p1_16frame_size_delta_sign <= p1_16frame_size_delta_sign;
-            end else begin
-                if (p1_16frame_size_delta > p1_2frame_size_delta) begin
-                    p1_16frame_size_delta <= p1_16frame_size_delta - p1_2frame_size_delta; 
-                    p1_16frame_size_delta_sign <= p1_16frame_size_delta_sign;
-                end else begin
-                    p1_16frame_size_delta <= p1_2frame_size_delta - p1_16frame_size_delta; 
-                    p1_16frame_size_delta_sign <= p1_2frame_size_delta_sign;
-                end
-            end
-
-            // update size change of p2 LED over 16 frames
-            if (p2_2frame_size_delta_sign==p2_16frame_size_delta_sign) begin
-                p2_16frame_size_delta <= p2_16frame_size_delta + p2_2frame_size_delta; 
-                p2_16frame_size_delta_sign <= p2_16frame_size_delta_sign;
-            end else begin
-                if (p2_16frame_size_delta > p2_2frame_size_delta) begin
-                    p2_16frame_size_delta <= p2_16frame_size_delta - p2_2frame_size_delta; 
-                    p2_16frame_size_delta_sign <= p2_16frame_size_delta_sign;
-                end else begin
-                    p2_16frame_size_delta <= p2_2frame_size_delta - p2_16frame_size_delta; 
-                    p2_16frame_size_delta_sign <= p2_2frame_size_delta_sign;
-                end
-            end
-        end
-
-        // at end_of_8_frames, extract displacement values then reset to 0
+        // at end_of_8_frames, extract delta values then reset to 0
         if (end_of_8_frames) begin
             reset_8frame_delta_values <= 1;
         end else if (reset_8frame_delta_values) begin
@@ -454,7 +406,9 @@ module camera_top_module (
             p1_8frame_dy <= 0;
             p2_8frame_dx <= 0;
             p2_8frame_dy <= 0;
-        // else if new frame, calculate change in LED pos. over 8 frames
+            p1_8frame_size_delta <= 0;
+            p2_8frame_size_delta <= 0;
+        // else if new frame, calculate change in LED pos. and size over 8 frames
         end else if (rising_edge_frame_done_out) begin
             // update dx of p1 LED over 8 frames 
             if (p1_8frame_dx_sign==p1_2frame_dx_sign) begin
@@ -518,6 +472,33 @@ module camera_top_module (
                 end
             end
 
+            // update size change of p1 LED over 8 frames
+            if (p1_2frame_size_delta_sign==p1_8frame_size_delta_sign) begin
+                p1_8frame_size_delta <= p1_8frame_size_delta + p1_2frame_size_delta; 
+                p1_8frame_size_delta_sign <= p1_8frame_size_delta_sign;
+            end else begin
+                if (p1_8frame_size_delta > p1_2frame_size_delta) begin
+                    p1_8frame_size_delta <= p1_8frame_size_delta - p1_2frame_size_delta; 
+                    p1_8frame_size_delta_sign <= p1_8frame_size_delta_sign;
+                end else begin
+                    p1_8frame_size_delta <= p1_2frame_size_delta - p1_8frame_size_delta; 
+                    p1_8frame_size_delta_sign <= p1_2frame_size_delta_sign;
+                end
+            end
+
+            // update size change of p2 LED over 8 frames
+            if (p2_2frame_size_delta_sign==p2_8frame_size_delta_sign) begin
+                p2_8frame_size_delta <= p2_8frame_size_delta + p2_2frame_size_delta; 
+                p2_8frame_size_delta_sign <= p2_8frame_size_delta_sign;
+            end else begin
+                if (p2_8frame_size_delta > p2_2frame_size_delta) begin
+                    p2_8frame_size_delta <= p2_8frame_size_delta - p2_2frame_size_delta; 
+                    p2_8frame_size_delta_sign <= p2_8frame_size_delta_sign;
+                end else begin
+                    p2_8frame_size_delta <= p2_2frame_size_delta - p2_8frame_size_delta; 
+                    p2_8frame_size_delta_sign <= p2_2frame_size_delta_sign;
+                end
+            end
         end
 
         // on falling edge of frame_done_out, update final pixel count
