@@ -69,10 +69,10 @@ module camera_top_module (
     // sizes: 0=[x0,x50), 1=[x50,x100), 2=[x100,x400), 3=[x400,x800)
     logic [1:0] p1_final_size, p1_prev_final_size, p2_final_size, p2_prev_final_size; 
     // change in LED size over 2 and 8 frames
-    logic [1:0] p1_2frame_size_delta, p2_2frame_size_delta;
+    logic [2:0] p1_2frame_size_delta, p2_2frame_size_delta;
     logic p1_2frame_size_delta_sign, p2_2frame_size_delta_sign; // 1=neg; 0=pos
-    logic [1:0] p1_8frame_size_delta, p2_8frame_size_delta;
-    logic p1_8frame_size_delta_sign, p2_8frame_size_delta_sign; // 1=neg; 0=pos
+    logic [5:0] p1_16frame_size_delta, p2_16frame_size_delta;
+    logic p1_16frame_size_delta_sign, p2_16frame_size_delta_sign; // 1=neg; 0=pos
     // x and y coordinate sum for calculating centers of LEDs
     logic [23:0] p1_x_coord_sum, p1_y_coord_sum, p2_x_coord_sum, p2_y_coord_sum;
     // calculate LED displacement over 2 frames
@@ -137,21 +137,21 @@ module camera_top_module (
             // left=p2, right=p1
             display_data = { count_num_pixels_for_p1[7:0],
                              count_num_pixels_for_p2[7:0],
-                             3'b000, p1_8frame_size_delta_sign, 
-                             2'b00, p1_8frame_size_delta, 
-                             3'b000, p2_8frame_size_delta_sign,
-                             2'b00, p2_8frame_size_delta};
+                             3'b000, p1_16frame_size_delta_sign, 
+                             2'b00, p1_16frame_size_delta, 
+                             3'b000, p2_16frame_size_delta_sign,
+                             2'b00, p2_16frame_size_delta};
 
             // get move forwards/backwards
             // player 1
-            if (p1_8frame_size_delta > MIN_SIZE_DELTA) begin
-                p1_move_forwards = !p1_8frame_size_delta_sign; //0=pos=forwards
-                p1_move_backwards = p1_8frame_size_delta_sign; //1=neg=backwards
+            if (p1_16frame_size_delta > MIN_SIZE_DELTA) begin
+                p1_move_forwards = !p1_16frame_size_delta_sign; //0=pos=forwards
+                p1_move_backwards = p1_16frame_size_delta_sign; //1=neg=backwards
             end
             // player 2
-            if (p2_8frame_size_delta > MIN_SIZE_DELTA) begin
-                p2_move_forwards = !p2_8frame_size_delta_sign; //0=pos=forwards
-                p2_move_backwards = p2_8frame_size_delta_sign; //1=neg=backwards
+            if (p2_16frame_size_delta > MIN_SIZE_DELTA) begin
+                p2_move_forwards = !p2_16frame_size_delta_sign; //0=pos=forwards
+                p2_move_backwards = p2_16frame_size_delta_sign; //1=neg=backwards
             end
         end
 
@@ -406,35 +406,35 @@ module camera_top_module (
             reset_16frame_delta_values <= 1;
         end else if (reset_16frame_delta_values) begin
             reset_16frame_delta_values <= 0;
-            p1_8frame_size_delta <= 0;
-            p2_8frame_size_delta <= 0;
+            p1_16frame_size_delta <= 0;
+            p2_16frame_size_delta <= 0;
         // else if new frame, calculate change in LED size over 16 frames
         end else if (rising_edge_frame_done_out) begin
             // update size change of p1 LED over 16 frames
-            if (p1_2frame_size_delta_sign==p1_8frame_size_delta_sign) begin
-                p1_8frame_size_delta <= p1_8frame_size_delta + p1_2frame_size_delta; 
-                p1_8frame_size_delta_sign <= p1_8frame_size_delta_sign;
+            if (p1_2frame_size_delta_sign==p1_16frame_size_delta_sign) begin
+                p1_16frame_size_delta <= p1_16frame_size_delta + p1_2frame_size_delta; 
+                p1_16frame_size_delta_sign <= p1_16frame_size_delta_sign;
             end else begin
-                if (p1_8frame_size_delta > p1_2frame_size_delta) begin
-                    p1_8frame_size_delta <= p1_8frame_size_delta - p1_2frame_size_delta; 
-                    p1_8frame_size_delta_sign <= p1_8frame_size_delta_sign;
+                if (p1_16frame_size_delta > p1_2frame_size_delta) begin
+                    p1_16frame_size_delta <= p1_16frame_size_delta - p1_2frame_size_delta; 
+                    p1_16frame_size_delta_sign <= p1_16frame_size_delta_sign;
                 end else begin
-                    p1_8frame_size_delta <= p1_2frame_size_delta - p1_8frame_size_delta; 
-                    p1_8frame_size_delta_sign <= p1_2frame_size_delta_sign;
+                    p1_16frame_size_delta <= p1_2frame_size_delta - p1_16frame_size_delta; 
+                    p1_16frame_size_delta_sign <= p1_2frame_size_delta_sign;
                 end
             end
 
             // update size change of p2 LED over 16 frames
-            if (p2_2frame_size_delta_sign==p2_8frame_size_delta_sign) begin
-                p2_8frame_size_delta <= p2_8frame_size_delta + p2_2frame_size_delta; 
-                p2_8frame_size_delta_sign <= p2_8frame_size_delta_sign;
+            if (p2_2frame_size_delta_sign==p2_16frame_size_delta_sign) begin
+                p2_16frame_size_delta <= p2_16frame_size_delta + p2_2frame_size_delta; 
+                p2_16frame_size_delta_sign <= p2_16frame_size_delta_sign;
             end else begin
-                if (p2_8frame_size_delta > p2_2frame_size_delta) begin
-                    p2_8frame_size_delta <= p2_8frame_size_delta - p2_2frame_size_delta; 
-                    p2_8frame_size_delta_sign <= p2_8frame_size_delta_sign;
+                if (p2_16frame_size_delta > p2_2frame_size_delta) begin
+                    p2_16frame_size_delta <= p2_16frame_size_delta - p2_2frame_size_delta; 
+                    p2_16frame_size_delta_sign <= p2_16frame_size_delta_sign;
                 end else begin
-                    p2_8frame_size_delta <= p2_2frame_size_delta - p2_8frame_size_delta; 
-                    p2_8frame_size_delta_sign <= p2_2frame_size_delta_sign;
+                    p2_16frame_size_delta <= p2_2frame_size_delta - p2_16frame_size_delta; 
+                    p2_16frame_size_delta_sign <= p2_2frame_size_delta_sign;
                 end
             end
         end
