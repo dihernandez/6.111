@@ -30,9 +30,18 @@ module movement(
     output logic [7:0] p1_x,
     output logic [7:0] p2_x
     );
+    
     //screen size
     // x_total = 1024 pixels             512-64= 448     1024-256= 768
     // y_total =  768 pixels             384-64= 320     768-240= 528
+    
+//    //square thing
+//    logic[11:0] square, square_color;     //square
+//    blob #(.WIDTH(128), .HEIGHT(128), .COLOR(12'H609)) //mine is approximately "dark orchid"
+//        square_box(.x_in(448), .y_in(320), //at location 448, 320
+//                    .hcount_in(hcount_in), .vcount_in(vcount_in), 
+//                    .pixel_out(square));
+    
     
     always_ff @(posedge clk) begin
         if (reset_in) begin
