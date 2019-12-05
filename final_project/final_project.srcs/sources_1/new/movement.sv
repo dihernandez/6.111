@@ -28,20 +28,29 @@ module movement(
     input logic [6:0] p1_hp, p2_hp,
     
     output logic [7:0] p1_x,
-    output logic [7:0] p2_x
+    output logic [7:0] p2_x,
+    output logic [11:0] pixel_out
     );
     
     //screen size
     // x_total = 1024 pixels             512-64= 448     1024-256= 768
     // y_total =  768 pixels             384-64= 320     768-240= 528
     
-//    //square thing
-//    logic[11:0] square, square_color;     //square
-//    blob #(.WIDTH(128), .HEIGHT(128), .COLOR(12'H609)) //mine is approximately "dark orchid"
-//        square_box(.x_in(448), .y_in(320), //at location 448, 320
-//                    .hcount_in(hcount_in), .vcount_in(vcount_in), 
-//                    .pixel_out(square));
-    
+    //player starter sprites
+    logic[11:0] p1_pix, p2_pix;     //squares for now 
+    blob #(.WIDTH(128), .HEIGHT(128), .COLOR(12'H609)) //mine is approximately "dark orchid"
+        player1(.x_in(400), .y_in(320), //p1 starts on right side
+                    .hcount_in(p1_x), .vcount_in(320), 
+                    .pixel_out(p1_pix)
+                    );
+        
+    blob #(.WIDTH(128), .HEIGHT(128), .COLOR(12'H906)) //mine is approximately "dark orchid"
+        player2(.x_in(624), .y_in(320), //p2 starts on left side
+                    .hcount_in(p2_x), .vcount_in(320), 
+                    .pixel_out(p2_pix)
+                    );
+        
+    assign pixel_out = p1_pix + p2_pix;
     
     always_ff @(posedge clk) begin
         if (reset_in) begin

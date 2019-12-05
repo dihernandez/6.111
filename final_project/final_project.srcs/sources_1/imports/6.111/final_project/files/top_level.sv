@@ -36,7 +36,7 @@ module top_level (
     logic p1_bwd, p2_bwd;   //is the player moving backward?
 
     wire hsync, vsync, blank;
-    logic [11:0] pixel_out;
+    logic [11:0] user_output;   //pixels from camera and motions
     logic [31:0] debugging_display_data;
 
     camera_top_module ctm (
@@ -44,7 +44,7 @@ module top_level (
         .sw(sw),
         .ja(ja), .jb(jb), .jbclk(jbclk), .jd(jd), .jdclk(jdclk),
         .hsync(hsync), .vsync(vsync), .blank(blank),
-        .pixel_out(pixel_out),
+        .pixel_out(user_output),  //////////////////////////////////////////changed
         .display_data(debugging_display_data),
         .p1_punch(p1_punch), .p1_kick(p1_kick),
         .p2_punch(p2_punch), .p2_kick(p2_kick),
@@ -79,13 +79,15 @@ module top_level (
     logic [11:0] p1_loc, p2_loc;	//locations of players
     logic [6:0] p1_points, p2_points;	//health points of players
     logic p1_dead, p2_dead;		//which players, if any, are dead
+    logic [11:0] game_output;   //pixels from game logic
     movement    player_motion(
         .p1_dead(p1_dead), .p2_dead(p2_dead),
         .p1_mvfwd(p1_fwd), .p2_mvfwd(p2_fwd),
         .p1_mvbwd(p1_bwd), .p2_mvbwd(p2_bwd),
         .p1_hp(p1_points), .p2_hp(p2_points),
         //outputs
-        .p1_x(p1_loc), .p2_x(p2_loc)
+        .p1_x(p1_loc), .p2_x(p2_loc),
+        .pixel_out(game_output) /////////////////////////////////new
     );
     
     HP	health_points(
@@ -104,6 +106,11 @@ module top_level (
         
     );
    
+    //screen output
+    logic [11:0] pixel_out;
+    assign pixel_out = game_output;//(user_output > 0)? user_output:game_output;
+    
+       
     // the following lines are required for the Nexys4 VGA circuit - do not change
     reg b,hs,vs;
     assign hs = hsync;
