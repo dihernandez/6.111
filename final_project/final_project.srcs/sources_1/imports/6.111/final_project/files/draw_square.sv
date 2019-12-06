@@ -15,6 +15,11 @@ module square (
     parameter WIDTH = 64;
     parameter HEIGHT = 64;
 
+    parameter p1_action_square_x = 320;
+    parameter p2_action_square_x = 900;
+    parameter p1_action_square_y = 10;
+    parameter p2_action_square_y = 10;
+
     logic [11:0] color;
     logic [10:0] x_in;
     logic [9:0] y_in;
@@ -22,12 +27,12 @@ module square (
     always_comb begin
         // player 1 => bottom left of screen
         if (player) begin 
-            x_in = 100;
-            y_in = 600;        
+            x_in = p1_action_square_x;
+            y_in = p1_action_square_y;        
         // player 2 => bottom right of screen
         end else begin
-            x_in = 800;
-            y_in = 600;        
+            x_in = p2_action_square_x;
+            y_in = p2_action_square_y;
         end
 
         if (punch) begin // punch=red

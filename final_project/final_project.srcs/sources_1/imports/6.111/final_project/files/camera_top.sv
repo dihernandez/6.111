@@ -323,14 +323,15 @@ module camera_top_module (
 
     // move targets to follow p1 led & p2 led
     // only display target p1 if there are bright p1-colored pixels
+    assign cam = ((hcount_mirror<320)&&(vcount<240)) ? frame_buff_out : 12'h000;
     assign target_p1 = (final_num_pixels_for_p1>5 && 
-            (hcount_mirror==x_coord_of_p1 || 
-             vcount==y_coord_of_p1)) ? 12'hF00 : 12'h000;
+            (hcount_mirror==x_coord_of_p1 || vcount==y_coord_of_p1) &&
+            (hcount_mirror<320 && vcount<240)) ? 12'hF00 : 12'h000;
 
     // only display target p2 if there are bright p2-colored pixels
     assign target_p2 = (final_num_pixels_for_p2>5 && 
-            (hcount_mirror==x_coord_of_p2 || 
-             vcount==y_coord_of_p2)) ? 12'hFFF : 12'h000;
+            (hcount_mirror==x_coord_of_p2 || vcount==y_coord_of_p2) &&
+            (hcount_mirror<320 && vcount<240)) ? 12'hFFF : 12'h000;
 
     // calc. sign and delta over 2 frames
     always_comb begin
