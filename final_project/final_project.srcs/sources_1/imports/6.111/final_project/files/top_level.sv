@@ -85,6 +85,7 @@ module top_level (
     logic p1_dead, p2_dead;		//which players, if any, are dead
     logic [11:0] game_output;   //pixels from game logic
     movement    player_motion(
+        .reset_in(btnc),
         .p1_dead(p1_dead), .p2_dead(p2_dead),
         .p1_mvfwd(p1_fwd), .p2_mvfwd(p2_fwd),
         .p1_mvbwd(p1_bwd), .p2_mvbwd(p2_bwd),
@@ -113,7 +114,7 @@ module top_level (
    
     //screen output
     logic [11:0] pixel_out;
-    assign pixel_out = user_output | game_output;  //hopefully allows all things to show up
+    assign pixel_out = game_output? game_output: user_output;  //hopefully allows all things to show up
     
        
     // the following lines are required for the Nexys4 VGA circuit - do not change
