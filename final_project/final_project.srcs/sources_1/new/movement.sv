@@ -76,7 +76,6 @@ module movement(
 
     logic old_right, old_left;
     logic rising_right, rising_left;
-
     logic right_on, left_on;
 
     //rising edge for puck movement
@@ -103,12 +102,12 @@ module movement(
                 old_right <= 0;
                 old_left <= 0;
             end else begin    
-                if (~p1_dead) begin
+                if (~p1_dead && ~p2_dead) begin //testing if p1 will stay still when p2 dies
                     //change 100s to hp level later
-                    if ((p1_x + 25 + 64 <= p2_x) && (right_on) )begin//|| p1_mvfwd) && ) begin  //don't run into p2
+                    if ((p1_x + 25 + 64 <= p2_x) && (right_on ))begin//|| p1_mvfwd)) begin  //don't run into p2
                         right_on <= 0;
                         p1_x <= p1_x + 25;
-                    end else if ((p1_x - 25 - 64 >= 24) && (left_on))begin // || p1_mvbwd))  begin   //as is, p1 cant run into p2 going backwards, 
+                    end else if ((p1_x - 25 - 64 >= 24) && (left_on ))begin // || p1_mvbwd))  begin   //as is, p1 cant run into p2 going backwards, 
                         left_on <= 0;                                                //but can run into the wall... 
                         p1_x <= p1_x - 25;
                     end
