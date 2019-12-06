@@ -47,9 +47,9 @@ module HP (
     logic[11:0] p1_hp_pix, p2_hp_pix;     //squares for now
     
     changable_blob p1_hp_bar(
-                    .WIDTH(p1_hp),   // default width: 64 pixels
+                    .WIDTH({3'b0, p1_hp}),   // default width: 64 pixels
                     .HEIGHT(32),  // default height: 64 pixels
-                    .COLOR(12'h00F),
+                    .COLOR(12'hF00),
                     .x_in(32), .y_in(666), //p1 starts on right side
                     .hcount_in(hcount), .vcount_in(vcount), 
                     .pixel_out(p1_hp_pix)
