@@ -20,22 +20,22 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module display_blob(
-    );
+//module display_blob(
+//    );
     
-    clk_wiz_final clkdivider(.clk_in1(clk_100mhz), .clk_out1(clk_65mhz));
+//    clk_wiz_final clkdivider(.clk_in1(clk_100mhz), .clk_out1(clk_65mhz));
     
-    wire [10:0] hcount;    // pixel on current line
-    wire [9:0] vcount;     // line number
-    wire hsync, vsync;
-    wire [11:0] p1_rest_pixel;
-    reg [11:0] rgb;    
-    xvga xvga1(.vclock_in(clk_65mhz),.hcount_out(hcount),.vcount_out(vcount),
-          .hsync_out(hsync),.vsync_out(vsync));
+//    wire [10:0] hcount;    // pixel on current line
+//    wire [9:0] vcount;     // line number
+//    wire hsync, vsync;
+//    wire [11:0] p1_rest_pixel;
+//    reg [11:0] rgb;    
+//    xvga xvga1(.vclock_in(clk_65mhz),.hcount_out(hcount),.vcount_out(vcount),
+//          .hsync_out(hsync),.vsync_out(vsync));
           
-    picture_blob p1_rest_blob(.pixel_clk_in(clk_65mhz), .x_in(256), .hcount_in(hcount), .y_in(256), .vcount_in(vcount), .pixel_out(p1_rest_pixel));
+//    picture_blob p1_rest_blob(.pixel_clk_in(clk_65mhz), .x_in(256), .hcount_in(hcount), .y_in(256), .vcount_in(vcount), .pixel_out(p1_rest_pixel));
 
-endmodule
+//endmodule
 
 
 //////////////////////////////////////////////////////////////////////

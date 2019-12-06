@@ -6,11 +6,13 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 module camera_top_module (
+        //inputs
         input clk_65mhz,
         input[15:0] sw,
         input [7:0] ja,
         input [2:0] jb,
         input [2:0] jd,
+        //outputs
         output logic jbclk,
         output logic jdclk,
         output logic hsync, vsync, blank,
