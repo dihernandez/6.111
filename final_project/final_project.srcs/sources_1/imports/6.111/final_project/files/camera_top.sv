@@ -46,8 +46,6 @@ module camera_top_module (
     // x value of pixel being displayed (pixel on current line)
     wire [10:0] hcount_mirror;  //,hcount //CHANGED
     assign hcount_mirror = 319-hcount; // make camera display mirror image
-    // y value of pixel being displayed (line number)
-//    wire [9:0] vcount;
     // keep track of whether (hcount,vcount) is on or off the screen
     // un-synchronized; outputs of screen module
     wire hsync_prev, vsync_prev, blank_prev;
@@ -65,16 +63,23 @@ module camera_top_module (
     assign end_of_8_frames = (eight_frame_tally == 7);
 
     // track player 1 + player 2 LEDs
-    // calculate size of player LEDs
-    logic [15:0] count_num_pixels_for_p1, count_num_pixels_for_p2; // sometimes invalid
-    logic [15:0] final_num_pixels_for_p1, final_num_pixels_for_p2; // final (valid) value
+    // calculate size of player LEDs (number of LED pixels detected)
+    logic [15:0] p1_size, p2_size; // sometimes invalid
+    logic [15:0] p1_final_size, p2_final_size; // final (valid) value
+    logic [15:0] p1_prev_final_size, p2_prev_final_size; // 1 clock cycle ago
+    //logic [15:0] count_num_pixels_for_p1, count_num_pixels_for_p2; // sometimes invalid
+    //logic [15:0] final_num_pixels_for_p1, final_num_pixels_for_p2; // final (valid) value
     // sizes: 0=[x0,x50), 1=[x50,x100), 2=[x100,x400), 3=[x400,x800)
-    logic [1:0] p1_final_size, p1_prev_final_size, p2_final_size, p2_prev_final_size; 
+    //logic [1:0] p1_final_size, p1_prev_final_size, p2_final_size, p2_prev_final_size; 
     // change in LED size over 2 and 8 frames
+    logic [16:0] p1_2frame_size_delta, p2_2frame_size_delta;
+    logic [18:0] p1_8frame_size_delta, p2_8frame_size_delta;
+    /*
     logic [2:0] p1_2frame_size_delta, p2_2frame_size_delta;
     logic p1_2frame_size_delta_sign, p2_2frame_size_delta_sign; // 1=neg; 0=pos
     logic [5:0] p1_8frame_size_delta, p2_8frame_size_delta;
     logic p1_8frame_size_delta_sign, p2_8frame_size_delta_sign; // 1=neg; 0=pos
+    */
     // x and y coordinate sum for calculating centers of LEDs
     logic [23:0] p1_x_coord_sum, p1_y_coord_sum, p2_x_coord_sum, p2_y_coord_sum;
     // calculate LED displacement over 2 frames
@@ -108,6 +113,20 @@ module camera_top_module (
     logic [8:0] x_coord_of_p2, prev_x_coord_of_p2;
     logic [7:0] y_coord_of_p2, prev_y_coord_of_p2;
 
+    // iir low pass filter
+    // all 9 bits
+    module iir_filter (
+            .prev_delta_x_val_out(), // prev iir output for delta x 
+            .prev_delta_y_val_out(), // prev iir output for delta y 
+            .delta_x_val_in(), // delta x coord input
+            .delta_y_val_in(), // delta y coord input
+            .delta_size_in(), // delta size input
+            .delta_x_val_out(), // iir output for delta x
+            .delta_y_val_out(), // iir output for delta y 
+            .delta_size_out(), // iir output for delta size
+        );
+
+
     // timer variables
     logic start;
     logic [3:0] value;
@@ -128,8 +147,8 @@ module camera_top_module (
     assign KICK_DX_MAX = 'h10 + 'h5 * sw[12:11];*/
     assign KICK_DY_MIN = 80;
     assign KICK_DX_MAX = 30;
-    // min change in size grade to indicate forward/backward movement
-    assign MIN_SIZE_DELTA = sw[15:13]; // use sw to calibrate threshhold
+    // min change in size to indicate forward/backward movement
+    assign MIN_SIZE_DELTA = sw[15:9]; // use sw to calibrate threshhold
 
     always_comb begin
         // after 8 frames get forward, backward, kick, punch states
@@ -351,6 +370,7 @@ module camera_top_module (
         if (p2_2frame_dy_sign) p2_2frame_dy = prev_y_coord_of_p2 - y_coord_of_p2;
         else p2_2frame_dy = y_coord_of_p2 - prev_y_coord_of_p2;
 
+        /*
         // calculate size grade from num. pixels
         if (final_num_pixels_for_p1 < 'h50) begin
             p1_final_size = 0;
@@ -370,8 +390,21 @@ module camera_top_module (
         end else begin
             p2_final_size = 3;
         end
+        */
 
+        /*
         // change in size grade over 2 frames
+        // signs (1=neg., 0=pos.)
+        p1_2frame_size_delta_sign = (p1_prev_final_size > p1_final_size);
+        p2_2frame_size_delta_sign = (p2_prev_final_size > p2_final_size);
+        // magnitudes
+        if (p1_2frame_size_delta_sign) p1_2frame_size_delta=p1_prev_final_size-p1_final_size;
+        else p1_2frame_size_delta = p1_final_size - p1_prev_final_size;
+        if (p2_2frame_size_delta_sign) p2_2frame_size_delta=p2_prev_final_size-p2_final_size;
+        else p2_2frame_size_delta = p2_final_size - p2_prev_final_size;
+        */
+
+        // change in size over 2 frames
         // signs (1=neg., 0=pos.)
         p1_2frame_size_delta_sign = (p1_prev_final_size > p1_final_size);
         p2_2frame_size_delta_sign = (p2_prev_final_size > p2_final_size);
