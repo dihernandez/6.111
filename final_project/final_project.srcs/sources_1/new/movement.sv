@@ -70,7 +70,7 @@ module movement(
     //HP BARS
     logic[11:0] p1_hp_pix, p2_hp_pix;     //rectangles that (hopefully) change size!
     changable_blob p1_hp_bar(
-                    .WIDTH({3'b0, p1_hp}),   // default width: 64 pixels
+                    .WIDTH({3'b0, p1_hp}<<2),   // default width: 64 pixels
                     .HEIGHT(32),  // default height: 64 pixels
                     .COLOR(12'hF00),
                     .x_in(32), .y_in(666), //p1 starts on right side
@@ -79,7 +79,7 @@ module movement(
                     );
                     
     changable_blob p2_hp_bar(
-                    .WIDTH({3'b0, p1_hp}),   // default width: 64 pixels
+                    .WIDTH({3'b0, p2_hp}<<2),   // default width: 64 pixels
                     .HEIGHT(32),  // default height: 64 pixels
                     .COLOR(12'hF00),
                     .x_in(32), .y_in(666), //p1 starts on right side
