@@ -65,9 +65,7 @@ endmodule
 //
 //////////////////////////////////////////////////////////////////////
 module changable_blob(
-    input logic [11:0] WIDTH,   // default width: 64 pixels
-    input logic [11:0] HEIGHT,  // default height: 64 pixels
-    input logic [11:0] COLOR,   // default color: white
+    input [11:0] WIDTH, HEIGHT, COLOR,
     input [10:0] x_in,hcount_in,
     input [9:0] y_in,vcount_in,
     output logic [11:0] pixel_out);

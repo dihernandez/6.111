@@ -66,33 +66,69 @@ module movement(
                     .hcount_in(hcount), .vcount_in(vcount), 
                     .pixel_out(p2_dead_pix)
                     );
+                    
+    //HP BARS
+    logic[11:0] p1_hp_pix, p2_hp_pix;     //rectangles that (hopefully) change size!
+    changable_blob p1_hp_bar(
+                    .WIDTH({3'b0, p1_hp}<<2),   // default width: 64 pixels
+                    .HEIGHT(32),  // default height: 64 pixels
+                    .COLOR(12'hF00),
+                    .x_in(32), .y_in(666), //p1 starts on right side
+                    .hcount_in(hcount), .vcount_in(vcount), 
+                    .pixel_out(p1_hp_pix)
+                    );
+                    
+    changable_blob p2_hp_bar(
+                    .WIDTH({3'b0, p2_hp}<<2),   // default width: 64 pixels
+                    .HEIGHT(32),  // default height: 64 pixels
+                    .COLOR(12'hF00),
+                    .x_in(32), .y_in(666), //p1 starts on right side
+                    .hcount_in(hcount), .vcount_in(vcount), 
+                    .pixel_out(p2_hp_pix)
+                    );
     
     //if player is dead, display a flat rectangle in it's place    
-    assign pixel_out = (p1_dead)? (p1_dead_pix + p2_pix): (p2_dead)? (p1_pix + p2_dead_pix): (p1_pix + p2_pix);
+    assign pixel_out =  (p1_dead)?  (p1_dead_pix + p2_pix + p1_hp_pix + p2_hp_pix): 
+                        (p2_dead)?  (p1_pix + p2_dead_pix + p1_hp_pix + p2_hp_pix): 
+                        (p1_pix + p2_pix + p1_hp_pix + p2_hp_pix);
+    
     
     //rising edge vars
     logic old_clean;
     logic rising_sync;
 
-    logic old_right, old_left;
-    logic rising_right, rising_left;
-    logic right_on, left_on;
+    logic old_right, old_left, old_p1_fwd, old_p1_bwd, old_p2_fwd, old_p2_bwd;
+    logic rising_right, rising_left, p1_rising_fwd, p1_rising_bwd, p2_rising_fwd, p2_rising_bwd;
+    logic right_on, left_on, p1_fwd_on, p1_bwd_on, p2_fwd_on, p2_bwd_on;
 
     //rising edge for puck movement
     assign rising_sync = vsync_in & !old_clean;    //so individual presses cause visible steps
     assign rising_right = right_in & !old_right;    //  '   '   '   '   '   '   '   '   '   ' 
     assign rising_left = left_in & !old_left;       //  '   '   '   '   '   '   '   '   '   '
+    assign p1_rising_fwd = p1_mvfwd & !old_p1_fwd;       //  '   '   '   '   '   '   '   '   '   '
+    assign p1_rising_bwd = p1_mvbwd & !old_p1_bwd;       //  '   '   '   '   '   '   '   '   '   '
+    assign p2_rising_fwd = p2_mvfwd & !old_p2_fwd;       //  '   '   '   '   '   '   '   '   '   '
+    assign p2_rising_bwd = p2_mvbwd & !old_p2_bwd;       //  '   '   '   '   '   '   '   '   '   '
     
     always_ff @(posedge clk) begin
         old_clean <= vsync_in;
         old_right <= right_in;
         old_left <= left_in;
         
+        
         if (rising_right) begin
             right_on <= 1;
         end else if (rising_left) begin
             left_on <= 1;
-        end 
+        end else if (p1_rising_fwd) begin
+            p1_fwd_on <= 1;
+        end else if (p1_rising_bwd) begin
+            p1_bwd_on <= 1;
+        end else if (p2_rising_fwd) begin
+            p2_fwd_on <= 1;
+        end else if (p2_rising_bwd) begin
+            p2_bwd_on <= 1;
+        end
         
         else if (rising_sync) begin
             if (reset_in) begin
@@ -101,14 +137,20 @@ module movement(
                 old_clean <= 0;
                 old_right <= 0;
                 old_left <= 0;
+                old_p1_fwd <= 0;
+                old_p1_bwd <= 0;
+                old_p2_fwd <= 0;
+                old_p2_bwd <= 0;
             end else begin    
-                if (~p1_dead && ~p2_dead) begin //testing if p1 will stay still when p2 dies
+                if (~p1_dead) begin //testing if p1 will stay still when p2 dies
                     //change 100s to hp level later
-                    if ((p1_x + 25 + 64 <= p2_x) && (right_on ))begin//|| p1_mvfwd)) begin  //don't run into p2
+                    if ((p1_x + 25 + 64 <= p2_x) && (right_on || p1_fwd_on)) begin  //don't run into p2
                         right_on <= 0;
+                        p1_fwd_on <= 0;
                         p1_x <= p1_x + 25;
-                    end else if ((p1_x - 25 - 64 >= 24) && (left_on ))begin // || p1_mvbwd))  begin   //as is, p1 cant run into p2 going backwards, 
+                    end else if ((p1_x - 25 - 64 >= 24) && (left_on || p1_bwd_on))  begin   //as is, p1 cant run into p2 going backwards, 
                         left_on <= 0;                                                //but can run into the wall... 
+                        p1_bwd_on <= 0;
                         p1_x <= p1_x - 25;
                     end
                 end//p1

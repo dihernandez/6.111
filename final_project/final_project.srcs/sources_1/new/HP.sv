@@ -26,7 +26,7 @@ module HP (
     input clk,  reset_in,	//I can't remember what the proper clk for the lights is
     input logic p1_punch, p1_kick,  //player 1 made an attack
     input logic p2_punch, p2_kick,  //player 2 made an attack
-    input logic [11:0] p1_x, p2_x,	//location of player 1 and player 2
+    input logic [10:0] p1_x, p2_x,	//location of player 1 and player 2
     //outputs
     output [31:0] hit_points, // data for hex display
     output logic [9:0] p1_hp, p2_hp,
@@ -36,27 +36,28 @@ module HP (
 
     parameter arm_len = 5;	//arms be long
     parameter leg_len = 6;	//legs be longer
-    parameter punch_pts = 5;	//punches are weak
-    parameter kick_pts = 10;	//kicks are strong-ish
+    parameter punch_pts = 10;	//punches are weak
+    parameter kick_pts = 20;	//kicks are strong-ish
 
 
     //setup for display of p1_hp | p2_hp
     assign hit_points = {6'b0, p1_hp, 6'b0, p2_hp};   //9+7+9+7 = 32
 
-    //HP BARS
-    logic[11:0] p1_hp_pix, p2_hp_pix;     //squares for now
-    
-    changable_blob p1_hp_bar(
-                    .WIDTH(p1_hp),   // default width: 64 pixels
-                    .HEIGHT(32),  // default height: 64 pixels
-                    .COLOR(12'h00F),
-                    .x_in(32), .y_in(666), //p1 starts on right side
-                    .hcount_in(hcount), .vcount_in(vcount), 
-                    .pixel_out(p1_hp_pix)
-                    );
+//moved to movement
+//    //HP BARS
+//    logic[11:0] p1_hp_pix, p2_hp_pix;     //rectangles that (hopefully) change size!
+//    changable_blob p1_hp_bar(
+//                    .WIDTH({3'b0, p1_hp}),   // default width: 64 pixels
+//                    .HEIGHT(32),  // default height: 64 pixels
+//                    .COLOR(12'hF00),
+//                    .x_in(32), .y_in(666), //p1 starts on right side
+//                    .hcount_in(hcount), .vcount_in(vcount), 
+//                    .pixel_out(p1_hp_pix)
+//                    );
 
     
     //rising edge vars
+    
     logic old_p1_punch, old_p2_punch, old_p1_kick, old_p2_kick;             //tracks previous val
     logic rising_p1_punch, rising_p2_punch, rising_p1_kick, rising_p2_kick; //makes is pos on an edge
     logic p1_punch_on, p2_punch_on, p1_kick_on, p2_kick_on;                 //pos until action is taken 
@@ -96,7 +97,7 @@ module HP (
         end else begin  //in game logic
         
             //Player 1 hp logic
-            if (p1_hp <= 10'b0) begin	//player 1 has died
+            if (p1_hp > 10'd100 || p1_hp < 10'b0) begin	//player 1 has died
                 p1_hp <= 10'b0;		//hp shows up as "0000"
                 p1_dead <= 1'b1;	//DEAD
             end else if (~p1_dead) begin 	//player 1 is not dead
