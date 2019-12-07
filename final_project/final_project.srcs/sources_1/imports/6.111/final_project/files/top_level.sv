@@ -95,17 +95,19 @@ module top_level (
     );
     
     //TODO: finish logic for to control this
-    logic [10:0] p1_loc, p2_loc;	//locations of players
+    logic [10:0] p1_loc, p2_loc;        //locations of players
     logic [9:0] p1_points, p2_points;	//health points of players
-    logic p1_dead, p2_dead;		//which players, if any, are dead
-    logic [11:0] game_output;   //pixels from game logic
+    logic p1_dead, p2_dead;             //which players, if any, are dead
+    logic [11:0] p1_hppix, p2_hppix;    //
+    logic [11:0] game_output;           //pixels from game logic
     movement    player_motion(
         .left_in(lefty), .right_in(righty),    //debugger inputs
         .clk(clk_100mhz), .reset_in(centre),
         .p1_dead(p1_dead), .p2_dead(p2_dead),
+        .p1_hp(p1_points), .p2_hp(p2_points),
+        .p1_hp_pix(p1_hppix), .p2_hp_pix(p2_hppix),
         .p1_mvfwd(p1_fwd), .p2_mvfwd(p2_fwd),
         .p1_mvbwd(p1_bwd), .p2_mvbwd(p2_bwd),
-        .p1_hp(p1_points), .p2_hp(p2_points),
         .hcount(h_count), .vcount(v_count),
         .vsync_in(vsync),
         //outputs
@@ -114,17 +116,22 @@ module top_level (
     );
     
     HP	health_points(
+        //debugger inputs
+        .up_in(upper), .dn_in(lower),
         //INPUTS
         .clk(clk_100mhz),   //I can't remember what the proper clock for the lights is
         .reset_in(centre), 
     	.p1_punch(p1_punch), .p1_kick(p1_kick),  //player 1 made an attack
     	.p2_punch(p2_punch), .p2_kick(p2_kick),  //player 2 made an attack
     	.p1_x(p1_loc), .p2_x(p2_loc),	//location of player 1 and player 2
+    	.hcount(h_count),
+        .vcount(v_count),
     	
         //OUTPUTS
         .hit_points(hp_display_data),   //hp vals
     	.p1_hp(p1_points), .p2_hp(p2_points),
     	.p1_dead(p1_dead), .p2_dead(p2_dead),
+    	.p1_hp_pix(p1_hppix), .p2_hp_pix(p2_hppix),
     	.speaker(jb[0])
         
     );

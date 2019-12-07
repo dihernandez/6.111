@@ -29,6 +29,7 @@ module movement(
     input logic p1_mvbwd, p2_mvbwd,
     input logic p1_dead, p2_dead,
     input logic [9:0] p1_hp, p2_hp,
+    input logic [11:0] p1_hp_pix, p2_hp_pix,    //
     input logic [10:0] hcount,
     input logic [9:0] vcount,
     input vsync_in,
@@ -67,25 +68,6 @@ module movement(
                     .pixel_out(p2_dead_pix)
                     );
                     
-    //HP BARS
-    logic[11:0] p1_hp_pix, p2_hp_pix;     //rectangles that (hopefully) change size!
-    changable_blob p1_hp_bar(
-                    .WIDTH({3'b0, p1_hp}<<2),   // default width: 64 pixels
-                    .HEIGHT(32),  // default height: 64 pixels
-                    .COLOR(12'hF00),
-                    .x_in(32), .y_in(666), //p1 starts on right side
-                    .hcount_in(hcount), .vcount_in(vcount), 
-                    .pixel_out(p1_hp_pix)
-                    );
-                    
-    changable_blob p2_hp_bar(
-                    .WIDTH({3'b0, p2_hp}<<2),   // default width: 64 pixels
-                    .HEIGHT(32),  // default height: 64 pixels
-                    .COLOR(12'hF00),
-                    .x_in(32), .y_in(666), //p1 starts on right side
-                    .hcount_in(hcount), .vcount_in(vcount), 
-                    .pixel_out(p2_hp_pix)
-                    );
     
     //if player is dead, display a flat rectangle in it's place    
     assign pixel_out =  (p1_dead)?  (p1_dead_pix + p2_pix + p1_hp_pix + p2_hp_pix): 
@@ -142,19 +124,31 @@ module movement(
                 old_p2_fwd <= 0;
                 old_p2_bwd <= 0;
             end else begin    
-                if (~p1_dead) begin //testing if p1 will stay still when p2 dies
+                 if (~p1_dead) begin //when p1 is not dead, they can attack and move
                     //change 100s to hp level later
-                    if ((p1_x + 25 + 64 <= p2_x) && (right_on || p1_fwd_on)) begin  //don't run into p2
+                    if ((p1_x + 64 + 25 <= p2_x) && (right_on || p1_fwd_on)) begin  //move forward, but don't run into p2
                         right_on <= 0;
                         p1_fwd_on <= 0;
                         p1_x <= p1_x + 25;
-                    end else if ((p1_x - 25 - 64 >= 24) && (left_on || p1_bwd_on))  begin   //as is, p1 cant run into p2 going backwards, 
-                        left_on <= 0;                                                //but can run into the wall... 
+                    end else if ((p1_x - 25 >= 24) && (left_on || p1_bwd_on))  begin   // go backwards, but don't run into the wall 
+                        left_on <= 0;
                         p1_bwd_on <= 0;
                         p1_x <= p1_x - 25;
                     end
                 end//p1
-        
+                
+                if (~p2_dead) begin //when p2 is not dead, they can attack and move
+                    //change 100s to hp level later
+                    if ((p1_x + 64 + 25 <= p2_x) && (right_on || p2_fwd_on)) begin  //move forward, but don't run into p1
+                        right_on <= 0;
+                        p2_fwd_on <= 0;
+                        p2_x <= p2_x - 25;
+                    end else if ((p2_x + 64 + 25 <= 1000) && (left_on || p2_bwd_on))  begin  //go backwards, but don't run into the wall 
+                        left_on <= 0;
+                        p2_bwd_on <= 0;
+                        p2_x <= p2_x + 25;
+                    end
+                end//p2
 //                if (~p2_dead) begin
 //                    if (p2_mvfwd && (p2_x - 25 - 64 >= p1_x) ) begin  //don't run into p2
 //                        p2_x <= p2_x - 25;
