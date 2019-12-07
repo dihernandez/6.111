@@ -115,6 +115,7 @@ module camera_top_module (
 
     // iir low pass filter
     // all 9 bits
+    /*
     module iir_filter (
             .prev_delta_x_val_out(), // prev iir output for delta x 
             .prev_delta_y_val_out(), // prev iir output for delta y 
@@ -125,7 +126,7 @@ module camera_top_module (
             .delta_y_val_out(), // iir output for delta y 
             .delta_size_out(), // iir output for delta size
         );
-
+    */
 
     // timer variables
     logic start;
@@ -153,8 +154,8 @@ module camera_top_module (
     always_comb begin
         // after 8 frames get forward, backward, kick, punch states
         if (end_of_8_frames) begin
-            display_data = { count_num_pixels_for_p1[7:0],
-                             count_num_pixels_for_p2[7:0],
+            display_data = { p1_size[7:0],
+                             p2_size[7:0],
                              3'b000, p1_8frame_size_delta_sign, 
                              2'b00, p1_8frame_size_delta, 
                              3'b000, p2_8frame_size_delta_sign,
@@ -297,13 +298,13 @@ module camera_top_module (
     end
 
     // DIVIDERS
-    // ignore the output when final_num_pixels_for_p# is 0
+    // ignore the output when p#_final_size is 0
     // (i.e. division by 0)
 
     // player 1 dividers
     div_gen_y y_div_uut (
         .aclk(clk_65mhz),
-        .s_axis_divisor_tdata(final_num_pixels_for_p1),
+        .s_axis_divisor_tdata(p1_final_size),
         .s_axis_divisor_tvalid(div_inputs_valid),
         .s_axis_dividend_tdata(p1_y_coord_sum),
         .s_axis_dividend_tvalid(div_inputs_valid),
@@ -312,7 +313,7 @@ module camera_top_module (
     );
     div_gen_x x_div_uut (
         .aclk(clk_65mhz),
-        .s_axis_divisor_tdata(final_num_pixels_for_p1),
+        .s_axis_divisor_tdata(p1_final_size),
         .s_axis_divisor_tvalid(div_inputs_valid),
         .s_axis_dividend_tdata(p1_x_coord_sum),
         .s_axis_dividend_tvalid(div_inputs_valid),
@@ -323,7 +324,7 @@ module camera_top_module (
     // player 2 dividers
     div_gen_y2 y2_div_uut (
         .aclk(clk_65mhz),
-        .s_axis_divisor_tdata(final_num_pixels_for_p2),
+        .s_axis_divisor_tdata(p2_final_size),
         .s_axis_divisor_tvalid(div_inputs_valid),
         .s_axis_dividend_tdata(p2_y_coord_sum),
         .s_axis_dividend_tvalid(div_inputs_valid),
@@ -332,7 +333,7 @@ module camera_top_module (
     );
     div_gen_x2 x2_div_uut (
         .aclk(clk_65mhz),
-        .s_axis_divisor_tdata(final_num_pixels_for_p2),
+        .s_axis_divisor_tdata(p2_final_size),
         .s_axis_divisor_tvalid(div_inputs_valid),
         .s_axis_dividend_tdata(p2_x_coord_sum),
         .s_axis_dividend_tvalid(div_inputs_valid),
@@ -343,12 +344,12 @@ module camera_top_module (
     // move targets to follow p1 led & p2 led
     // only display target p1 if there are bright p1-colored pixels
     assign cam = ((hcount_mirror<320)&&(vcount<240)) ? frame_buff_out : 12'h000;
-    assign target_p1 = (final_num_pixels_for_p1>5 && 
+    assign target_p1 = (p1_final_size>5 && 
             (hcount_mirror==x_coord_of_p1 || vcount==y_coord_of_p1) &&
             (hcount_mirror<320 && vcount<240)) ? 12'hF00 : 12'h000;
 
     // only display target p2 if there are bright p2-colored pixels
-    assign target_p2 = (final_num_pixels_for_p2>5 && 
+    assign target_p2 = (p2_final_size>5 && 
             (hcount_mirror==x_coord_of_p2 || vcount==y_coord_of_p2) &&
             (hcount_mirror<320 && vcount<240)) ? 12'hFFF : 12'h000;
 
@@ -546,14 +547,14 @@ module camera_top_module (
             p1_prev_final_size <= p1_final_size;
             p2_prev_final_size <= p2_final_size;
             // update current values
-            final_num_pixels_for_p1 <= count_num_pixels_for_p1;
-            final_num_pixels_for_p2 <= count_num_pixels_for_p2;
+            p1_final_size <= p1_size;
+            p2_final_size <= p2_size;
             div_inputs_valid <= 1;
         end else if (div_inputs_valid) begin
             // reset values to 0 after calculating quotient
             div_inputs_valid <= 0;
-            count_num_pixels_for_p1 <= 0;
-            count_num_pixels_for_p2 <= 0;
+            p1_size <= 0;
+            p2_size <= 0;
             p1_x_coord_sum <= 0;
             p1_y_coord_sum <= 0;
             p2_x_coord_sum <= 0;
@@ -569,13 +570,13 @@ module camera_top_module (
         // player 1 LED (red LED)
         if (rgb_pixel_valid && cam[11:8]>RED_MIN_R && cam[7:4]<RED_MAX_G 
                 && cam[3:0]<RED_MAX_B) begin
-            count_num_pixels_for_p1 <= count_num_pixels_for_p1 + 1;
+            p1_size <= p1_size + 1;
             p1_x_coord_sum <= p1_x_coord_sum + hcount_mirror;
             p1_y_coord_sum <= p1_y_coord_sum + vcount;
         // player 2 LED (IR LED (white))
         end else if (rgb_pixel_valid && cam[11:8]>IR_MIN_R && cam[7:4]>IR_MIN_G 
                 && cam[3:0]>IR_MIN_B) begin
-            count_num_pixels_for_p2 <= count_num_pixels_for_p2 + 1;
+            p2_size <= p2_size + 1;
             p2_x_coord_sum <= p2_x_coord_sum + hcount_mirror;
             p2_y_coord_sum <= p2_y_coord_sum + vcount;
         end
@@ -640,7 +641,7 @@ module camera_top_module (
 
     // set pixel_out
     always_ff @(posedge clk_65mhz) begin
-        // if target p1 is there, display*/
+        // if target p1 is there, display
         if (target_p1 != 0) begin
             pixel_out <= target_p1;
         // else if target p2 is there, display 
