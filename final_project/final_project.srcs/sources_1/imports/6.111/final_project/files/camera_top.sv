@@ -73,12 +73,12 @@ module camera_top_module (
     //logic [1:0] p1_final_size, p1_prev_final_size, p2_final_size, p2_prev_final_size; 
     // change in LED size over 2 and 8 frames
     logic [16:0] p1_2frame_size_delta, p2_2frame_size_delta;
+    logic p1_2frame_size_delta_sign, p2_2frame_size_delta_sign; // 1=neg; 0=pos
     logic [18:0] p1_8frame_size_delta, p2_8frame_size_delta;
+    logic p1_8frame_size_delta_sign, p2_8frame_size_delta_sign; // 1=neg; 0=pos
     /*
     logic [2:0] p1_2frame_size_delta, p2_2frame_size_delta;
-    logic p1_2frame_size_delta_sign, p2_2frame_size_delta_sign; // 1=neg; 0=pos
     logic [5:0] p1_8frame_size_delta, p2_8frame_size_delta;
-    logic p1_8frame_size_delta_sign, p2_8frame_size_delta_sign; // 1=neg; 0=pos
     */
     // x and y coordinate sum for calculating centers of LEDs
     logic [23:0] p1_x_coord_sum, p1_y_coord_sum, p2_x_coord_sum, p2_y_coord_sum;
@@ -113,20 +113,44 @@ module camera_top_module (
     logic [8:0] x_coord_of_p2, prev_x_coord_of_p2;
     logic [7:0] y_coord_of_p2, prev_y_coord_of_p2;
 
-    // iir low pass filter
-    // all 9 bits
-    /*
-    module iir_filter (
-            .prev_delta_x_val_out(), // prev iir output for delta x 
-            .prev_delta_y_val_out(), // prev iir output for delta y 
-            .delta_x_val_in(), // delta x coord input
-            .delta_y_val_in(), // delta y coord input
-            .delta_size_in(), // delta size input
-            .delta_x_val_out(), // iir output for delta x
-            .delta_y_val_out(), // iir output for delta y 
-            .delta_size_out(), // iir output for delta size
+    // iir low pass filter to reduce noise
+    logic [12:0] prev_smooth_p1_8frame_dx, prev_smooth_p1_8frame_dy;
+    logic [12:0] smooth_p1_8frame_dx, smooth_p1_8frame_dy;
+    logic [18:0] prev_smooth_p1_8frame_size_delta;
+    logic [18:0] smooth_p1_8frame_size_delta;
+    iir_filter p1_iir_filter(
+            // prev iir outputs
+            .prev_dx_val_out(prev_smooth_p1_8frame_dx),
+            .prev_dy_val_out(prev_smooth_p1_8frame_dy),
+            .prev_delta_size_out(prev_smooth_p1_8frame_size_delta),
+            // current iir inputs
+            .dx_val_in(p1_8frame_dx), 
+            .dy_val_in(p1_8frame_dy), 
+            .delta_size_in(p1_8frame_size_delta),
+            // iir outputs
+            .dx_val_out(smooth_p1_8frame_dx),
+            .dy_val_out(smooth_p1_8frame_dy),
+            .delta_size_out(smooth_p1_8frame_size_delta)
         );
-    */
+
+    logic [12:0] prev_smooth_p2_8frame_dx, prev_smooth_p2_8frame_dy;
+    logic [12:0] smooth_p2_8frame_dx, smooth_p2_8frame_dy;
+    logic [18:0] prev_smooth_p2_8frame_size_delta;
+    logic [18:0] smooth_p2_8frame_size_delta;
+    iir_filter p2_iir_filter(
+            // prev iir outputs
+            .prev_dx_val_out(prev_smooth_p2_8frame_dx),
+            .prev_dy_val_out(prev_smooth_p2_8frame_dy),
+            .prev_delta_size_out(prev_smooth_p2_8frame_size_delta),
+            // current iir inputs
+            .dx_val_in(p2_8frame_dx), 
+            .dy_val_in(p2_8frame_dy), 
+            .delta_size_in(p2_8frame_size_delta),
+            // iir outputs
+            .dx_val_out(smooth_p2_8frame_dx),
+            .dy_val_out(smooth_p2_8frame_dy),
+            .delta_size_out(smooth_p2_8frame_size_delta)
+        );
 
     // timer variables
     logic start;
@@ -163,7 +187,7 @@ module camera_top_module (
 
             // get move forwards/backwards
             // player 1
-            if (p1_8frame_size_delta > MIN_SIZE_DELTA) begin
+            if (smooth_p1_8frame_size_delta > MIN_SIZE_DELTA) begin
                 p1_move_forwards = !p1_8frame_size_delta_sign; //0=pos=forwards
                 p1_move_backwards = p1_8frame_size_delta_sign; //1=neg=backwards
             end else begin
@@ -180,10 +204,10 @@ module camera_top_module (
             end
 
             // get punch, kick
-            p1_punch = (p1_8frame_dx > PUNCH_DX_MIN) && (p1_8frame_dy < PUNCH_DY_MAX);
-            p1_kick = (p1_8frame_dy > KICK_DY_MIN) && (p1_8frame_dx < KICK_DX_MAX);
-            p2_punch = (p2_8frame_dx > PUNCH_DX_MIN) && (p2_8frame_dy < PUNCH_DY_MAX);
-            p2_kick = (p2_8frame_dy > KICK_DY_MIN) && (p2_8frame_dx < KICK_DX_MAX);
+            p1_punch = (smooth_p1_8frame_dx>PUNCH_DX_MIN)&&(smooth_p1_8frame_dy<PUNCH_DY_MAX);
+            p1_kick = (smooth_p1_8frame_dy>KICK_DY_MIN)&&(smooth_p1_8frame_dx<KICK_DX_MAX);
+            p2_punch = (smooth_p2_8frame_dx>PUNCH_DX_MIN)&&(smooth_p2_8frame_dy<PUNCH_DY_MAX);
+            p2_kick = (smooth_p2_8frame_dy>KICK_DY_MIN)&&(smooth_p2_8frame_dx<KICK_DX_MAX);
         end
     end
 
@@ -433,6 +457,15 @@ module camera_top_module (
     assign IR_MIN_B = 12;
 
     always_ff @(posedge clk_65mhz) begin
+        // update previous outputs of iir filter
+        prev_smooth_p1_8frame_dx <= smooth_p1_8frame_dx;
+        prev_smooth_p1_8frame_dy <= smooth_p1_8frame_dy;
+        prev_smooth_p2_8frame_dx <= smooth_p2_8frame_dx;
+        prev_smooth_p2_8frame_dy <= smooth_p2_8frame_dy;
+        prev_smooth_p1_8frame_size_delta <= smooth_p1_8frame_size_delta;
+        prev_smooth_p2_8frame_size_delta <= smooth_p2_8frame_size_delta;
+
+        // update buffer frame and frame tally
         buffer_frame_done_out <= frame_done_out;
         if (rising_edge_frame_done_out) eight_frame_tally <= eight_frame_tally + 1;
 
