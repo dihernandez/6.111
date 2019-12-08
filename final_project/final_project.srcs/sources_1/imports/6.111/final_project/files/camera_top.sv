@@ -46,6 +46,8 @@ module camera_top_module (
     // x value of pixel being displayed (pixel on current line)
     wire [10:0] hcount_mirror;  //,hcount //CHANGED
     assign hcount_mirror = 319-hcount; // make camera display mirror image
+    // y value of pixel being displayed (line number)
+//    wire [9:0] vcount;
     // keep track of whether (hcount,vcount) is on or off the screen
     // un-synchronized; outputs of screen module
     wire hsync_prev, vsync_prev, blank_prev;
@@ -63,17 +65,12 @@ module camera_top_module (
     assign end_of_8_frames = (eight_frame_tally == 7);
 
     // track player 1 + player 2 LEDs
-    // calculate size of player LEDs (number of LED pixels detected)
-    //logic [15:0] p1_size, p2_size; // sometimes invalid
-    //logic [15:0] p1_final_size, p2_final_size; // final (valid) value
-    //logic [15:0] p1_prev_final_size, p2_prev_final_size; // 1 clock cycle ago
+    // calculate size of player LEDs
     logic [15:0] count_num_pixels_for_p1, count_num_pixels_for_p2; // sometimes invalid
     logic [15:0] final_num_pixels_for_p1, final_num_pixels_for_p2; // final (valid) value
     // sizes: 0=[x0,x50), 1=[x50,x100), 2=[x100,x400), 3=[x400,x800)
     logic [1:0] p1_final_size, p1_prev_final_size, p2_final_size, p2_prev_final_size; 
     // change in LED size over 2 and 8 frames
-    //logic [16:0] p1_2frame_size_delta, p2_2frame_size_delta;
-    //logic [18:0] p1_8frame_size_delta, p2_8frame_size_delta;
     logic [2:0] p1_2frame_size_delta, p2_2frame_size_delta;
     logic p1_2frame_size_delta_sign, p2_2frame_size_delta_sign; // 1=neg; 0=pos
     logic [5:0] p1_8frame_size_delta, p2_8frame_size_delta;
@@ -111,167 +108,6 @@ module camera_top_module (
     logic [8:0] x_coord_of_p2, prev_x_coord_of_p2;
     logic [7:0] y_coord_of_p2, prev_y_coord_of_p2;
 
-    /*
-    // convert (x,y) and size variables to unsigned variables
-    // for low pass filter
-    logic [13:0] p1_8frame_dx_unsigned, p1_8frame_dy_unsigned;
-    logic [13:0] p2_8frame_dx_unsigned, p2_8frame_dy_unsigned;
-    logic [19:0] p1_8frame_size_delta_unsigned;
-    logic [19:0] p2_8frame_size_delta_unsigned;
-
-    // max values
-    parameter MAX_DX = 2000;
-    parameter MAX_DY = 2000;
-    parameter MAX_DSIZE = 50000;
-
-    // shift up magnitude + sign variables by max value to make magnitude only
-    always_comb begin
-        if (end_of_8_frames) begin
-            if (p1_8frame_dx_sign) begin // if negative
-                p1_8frame_dx_unsigned = MAX_DX - p1_8frame_dx;
-            end else begin
-                p1_8frame_dx_unsigned = MAX_DX + p1_8frame_dx;
-            end
-
-            if (p1_8frame_dy_sign) begin // if negative
-                p1_8frame_dy_unsigned = MAX_DY - p1_8frame_dy; 
-            end else begin
-                p1_8frame_dy_unsigned = MAX_DY + p1_8frame_dy;
-            end
-
-            if (p1_8frame_size_delta_sign) begin // if negative
-                p1_8frame_size_delta_unsigned = MAX_DSIZE - p1_8frame_size_delta;
-            end else begin
-                p1_8frame_size_delta_unsigned = MAX_DSIZE + p1_8frame_size_delta;
-            end
-
-            if (p2_8frame_dx_sign) begin // if negative
-                p2_8frame_dx_unsigned = MAX_DX - p2_8frame_dx;
-            end else begin
-                p2_8frame_dx_unsigned = MAX_DX + p2_8frame_dx;
-            end
-
-            if (p2_8frame_dy_sign) begin // if negative
-                p2_8frame_dy_unsigned = MAX_DY - p2_8frame_dy; 
-            end else begin
-                p2_8frame_dy_unsigned = MAX_DY + p2_8frame_dy;
-            end
-
-            if (p2_8frame_size_delta_sign) begin // if negative
-                p2_8frame_size_delta_unsigned = MAX_DSIZE - p2_8frame_size_delta;
-            end else begin
-                p2_8frame_size_delta_unsigned = MAX_DSIZE + p2_8frame_size_delta;
-            end
-        end
-    end
-    */
-    
-
-    /*
-    // iir low pass filter to reduce noise
-    logic [13:0] prev_smooth_p1_8frame_dx_unsigned, prev_smooth_p1_8frame_dy_unsigned;
-    logic [13:0] smooth_p1_8frame_dx_unsigned, smooth_p1_8frame_dy_unsigned;
-    logic [19:0] prev_smooth_p1_8frame_size_delta_unsigned;
-    logic [19:0] smooth_p1_8frame_size_delta_unsigned;
-    iir_filter p1_iir_filter(
-            // prev iir outputs
-            .prev_dx_val_out(prev_smooth_p1_8frame_dx_unsigned),
-            .prev_dy_val_out(prev_smooth_p1_8frame_dy_unsigned),
-            .prev_delta_size_out(prev_smooth_p1_8frame_size_delta_unsigned),
-            // current iir inputs
-            .dx_val_in(p1_8frame_dx_unsigned), 
-            .dy_val_in(p1_8frame_dy_unsigned), 
-            .delta_size_in(p1_8frame_size_delta_unsigned),
-            // iir outputs
-            .dx_val_out(smooth_p1_8frame_dx_unsigned),
-            .dy_val_out(smooth_p1_8frame_dy_unsigned),
-            .delta_size_out(smooth_p1_8frame_size_delta_unsigned)
-        );
-
-    logic [12:0] prev_smooth_p2_8frame_dx_unsigned, prev_smooth_p2_8frame_dy_unsigned;
-    logic [12:0] smooth_p2_8frame_dx_unsigned, smooth_p2_8frame_dy_unsigned;
-    logic [18:0] prev_smooth_p2_8frame_size_delta_unsigned;
-    logic [18:0] smooth_p2_8frame_size_delta_unsigned;
-    iir_filter p2_iir_filter(
-            // prev iir outputs
-            .prev_dx_val_out(prev_smooth_p2_8frame_dx_unsigned),
-            .prev_dy_val_out(prev_smooth_p2_8frame_dy_unsigned),
-            .prev_delta_size_out(prev_smooth_p2_8frame_size_delta_unsigned),
-            // current iir inputs
-            .dx_val_in(p2_8frame_dx_unsigned), 
-            .dy_val_in(p2_8frame_dy_unsigned), 
-            .delta_size_in(p2_8frame_size_delta_unsigned),
-            // iir outputs
-            .dx_val_out(smooth_p2_8frame_dx_unsigned),
-            .dy_val_out(smooth_p2_8frame_dy_unsigned),
-            .delta_size_out(smooth_p2_8frame_size_delta_unsigned)
-        );
-
-    // convert magnitude only variables to magnitude + sign
-    logic [12:0] final_smooth_p1_8frame_dx, final_smooth_p1_8frame_dy;
-    logic final_smooth_p1_8frame_dx_sign, final_smooth_p1_8frame_dy_sign;
-    logic [12:0] final_smooth_p2_8frame_dx, final_smooth_p2_8frame_dy;
-    logic final_smooth_p2_8frame_dx_sign, final_smooth_p2_8frame_dy_sign;
-    logic [18:0] final_smooth_p1_8frame_size_delta;
-    logic final_smooth_p1_8frame_size_delta_sign;
-    logic [18:0] final_smooth_p2_8frame_size_delta;
-    logic final_smooth_p2_8frame_size_delta_sign;
-
-    always_comb begin
-        // buffer time for iir filter to finish
-        //if (eight_frame_tally==0) begin
-        if (end_of_8_frames) begin
-            if (smooth_p1_8frame_dx_unsigned > MAX_DX) begin // if positive
-                final_smooth_p1_8frame_dx = smooth_p1_8frame_dx_unsigned - MAX_DX;
-                final_smooth_p1_8frame_dx_sign = 0;
-            end else begin // else if negative
-                final_smooth_p1_8frame_dx = MAX_DX - smooth_p1_8frame_dx_unsigned;
-                final_smooth_p1_8frame_dx_sign = 1;
-            end
-
-            if (smooth_p1_8frame_dy_unsigned > MAX_DY) begin // if positive
-                final_smooth_p1_8frame_dy = smooth_p1_8frame_dy_unsigned - MAX_DY;
-                final_smooth_p1_8frame_dy_sign = 0;
-            end else begin // else if negative
-                final_smooth_p1_8frame_dy = MAX_DY - smooth_p1_8frame_dy_unsigned;
-                final_smooth_p1_8frame_dy_sign = 1;
-            end
-
-            if (smooth_p1_8frame_size_delta_unsigned > MAX_DSIZE) begin // if positive
-                final_smooth_p1_8frame_size_delta = smooth_p1_8frame_size_delta_unsigned - MAX_DSIZE;
-                final_smooth_p1_8frame_size_delta_sign = 0;
-            end else begin // else if negative
-                final_smooth_p1_8frame_size_delta = MAX_DSIZE - smooth_p1_8frame_size_delta_unsigned;
-                final_smooth_p1_8frame_size_delta_sign = 1;
-            end
-
-            if (smooth_p2_8frame_dx_unsigned > MAX_DX) begin // if positive
-                final_smooth_p2_8frame_dx = smooth_p2_8frame_dx_unsigned - MAX_DX;
-                final_smooth_p2_8frame_dx_sign = 0;
-            end else begin // else if negative
-                final_smooth_p2_8frame_dx = MAX_DX - smooth_p2_8frame_dx_unsigned;
-                final_smooth_p2_8frame_dx_sign = 1;
-            end
-
-            if (smooth_p2_8frame_dy_unsigned > MAX_DY) begin // if positive
-                final_smooth_p2_8frame_dy = smooth_p2_8frame_dy_unsigned - MAX_DY;
-                final_smooth_p2_8frame_dy_sign = 0;
-            end else begin // else if negative
-                final_smooth_p2_8frame_dy = MAX_DY - smooth_p2_8frame_dy_unsigned;
-                final_smooth_p2_8frame_dy_sign = 1;
-            end
-
-            if (smooth_p2_8frame_size_delta_unsigned > MAX_DSIZE) begin // if positive
-                final_smooth_p2_8frame_size_delta = smooth_p2_8frame_size_delta_unsigned - MAX_DSIZE;
-                final_smooth_p2_8frame_size_delta_sign = 0;
-            end else begin // else if negative
-                final_smooth_p2_8frame_size_delta = MAX_DSIZE - smooth_p2_8frame_size_delta_unsigned;
-                final_smooth_p2_8frame_size_delta_sign = 1;
-            end
-        end
-    end
-    */
-
     // timer variables
     logic start;
     logic [3:0] value;
@@ -285,45 +121,25 @@ module camera_top_module (
     // punch: move LED in x direction
     /*assign PUNCH_DX_MIN = 'h40 + 'h5 * sw[15:13]; // use sw to calibrate threshholds
     assign PUNCH_DY_MAX = 'h10 + 'h5 * sw[12:11];*/
-    assign PUNCH_DX_MIN = 60;
+    assign PUNCH_DX_MIN = 80;
     assign PUNCH_DY_MAX = 30;
     // kick: move LED in y direction
     /*assign KICK_DY_MIN = 'h40 + 'h5 * sw[15:13]; // use sw to calibrate threshholds
     assign KICK_DX_MAX = 'h10 + 'h5 * sw[12:11];*/
-    assign KICK_DY_MIN = 60;
+    assign KICK_DY_MIN = 80;
     assign KICK_DX_MAX = 30;
-    // min change in size to indicate forward/backward movement
+    // min change in size grade to indicate forward/backward movement
     assign MIN_SIZE_DELTA = sw[15:13]; // use sw to calibrate threshhold
 
     always_comb begin
         // after 8 frames get forward, backward, kick, punch states
         if (end_of_8_frames) begin
-            // use switches to decide what to output to hex display
-            if (sw[2]) begin
-                display_data = {p1_8frame_size_delta_sign,
-                                3'd0,
-                                p1_8frame_size_delta}; 
-            end else if (sw[3]) begin
-                display_data = {p1_8frame_dx_sign,
-                                3'd0,
-                                p1_8frame_dx}; 
-            end else if (sw[4]) begin
-                display_data = {p1_8frame_dy_sign,
-                                3'd0,
-                                p1_8frame_dy}; 
-            end else if (sw[5]) begin
-                display_data = {p2_8frame_size_delta_sign,
-                                3'd0,
-                                p2_8frame_size_delta}; 
-            end else if (sw[6]) begin
-                display_data = {p2_8frame_dx_sign,
-                                3'd0,
-                                p2_8frame_dx}; 
-            end else if (sw[7]) begin
-                display_data = {p2_8frame_dy_sign,
-                                3'd0,
-                                p2_8frame_dy}; 
-            end
+            display_data = { count_num_pixels_for_p1[7:0],
+                             count_num_pixels_for_p2[7:0],
+                             3'b000, p1_8frame_size_delta_sign, 
+                             2'b00, p1_8frame_size_delta, 
+                             3'b000, p2_8frame_size_delta_sign,
+                             2'b00, p2_8frame_size_delta};
 
             // get move forwards/backwards
             // player 1
@@ -344,10 +160,10 @@ module camera_top_module (
             end
 
             // get punch, kick
-            p1_punch = (p1_8frame_dx>PUNCH_DX_MIN)&&(p1_8frame_dy<PUNCH_DY_MAX);
-            p1_kick = (p1_8frame_dy>KICK_DY_MIN)&&(p1_8frame_dx<KICK_DX_MAX);
-            p2_punch = (p2_8frame_dx>PUNCH_DX_MIN)&&(p2_8frame_dy<PUNCH_DY_MAX);
-            p2_kick = (p2_8frame_dy>KICK_DY_MIN)&&(p2_8frame_dx<KICK_DX_MAX);
+            p1_punch = (p1_8frame_dx > PUNCH_DX_MIN) && (p1_8frame_dy < PUNCH_DY_MAX);
+            p1_kick = (p1_8frame_dy > KICK_DY_MIN) && (p1_8frame_dx < KICK_DX_MAX);
+            p2_punch = (p2_8frame_dx > PUNCH_DX_MIN) && (p2_8frame_dy < PUNCH_DY_MAX);
+            p2_kick = (p2_8frame_dy > KICK_DY_MIN) && (p2_8frame_dx < KICK_DX_MAX);
         end
     end
 
@@ -462,7 +278,7 @@ module camera_top_module (
     end
 
     // DIVIDERS
-    // ignore the output when p#_final_size is 0
+    // ignore the output when final_num_pixels_for_p# is 0
     // (i.e. division by 0)
 
     // player 1 dividers
@@ -583,15 +399,6 @@ module camera_top_module (
     assign IR_MIN_B = 12;
 
     always_ff @(posedge clk_65mhz) begin
-        // update previous outputs of iir filter
-        /*prev_smooth_p1_8frame_dx_unsigned <= smooth_p1_8frame_dx_unsigned;
-        prev_smooth_p1_8frame_dy_unsigned <= smooth_p1_8frame_dy_unsigned;
-        prev_smooth_p2_8frame_dx_unsigned <= smooth_p2_8frame_dx_unsigned;
-        prev_smooth_p2_8frame_dy_unsigned <= smooth_p2_8frame_dy_unsigned;
-        prev_smooth_p1_8frame_size_delta_unsigned <= smooth_p1_8frame_size_delta_unsigned;
-        prev_smooth_p2_8frame_size_delta_unsigned <= smooth_p2_8frame_size_delta_unsigned;*/
-
-        // update buffer frame and frame tally
         buffer_frame_done_out <= frame_done_out;
         if (rising_edge_frame_done_out) eight_frame_tally <= eight_frame_tally + 1;
 
@@ -698,13 +505,6 @@ module camera_top_module (
                 end
             end
         end
-        
-        /*
-            logic [15:0] count_num_pixels_for_p1, count_num_pixels_for_p2; // sometimes invalid
-    logic [15:0] final_num_pixels_for_p1, final_num_pixels_for_p2; // final (valid) value
-
-        
-        */
 
         // on falling edge of frame_done_out, update final pixel count
         // for p1 and p2 and set div_inputs_valid to true
@@ -807,7 +607,7 @@ module camera_top_module (
 
     // set pixel_out
     always_ff @(posedge clk_65mhz) begin
-        // if target p1 is there, display
+        // if target p1 is there, display*/
         if (target_p1 != 0) begin
             pixel_out <= target_p1;
         // else if target p2 is there, display 
