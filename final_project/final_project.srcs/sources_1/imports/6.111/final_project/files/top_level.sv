@@ -120,8 +120,6 @@ module top_level (
     HP	health_points(
         //debugger inputs
         .up_in(upper), .dn_in(lower),
-        .p1_puncht(sw[12]), .p1_kickt(sw[11]),
-        .p2_puncht(sw[10]), .p2_kickt(sw[9]),
     	
     	//INPUTS
         .clk(clk_100mhz),   //I can't remember what the proper clock for the lights is
