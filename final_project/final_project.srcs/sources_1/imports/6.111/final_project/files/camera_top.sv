@@ -131,6 +131,10 @@ module camera_top_module (
     // min change in size grade to indicate forward/backward movement
     assign MIN_SIZE_DELTA = 1; //sw[15:13]; // use sw to calibrate threshhold
 
+    // punch, kick, step (forwards/backwards) strength (0=no action, 1=weak, 2=strong)
+    logic [1:0] p1_punch_strength, p1_kick_strength, p1_step_strength;
+    logic [1:0] p2_punch_strength, p2_kick_strength, p2_step_strength;
+
     always_comb begin
         // after 8 frames get forward, backward, kick, punch states
         if (end_of_8_frames) begin
@@ -146,17 +150,23 @@ module camera_top_module (
             if ((p1_8frame_size_delta > MIN_SIZE_DELTA) & (p1_detected[3:0]==4'b1111)) begin
                 p1_move_forwards = !p1_8frame_size_delta_sign; //0=pos=forwards
                 p1_move_backwards = p1_8frame_size_delta_sign; //1=neg=backwards
+                if (p1_8frame_size_delta > 2) p1_step_strength = 2;
+                else p1_step_strength = 1; 
             end else begin
                 p1_move_forwards = 0; 
                 p1_move_backwards = 0;
+                p1_step_strength = 0;
             end
             // player 2
             if ((p2_8frame_size_delta > MIN_SIZE_DELTA) && (p2_detected[3:0]==4'b1111)) begin
                 p2_move_forwards = !p2_8frame_size_delta_sign; //0=pos=forwards
                 p2_move_backwards = p2_8frame_size_delta_sign; //1=neg=backwards
+                if (p2_8frame_size_delta > 2) p2_step_strength = 2;
+                else p2_step_strength = 1; 
             end else begin
                 p2_move_forwards = 0; 
                 p2_move_backwards = 0;
+                p2_step_strength = 0;
             end
 
             // get punch, kick
@@ -168,6 +178,23 @@ module camera_top_module (
                 (p2_detected[3:0]==4'b1111);
             p2_kick = (p2_8frame_dy > KICK_DY_MIN) && (p2_8frame_dx < KICK_DX_MAX) &&
                 (p2_detected[3:0]==4'b1111);
+
+            // get punch + kick strength
+            if (p1_8frame_dx > 'hA0) p1_punch_strength = 2;
+            else if (p1_8frame_dx > PUNCH_DX_MIN) p1_punch_strength = 1;
+            else p1_punch_strength = 0;
+
+            if (p1_8frame_dy > 'hA0) p1_kick_strength = 2;
+            else if (p1_8frame_dy > PUNCH_DY_MIN) p1_kick_strength = 1;
+            else p1_kick_strength = 0;
+
+            if (p2_8frame_dx > 'hA0) p2_punch_strength = 2;
+            else if (p2_8frame_dx > PUNCH_DX_MIN) p2_punch_strength = 1;
+            else p2_punch_strength = 0;
+
+            if (p2_8frame_dy > 'hA0) p2_kick_strength = 2;
+            else if (p2_8frame_dy > PUNCH_DY_MIN) p2_kick_strength = 1;
+            else p2_kick_strength = 0;
         end
     end
 
