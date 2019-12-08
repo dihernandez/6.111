@@ -39,12 +39,11 @@ module movement(
     output logic [11:0] pixel_out
     );
     
-    parameter step_size = 11'd25;
     
     //screen size
-    // x_total = 1024 pixels             512-64= 448     1024-256= 768
-    // y_total =  768 pixels             384-64= 320     768-240= 528
-    // try to get a 24
+    // x_total = 1024 pixels
+    // y_total =  768 pixels
+    // try to get a 24 pixel border
     
     //player starter sprites
     logic[11:0] p1_pix, p1_dead_pix, p2_pix, p2_dead_pix;     //squares for now 
@@ -81,11 +80,11 @@ module movement(
     logic rising_sync;
 
     logic old_right, old_left, old_up, old_dn, 
-    old_p1_fwd, old_p1_bwd, old_p2_fwd, old_p2_bwd;
+            old_p1_fwd, old_p1_bwd, old_p2_fwd, old_p2_bwd;
     logic rising_right, rising_left, rising_up, rising_dn, 
-    rising_p1_fwd, rising_p1_bwd, rising_p2_fwd, rising_p2_bwd;
+            rising_p1_fwd, rising_p1_bwd, rising_p2_fwd, rising_p2_bwd;
     logic right_on, left_on, up_on, dn_on, 
-    p1_fwd_on, p1_bwd_on, p2_fwd_on, p2_bwd_on;
+            p1_fwd_on, p1_bwd_on, p2_fwd_on, p2_bwd_on;
 
     //rising edge for puck movement
     assign rising_sync = vsync_in & !old_clean;     //so individual presses cause visible steps
@@ -101,15 +100,20 @@ module movement(
     assign rising_p2_bwd = p2_bwd & !old_p2_bwd;    //  '   '   '   '   '   '   '   '   '   '
     
     always_ff @(posedge clk) begin
-        old_clean <= vsync_in;      //initialize 
+        //initialize all the olds
+        old_clean <= vsync_in;
+        
         old_right <= right_in;  
         old_left <= left_in;
+        old_up <= up_in;
+        old_dn <= dn_in;
+        
         old_p1_fwd <= p1_fwd;
         old_p1_bwd <= p1_bwd;
         old_p2_fwd <= p2_fwd;
         old_p2_bwd <= p2_bwd;
         
-        //
+        //set signals high on rising edge; will change back to 0 after action-in-question is taken or on RESET
         if (rising_right) begin
             right_on <= 1;
         end else if (rising_left) begin
@@ -118,7 +122,8 @@ module movement(
             up_on <= 1;
         end else if (rising_dn) begin
             dn_on <= 1;
-        end else if (rising_p1_fwd) begin
+        end 
+        else if (rising_p1_fwd) begin
             p1_fwd_on <= 1;
         end else if (rising_p1_bwd) begin
             p1_bwd_on <= 1;
@@ -156,11 +161,11 @@ module movement(
                 if (~p2_dead) begin //when p2 is not dead, they can attack and move
                     //change 100s to hp level later
                     if ((p1_x + 64 + 25 <= p2_x) && (up_on || p2_fwd_on)) begin  //move forward, but don't run into p1
-                        right_on <= 0;
+                        up_on <= 0;
                         p2_fwd_on <= 0;
                         p2_x <= p2_x - 25;
                     end else if ((p2_x + 64 + 25 <= 1000) && (dn_on || p2_bwd_on))  begin  //go backwards, but don't run into the wall 
-                        left_on <= 0;
+                        dn_on <= 0;
                         p2_bwd_on <= 0;
                         p2_x <= p2_x + 25;
                     end

@@ -24,6 +24,8 @@
 module HP (
     //debugger inputs
     input logic up_in, dn_in,
+    input logic p1_puncht, p1_kickt, p2_puncht, p2_kickt,
+    	
     //inputs
     input clk,  reset_in,	//I can't remember what the proper clk for the lights is
     input logic p1_punch, p1_kick,  //player 1 made an attack
@@ -42,24 +44,23 @@ module HP (
 
     parameter arm_len = 11'd5;	//arms be long
     parameter leg_len = 11'd6;	//legs be longer
-    parameter punch_pts = 10'd15;	//punches are weak
-    parameter kick_pts = 10'd30;	//kicks are strong-ish
+    parameter punch_pts = 10'd6;	//punches are weak
+    parameter kick_pts = 10'd12;	//kicks are strong-ish
     parameter start_hp = 10'd50;
-    parameter start_colour = 12'h0F0;
+    parameter start_colour = 12'hF0F;
 
 
     //setup for display of p1_hp | p2_hp
     assign hit_points = {6'b0, p1_hp, 6'b0, p2_hp};   //9+7+9+7 = 32
 
-    //HP BARS
-    logic [11:0] p1_hp_pix, p2_hp_pix;     
+    //HP BARS   
     logic [11:0] p1_hpcolour, p2_hpcolour;
     logic [11:0] p1_hpwidth, p2_hpwidth;
     
     //rectangles that change size and colour!
     assign p1_hpwidth = {3'b0, p1_hp}<<2;
     changable_blob p1_hp_bar(
-                    .WIDTH(p1_hpwidth),   // default width: 64 pixels
+                    .WIDTH(p1_hpwidth + 10),   // default width: 64 pixels
                     .HEIGHT(32),  // default height: 64 pixels
                     .COLOR(p1_hpcolour),
                     .x_in(24), .y_in(666), //p1 starts on right side
@@ -69,11 +70,11 @@ module HP (
     
     assign p2_hpwidth = {3'b0, p2_hp}<<2;          
     changable_blob p2_hp_bar(
-                    .WIDTH(p2_hpwidth),   // default width: 64 pixels
+                    .WIDTH(p2_hpwidth + 10),   // default width: 64 pixels
                     .HEIGHT(32),  // default height: 64 pixels
                     .COLOR(p2_hpcolour),
                     //1024-24
-                    .x_in(1000 - p2_hpwidth), .y_in(666), //p1 starts on right side
+                    .x_in(1010 - p2_hpwidth), .y_in(666), //p1 starts on right side
                     .hcount_in(hcount), .vcount_in(vcount), 
                     .pixel_out(p2_hp_pix)
                     );
@@ -109,10 +110,10 @@ module HP (
         end
         
         if (reset_in) begin     //RESTART
-            p1_hp <= start_hp;    //start hp of 1000
-            p2_hp <= start_hp;	//start hp of 1000 
             p1_dead <= 0;
             p2_dead <= 0;
+            p1_hp <= start_hp;    //start hp of 1000
+            p2_hp <= start_hp;	//start hp of 1000 
             p1_hpcolour <= start_colour;
             p2_hpcolour <= start_colour;
             
@@ -129,17 +130,17 @@ module HP (
             end else if (~p1_dead) begin 	//player 1 is not dead
                 if (p1_punch_on) begin
                     p1_punch_on <= 0;
-                    if (p1_x + 64 + arm_len <= p2_x) begin	//p1 punches p2
+                    if (p1_x + 64 + arm_len >= p2_x) begin	//p1 punches p2
                         p2_hp <= p2_hp - punch_pts;	//drop p2's hp
-                        p2_hpcolour <= p2_hpcolour + 12'h0C0;
+                        p2_hpcolour <= p2_hpcolour - 12'h002;
                         
                         //p2 may get shoved back at some point, but not now
                     end//p1 punch
                 end else if (p1_kick_on) begin
                     p1_kick_on <= 0;
-                    if (p1_x + 64 + leg_len <= p2_x) begin	//p1 kicks p2
+                    if (p1_x + 64 + leg_len >= p2_x) begin	//p1 kicks p2
                         p2_hp <= p2_hp - kick_pts;	//drop p2's hp
-                        p2_hpcolour <= p2_hpcolour + 12'h2A0;
+                        p2_hpcolour <= p2_hpcolour - 12'h004;
                     end
                 //p2 punch
                 end
@@ -152,17 +153,17 @@ module HP (
             end else if (~p2_dead) begin 	//player 2 is not dead
                 if (p2_punch_on) begin
                     p2_punch_on <= 0;
-                    if (p1_x + 64 + arm_len <= p2_x) begin	//p2 punches p1
+                    if (p1_x + 64 + arm_len >= p2_x) begin	//p2 punches p1
                         p1_hp <= p1_hp - punch_pts;	//drop p1's hp
-                        p1_hpcolour <= p1_hpcolour + 12'h380;
+                        p1_hpcolour <= p1_hpcolour - 12'h200;
                         //p1 may get shoved back at some point, but not now
                     end
                 //p2 punch
                 end else if (p2_kick_on) begin
                     p2_kick_on <= 0;
-                    if (p1_x + 64 + leg_len <= p2_x) begin	//p2 kicks p1
+                    if (p1_x + 64 + leg_len >= p2_x) begin	//p2 kicks p1
                         p1_hp <= p1_hp - kick_pts;	//drop p1's hp
-                        p1_hpcolour <= p1_hpcolour + 12'h460;
+                        p1_hpcolour <= p1_hpcolour - 12'h400;
                     end
                 end//p2 kick
             end//p2 hit logic

@@ -42,6 +42,7 @@ module top_level (
 
     // ACTIONS
     logic p1_punch, p1_kick, p2_punch, p2_kick; //hit action being taken 
+    logic p1_punch_test, p1_kick_test, p2_punch_test, p2_kick_test; //hit action being taken 
     logic p1_fwd, p2_fwd;   //is the player moving forward?
     logic p1_bwd, p2_bwd;   //is the player moving backward?
 
@@ -51,22 +52,22 @@ module top_level (
     logic [10:0] h_count;
     logic [9:0] v_count;
 
-//    camera_top_module ctm (
-//        .clk_65mhz(clk_65mhz),
-//        .sw(sw),
-//        .ja(ja), .jb(jb), .jbclk(jbclk), .jd(jd), .jdclk(jdclk),
-//        .hsync(hsync), .vsync(vsync), .blank(blank),
-//        .pixel_out(user_output),
-//        .display_data(debugging_display_data),
-//        .p1_punch(p1_punch), .p1_kick(p1_kick),
-//        .p2_punch(p2_punch), .p2_kick(p2_kick),
-//        .p1_move_forwards(p1_fwd),
-//        .p2_move_forwards(p2_fwd),
-//        .p1_move_backwards(p1_bwd),
-//        .p2_move_backwards(p2_bwd),
-//        .hcount(h_count),
-//        .vcount(v_count)
-//    );
+    camera_top_module ctm (
+        .clk_65mhz(clk_65mhz),
+        .sw(sw),
+        .ja(ja), .jb(jb), .jbclk(jbclk), .jd(jd), .jdclk(jdclk),
+        .hsync(hsync), .vsync(vsync), .blank(blank),
+        .pixel_out(user_output),
+        .display_data(debugging_display_data),
+        .p1_punch(p1_punch), .p1_kick(p1_kick),
+        .p2_punch(p2_punch), .p2_kick(p2_kick),
+        .p1_move_forwards(p1_fwd),
+        .p2_move_forwards(p2_fwd),
+        .p1_move_backwards(p1_bwd),
+        .p2_move_backwards(p2_bwd),
+        .hcount(h_count),
+        .vcount(v_count)
+    );
 
 
     // hex display
@@ -74,6 +75,7 @@ module top_level (
     logic [31:0] hp_display_data;
     
     logic [31:0] x_pos;
+    logic [10:0] p1_loc, p2_loc;        //locations of players
     assign x_pos = {5'b0, p1_loc, 5'b0, p2_loc};    //player locs    
     
     // if sw[0] switched, display debugging output
@@ -95,13 +97,13 @@ module top_level (
     );
     
     //TODO: finish logic for to control this
-    logic [10:0] p1_loc, p2_loc;        //locations of players
     logic [9:0] p1_points, p2_points;	//health points of players
     logic p1_dead, p2_dead;             //which players, if any, are dead
     logic [11:0] p1_hppix, p2_hppix;    //
     logic [11:0] game_output;           //pixels from game logic
     movement    player_motion(
         .left_in(lefty), .right_in(righty),    //debugger inputs
+        .up_in(upper), .dn_in(lower),
         .clk(clk_100mhz), .reset_in(centre),
         .p1_dead(p1_dead), .p2_dead(p2_dead),
         .p1_hp(p1_points), .p2_hp(p2_points),
@@ -118,7 +120,10 @@ module top_level (
     HP	health_points(
         //debugger inputs
         .up_in(upper), .dn_in(lower),
-        //INPUTS
+        .p1_puncht(sw[12]), .p1_kickt(sw[11]),
+        .p2_puncht(sw[10]), .p2_kickt(sw[9]),
+    	
+    	//INPUTS
         .clk(clk_100mhz),   //I can't remember what the proper clock for the lights is
         .reset_in(centre), 
     	.p1_punch(p1_punch), .p1_kick(p1_kick),  //player 1 made an attack
@@ -126,7 +131,7 @@ module top_level (
     	.p1_x(p1_loc), .p2_x(p2_loc),	//location of player 1 and player 2
     	.hcount(h_count),
         .vcount(v_count),
-    	
+        
         //OUTPUTS
         .hit_points(hp_display_data),   //hp vals
     	.p1_hp(p1_points), .p2_hp(p2_points),
