@@ -111,6 +111,7 @@ module camera_top_module (
     logic [8:0] x_coord_of_p2, prev_x_coord_of_p2;
     logic [7:0] y_coord_of_p2, prev_y_coord_of_p2;
 
+    /*
     // convert (x,y) and size variables to unsigned variables
     // for low pass filter
     logic [13:0] p1_8frame_dx_unsigned, p1_8frame_dy_unsigned;
@@ -163,6 +164,8 @@ module camera_top_module (
             end
         end
     end
+    */
+    
 
     /*
     // iir low pass filter to reduce noise
@@ -294,7 +297,7 @@ module camera_top_module (
 
     always_comb begin
         // after 8 frames get forward, backward, kick, punch states
-        if (eight_frame_tally==0) begin
+        if (end_of_8_frames) begin
             // use switches to decide what to output to hex display
             if (sw[2]) begin
                 display_data = {p1_8frame_size_delta_sign,
