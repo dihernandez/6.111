@@ -233,7 +233,7 @@ module camera_top_module (
                 final_smooth_p1_8frame_dy_sign = 1;
             end
 
-            if (smooth_p1_8frame_size_delta_unsigned > MAX_DY) begin // if positive
+            if (smooth_p1_8frame_size_delta_unsigned > MAX_DSIZE) begin // if positive
                 final_smooth_p1_8frame_size_delta = smooth_p1_8frame_size_delta_unsigned - MAX_DSIZE;
                 final_smooth_p1_8frame_size_delta_sign = 0;
             end else begin // else if negative
@@ -257,7 +257,7 @@ module camera_top_module (
                 final_smooth_p2_8frame_dy_sign = 1;
             end
 
-            if (smooth_p2_8frame_size_delta_unsigned > MAX_DY) begin // if positive
+            if (smooth_p2_8frame_size_delta_unsigned > MAX_DSIZE) begin // if positive
                 final_smooth_p2_8frame_size_delta = smooth_p2_8frame_size_delta_unsigned - MAX_DSIZE;
                 final_smooth_p2_8frame_size_delta_sign = 0;
             end else begin // else if negative
@@ -293,12 +293,32 @@ module camera_top_module (
     always_comb begin
         // after 8 frames get forward, backward, kick, punch states
         if (eight_frame_tally==0) begin
-            display_data = { p1_size[7:0],
-                             p2_size[7:0],
-                             3'b000, p1_8frame_size_delta_sign, 
-                             2'b00, p1_8frame_size_delta, 
-                             3'b000, p2_8frame_size_delta_sign,
-                             2'b00, p2_8frame_size_delta};
+            // use switches to decide what to output to hex display
+            if (sw[2]) begin
+                display_data = {final_smooth_p1_8frame_size_delta_sign,
+                                13'd0,
+                                final_smooth_p1_8frame_size_delta}; 
+            end else if (sw[3]) begin
+                display_data = {final_smooth_p1_8frame_dx_sign,
+                                13'd0,
+                                final_smooth_p1_8frame_dx}; 
+            end else if (sw[4]) begin
+                display_data = {final_smooth_p1_8frame_dy_sign,
+                                13'd0,
+                                final_smooth_p1_8frame_dy}; 
+            end else if (sw[5]) begin
+                display_data = {final_smooth_p2_8frame_size_delta_sign,
+                                13'd0,
+                                final_smooth_p2_8frame_size_delta}; 
+            end else if (sw[6]) begin
+                display_data = {final_smooth_p1_8frame_dx_sign,
+                                13'd0,
+                                final_smooth_p1_8frame_dx}; 
+            end else if (sw[7]) begin
+                display_data = {final_smooth_p1_8frame_dy_sign,
+                                13'd0,
+                                final_smooth_p1_8frame_dy}; 
+            end
 
             // get move forwards/backwards
             // player 1
