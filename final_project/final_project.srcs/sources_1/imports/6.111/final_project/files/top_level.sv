@@ -51,22 +51,22 @@ module top_level (
     logic [10:0] h_count;
     logic [9:0] v_count;
 
-    camera_top_module ctm (
-        .clk_65mhz(clk_65mhz),
-        .sw(sw),
-        .ja(ja), .jb(jb), .jbclk(jbclk), .jd(jd), .jdclk(jdclk),
-        .hsync(hsync), .vsync(vsync), .blank(blank),
-        .pixel_out(user_output),
-        .display_data(debugging_display_data),
-        .p1_punch(p1_punch), .p1_kick(p1_kick),
-        .p2_punch(p2_punch), .p2_kick(p2_kick),
-        .p1_move_forwards(p1_fwd),
-        .p2_move_forwards(p2_fwd),
-        .p1_move_backwards(p1_bwd),
-        .p2_move_backwards(p2_bwd),
-        .hcount(h_count),
-        .vcount(v_count)
-    );
+//    camera_top_module ctm (
+//        .clk_65mhz(clk_65mhz),
+//        .sw(sw),
+//        .ja(ja), .jb(jb), .jbclk(jbclk), .jd(jd), .jdclk(jdclk),
+//        .hsync(hsync), .vsync(vsync), .blank(blank),
+//        .pixel_out(user_output),
+//        .display_data(debugging_display_data),
+//        .p1_punch(p1_punch), .p1_kick(p1_kick),
+//        .p2_punch(p2_punch), .p2_kick(p2_kick),
+//        .p1_move_forwards(p1_fwd),
+//        .p2_move_forwards(p2_fwd),
+//        .p1_move_backwards(p1_bwd),
+//        .p2_move_backwards(p2_bwd),
+//        .hcount(h_count),
+//        .vcount(v_count)
+//    );
 
 
     // hex display
@@ -106,8 +106,8 @@ module top_level (
         .p1_dead(p1_dead), .p2_dead(p2_dead),
         .p1_hp(p1_points), .p2_hp(p2_points),
         .p1_hp_pix(p1_hppix), .p2_hp_pix(p2_hppix),
-        .p1_mvfwd(p1_fwd), .p2_mvfwd(p2_fwd),
-        .p1_mvbwd(p1_bwd), .p2_mvbwd(p2_bwd),
+        .p1_fwd(p1_fwd), .p2_fwd(p2_fwd),
+        .p1_bwd(p1_bwd), .p2_bwd(p2_bwd),
         .hcount(h_count), .vcount(v_count),
         .vsync_in(vsync),
         //outputs

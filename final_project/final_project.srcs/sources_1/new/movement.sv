@@ -22,11 +22,11 @@
 
 module movement(
     //debugger inputs
-    input logic left_in, right_in, 
+    input logic left_in, right_in, up_in, dn_in,
     //inputs
     input clk, reset_in,
-    input logic p1_mvfwd, p2_mvfwd,
-    input logic p1_mvbwd, p2_mvbwd,
+    input logic p1_fwd, p2_fwd,
+    input logic p1_bwd, p2_bwd,
     input logic p1_dead, p2_dead,
     input logic [9:0] p1_hp, p2_hp,
     input logic [11:0] p1_hp_pix, p2_hp_pix,    //
@@ -38,6 +38,8 @@ module movement(
     output logic [10:0] p2_x,
     output logic [11:0] pixel_out
     );
+    
+    parameter step_size = 11'd25;
     
     //screen size
     // x_total = 1024 pixels             512-64= 448     1024-256= 768
@@ -74,41 +76,55 @@ module movement(
                         (p2_dead)?  (p1_pix + p2_dead_pix + p1_hp_pix + p2_hp_pix): 
                         (p1_pix + p2_pix + p1_hp_pix + p2_hp_pix);
     
-    
     //rising edge vars
     logic old_clean;
     logic rising_sync;
 
-    logic old_right, old_left, old_p1_fwd, old_p1_bwd, old_p2_fwd, old_p2_bwd;
-    logic rising_right, rising_left, p1_rising_fwd, p1_rising_bwd, p2_rising_fwd, p2_rising_bwd;
-    logic right_on, left_on, p1_fwd_on, p1_bwd_on, p2_fwd_on, p2_bwd_on;
+    logic old_right, old_left, old_up, old_dn, 
+    old_p1_fwd, old_p1_bwd, old_p2_fwd, old_p2_bwd;
+    logic rising_right, rising_left, rising_up, rising_dn, 
+    rising_p1_fwd, rising_p1_bwd, rising_p2_fwd, rising_p2_bwd;
+    logic right_on, left_on, up_on, dn_on, 
+    p1_fwd_on, p1_bwd_on, p2_fwd_on, p2_bwd_on;
 
     //rising edge for puck movement
-    assign rising_sync = vsync_in & !old_clean;    //so individual presses cause visible steps
+    assign rising_sync = vsync_in & !old_clean;     //so individual presses cause visible steps
+    
     assign rising_right = right_in & !old_right;    //  '   '   '   '   '   '   '   '   '   ' 
     assign rising_left = left_in & !old_left;       //  '   '   '   '   '   '   '   '   '   '
-    assign p1_rising_fwd = p1_mvfwd & !old_p1_fwd;       //  '   '   '   '   '   '   '   '   '   '
-    assign p1_rising_bwd = p1_mvbwd & !old_p1_bwd;       //  '   '   '   '   '   '   '   '   '   '
-    assign p2_rising_fwd = p2_mvfwd & !old_p2_fwd;       //  '   '   '   '   '   '   '   '   '   '
-    assign p2_rising_bwd = p2_mvbwd & !old_p2_bwd;       //  '   '   '   '   '   '   '   '   '   '
+    assign rising_up = up_in & !old_up;             //  '   '   '   '   '   '   '   '   '   '
+    assign rising_dn = dn_in & !old_dn;             //  '   '   '   '   '   '   '   '   '   '
+    
+    assign rising_p1_fwd = p1_fwd & !old_p1_fwd;    //  '   '   '   '   '   '   '   '   '   '
+    assign rising_p1_bwd = p1_bwd & !old_p1_bwd;    //  '   '   '   '   '   '   '   '   '   '
+    assign rising_p2_fwd = p2_fwd & !old_p2_fwd;    //  '   '   '   '   '   '   '   '   '   '
+    assign rising_p2_bwd = p2_bwd & !old_p2_bwd;    //  '   '   '   '   '   '   '   '   '   '
     
     always_ff @(posedge clk) begin
-        old_clean <= vsync_in;
-        old_right <= right_in;
+        old_clean <= vsync_in;      //initialize 
+        old_right <= right_in;  
         old_left <= left_in;
+        old_p1_fwd <= p1_fwd;
+        old_p1_bwd <= p1_bwd;
+        old_p2_fwd <= p2_fwd;
+        old_p2_bwd <= p2_bwd;
         
-        
+        //
         if (rising_right) begin
             right_on <= 1;
         end else if (rising_left) begin
             left_on <= 1;
-        end else if (p1_rising_fwd) begin
+        end else if (rising_up) begin
+            up_on <= 1;
+        end else if (rising_dn) begin
+            dn_on <= 1;
+        end else if (rising_p1_fwd) begin
             p1_fwd_on <= 1;
-        end else if (p1_rising_bwd) begin
+        end else if (rising_p1_bwd) begin
             p1_bwd_on <= 1;
-        end else if (p2_rising_fwd) begin
+        end else if (rising_p2_fwd) begin
             p2_fwd_on <= 1;
-        end else if (p2_rising_bwd) begin
+        end else if (rising_p2_bwd) begin
             p2_bwd_on <= 1;
         end
         
@@ -130,7 +146,7 @@ module movement(
                         right_on <= 0;
                         p1_fwd_on <= 0;
                         p1_x <= p1_x + 25;
-                    end else if ((p1_x - 25 >= 24) && (left_on || p1_bwd_on))  begin   // go backwards, but don't run into the wall 
+                    end else if ((p1_x >= 24 + 25) && (left_on || p1_bwd_on))  begin   // go backwards, but don't run into the wall 
                         left_on <= 0;
                         p1_bwd_on <= 0;
                         p1_x <= p1_x - 25;
@@ -139,25 +155,17 @@ module movement(
                 
                 if (~p2_dead) begin //when p2 is not dead, they can attack and move
                     //change 100s to hp level later
-                    if ((p1_x + 64 + 25 <= p2_x) && (right_on || p2_fwd_on)) begin  //move forward, but don't run into p1
+                    if ((p1_x + 64 + 25 <= p2_x) && (up_on || p2_fwd_on)) begin  //move forward, but don't run into p1
                         right_on <= 0;
                         p2_fwd_on <= 0;
                         p2_x <= p2_x - 25;
-                    end else if ((p2_x + 64 + 25 <= 1000) && (left_on || p2_bwd_on))  begin  //go backwards, but don't run into the wall 
+                    end else if ((p2_x + 64 + 25 <= 1000) && (dn_on || p2_bwd_on))  begin  //go backwards, but don't run into the wall 
                         left_on <= 0;
                         p2_bwd_on <= 0;
                         p2_x <= p2_x + 25;
                     end
                 end//p2
-//                if (~p2_dead) begin
-//                    if (p2_mvfwd && (p2_x - 25 - 64 >= p1_x) ) begin  //don't run into p2
-//                        p2_x <= p2_x - 25;
-//                    end else if (p2_mvbwd && (p1_x + 25 + 64 <= 900))  begin   //as is, p1 cant run into p2 going backwards,
-//                                                                           //but can run into the wall... 
-//                        p2_x <= p2_x + 25;
-//                    end 
-//                end//p2
-                
+          
             end//not reset
         end//rising_sync
     end //always

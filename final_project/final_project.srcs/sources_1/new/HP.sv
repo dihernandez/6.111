@@ -40,11 +40,11 @@ module HP (
     output logic speaker        //potential sounds
     );
 
-    parameter arm_len = 5;	//arms be long
-    parameter leg_len = 6;	//legs be longer
-    parameter punch_pts = 15;	//punches are weak
-    parameter kick_pts = 30;	//kicks are strong-ish
-    parameter start_hp = 50;
+    parameter arm_len = 11'd5;	//arms be long
+    parameter leg_len = 11'd6;	//legs be longer
+    parameter punch_pts = 10'd15;	//punches are weak
+    parameter kick_pts = 10'd30;	//kicks are strong-ish
+    parameter start_hp = 10'd50;
     parameter start_colour = 12'h0F0;
 
 
@@ -73,7 +73,7 @@ module HP (
                     .HEIGHT(32),  // default height: 64 pixels
                     .COLOR(p2_hpcolour),
                     //1024-24
-                    .x_in(612 - p2_hpwidth), .y_in(666), //p1 starts on right side
+                    .x_in(1000 - p2_hpwidth), .y_in(666), //p1 starts on right side
                     .hcount_in(hcount), .vcount_in(vcount), 
                     .pixel_out(p2_hp_pix)
                     );
@@ -123,48 +123,46 @@ module HP (
         end else begin  //in game logic
         
             //Player 1 hp logic
-            if (p1_hp < 10'b0 || p1_hp > 10'd100) begin	//player 1 has died
-                p1_hp <= 10'b0;		//hp shows up as "0000"
+            if (p1_hp < 0 || p1_hp > start_hp) begin	//player 1 has died
+                p1_hp <= 0;		//hp shows up as "0000"
                 p1_dead <= 1'b1;	//DEAD
             end else if (~p1_dead) begin 	//player 1 is not dead
                 if (p1_punch_on) begin
                     p1_punch_on <= 0;
-                    if (p1_x + 64 + arm_len >= p2_x) begin	//p1 punches p2
+                    if (p1_x + 64 + arm_len <= p2_x) begin	//p1 punches p2
                         p2_hp <= p2_hp - punch_pts;	//drop p2's hp
-//                        p2_hpcolour <= p2_hpcolour + 12'h100;
-//                        p2_hpcolour <= p2_hpcolour - 12'h010;
-                        p2_hpcolour <= p2_hpcolour + 12'h0E0;
+                        p2_hpcolour <= p2_hpcolour + 12'h0C0;
                         
                         //p2 may get shoved back at some point, but not now
                     end//p1 punch
                 end else if (p1_kick_on) begin
                     p1_kick_on <= 0;
-                    if (p1_x + 64 + leg_len >= p2_x) begin	//p1 kicks p2
+                    if (p1_x + 64 + leg_len <= p2_x) begin	//p1 kicks p2
                         p2_hp <= p2_hp - kick_pts;	//drop p2's hp
-                        p2_hpcolour <= p2_hpcolour + 12'h1D0;
+                        p2_hpcolour <= p2_hpcolour + 12'h2A0;
                     end
                 //p2 punch
                 end
             end//p1 hit logic
             
             //Player 2 hp logic
-            if (p2_hp < 10'b0 || p2_hp > 10'd100) begin	//player 2 has died
-                p2_hp <= 10'b0;		//hp shows up as "0000"
+            if (p2_hp < 0 || p2_hp > start_hp) begin	//player 2 has died
+                p2_hp <= 0;		//hp shows up as "0000"
                 p2_dead <= 1'b1;	//DEAD
             end else if (~p2_dead) begin 	//player 2 is not dead
                 if (p2_punch_on) begin
                     p2_punch_on <= 0;
-                    if (p1_x + 64 + arm_len >= p2_x) begin	//p2 punches p1
+                    if (p1_x + 64 + arm_len <= p2_x) begin	//p2 punches p1
                         p1_hp <= p1_hp - punch_pts;	//drop p1's hp
-                        p1_hpcolour <= p1_hpcolour + 12'h2C0;
+                        p1_hpcolour <= p1_hpcolour + 12'h380;
                         //p1 may get shoved back at some point, but not now
                     end
                 //p2 punch
                 end else if (p2_kick_on) begin
                     p2_kick_on <= 0;
-                    if (p1_x + 64 + leg_len >= p2_x) begin	//p2 kicks p1
+                    if (p1_x + 64 + leg_len <= p2_x) begin	//p2 kicks p1
                         p1_hp <= p1_hp - kick_pts;	//drop p1's hp
-                        p1_hpcolour <= p1_hpcolour + 12'h3B0;
+                        p1_hpcolour <= p1_hpcolour + 12'h460;
                     end
                 end//p2 kick
             end//p2 hit logic
