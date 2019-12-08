@@ -46,8 +46,6 @@ module camera_top_module (
     // x value of pixel being displayed (pixel on current line)
     wire [10:0] hcount_mirror;  //,hcount //CHANGED
     assign hcount_mirror = 319-hcount; // make camera display mirror image
-    // y value of pixel being displayed (line number)
-//    wire [9:0] vcount;
     // keep track of whether (hcount,vcount) is on or off the screen
     // un-synchronized; outputs of screen module
     wire hsync_prev, vsync_prev, blank_prev;
@@ -88,6 +86,12 @@ module camera_top_module (
     // reset LED displacement values after 8 frames
     logic reset_8frame_delta_values;
 
+    // keep track of number of frames that no pixels from p1 LED and p1 LED are detected
+    // if p1 LED not detected for 4 frames, do not detect motion
+    logic [7:0] p1_detected;
+    // if p2 LED not detected for 4 frames, do not detect motion
+    logic [7:0] p2_detected;
+
     // player 1 + player 2 variables
     logic div_inputs_valid;
     // player 1 variables
@@ -119,13 +123,9 @@ module camera_top_module (
     logic [7:0] PUNCH_DX_MIN, PUNCH_DY_MAX, KICK_DX_MAX, KICK_DY_MIN;
     logic [2:0] MIN_SIZE_DELTA;
     // punch: move LED in x direction
-    /*assign PUNCH_DX_MIN = 'h40 + 'h5 * sw[15:13]; // use sw to calibrate threshholds
-    assign PUNCH_DY_MAX = 'h10 + 'h5 * sw[12:11];*/
     assign PUNCH_DX_MIN = 80;
     assign PUNCH_DY_MAX = 30;
     // kick: move LED in y direction
-    /*assign KICK_DY_MIN = 'h40 + 'h5 * sw[15:13]; // use sw to calibrate threshholds
-    assign KICK_DX_MAX = 'h10 + 'h5 * sw[12:11];*/
     assign KICK_DY_MIN = 80;
     assign KICK_DX_MAX = 30;
     // min change in size grade to indicate forward/backward movement
@@ -160,10 +160,14 @@ module camera_top_module (
             end
 
             // get punch, kick
-            p1_punch = (p1_8frame_dx > PUNCH_DX_MIN) && (p1_8frame_dy < PUNCH_DY_MAX);
-            p1_kick = (p1_8frame_dy > KICK_DY_MIN) && (p1_8frame_dx < KICK_DX_MAX);
-            p2_punch = (p2_8frame_dx > PUNCH_DX_MIN) && (p2_8frame_dy < PUNCH_DY_MAX);
-            p2_kick = (p2_8frame_dy > KICK_DY_MIN) && (p2_8frame_dx < KICK_DX_MAX);
+            p1_punch = (p1_8frame_dx > PUNCH_DX_MIN) && (p1_8frame_dy < PUNCH_DY_MAX) &&
+                (p1_detected[3:0]==4'b111);
+            p1_kick = (p1_8frame_dy > KICK_DY_MIN) && (p1_8frame_dx < KICK_DX_MAX) &&
+                (p1_detected[3:0]==4'b111);
+            p2_punch = (p2_8frame_dx > PUNCH_DX_MIN) && (p2_8frame_dy < PUNCH_DY_MAX) &&
+                (p2_detected[3:0]==4'b111);
+            p2_kick = (p2_8frame_dy > KICK_DY_MIN) && (p2_8frame_dx < KICK_DX_MAX) &&
+                (p2_detected[3:0]==4'b111);
         end
     end
 
@@ -192,17 +196,6 @@ module camera_top_module (
             .pixel_out(p2_square_pixel)
         );
 
-
-    // hex display 
-//    assign {cg, cf, ce, cd, cc, cb, ca} = segments[6:0];
-//    assign dp = 1'b1;  // turn off the period
-/*    display_8hex display(
-            .clk_in(clk_65mhz),
-            .data_in(display_data), 
-            .seg_out(segments), 
-            .strobe_out(an)
-    ); */
-    
     // timer
     timer timer_uut (
             .clock(clk_65mhz),
@@ -385,12 +378,6 @@ module camera_top_module (
     // led threshholds
     logic [4:0] RED_MIN_R, RED_MAX_G, RED_MAX_B;
     logic [4:0] IR_MIN_R, IR_MIN_G, IR_MIN_B;
-    /*assign RED_MIN_R = 8 + sw[8:6]; // use switches to calibrate threshholds
-    assign RED_MAX_G = 1 + sw[5:4];
-    assign RED_MAX_B = 1 + sw[5:4];
-    assign IR_MIN_R = 8 + sw[3:1];
-    assign IR_MIN_G = 8 + sw[3:1];
-    assign IR_MIN_B = 8 + sw[3:1];*/
     assign RED_MIN_R = 11;
     assign RED_MAX_G = 3;
     assign RED_MAX_B = 3;
@@ -516,6 +503,9 @@ module camera_top_module (
             final_num_pixels_for_p1 <= count_num_pixels_for_p1;
             final_num_pixels_for_p2 <= count_num_pixels_for_p2;
             div_inputs_valid <= 1;
+            // update whether or not p1 and p2 detected
+            p1_detected <= {p1[6:0], final_num_pixels_for_p1>5};
+            p2_detected <= {p2[6:0], final_num_pixels_for_p2>5};
         end else if (div_inputs_valid) begin
             // reset values to 0 after calculating quotient
             div_inputs_valid <= 0;
