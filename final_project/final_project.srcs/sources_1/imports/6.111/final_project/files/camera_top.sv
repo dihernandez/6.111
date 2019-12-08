@@ -143,7 +143,7 @@ module camera_top_module (
 
             // get move forwards/backwards
             // player 1
-            if (p1_8frame_size_delta > MIN_SIZE_DELTA) begin
+            if ((p1_8frame_size_delta > MIN_SIZE_DELTA) & (p1_detected[3:0]==4'b1111)) begin
                 p1_move_forwards = !p1_8frame_size_delta_sign; //0=pos=forwards
                 p1_move_backwards = p1_8frame_size_delta_sign; //1=neg=backwards
             end else begin
@@ -151,7 +151,7 @@ module camera_top_module (
                 p1_move_backwards = 0;
             end
             // player 2
-            if (p2_8frame_size_delta > MIN_SIZE_DELTA) begin
+            if ((p2_8frame_size_delta > MIN_SIZE_DELTA) && (p2_detected[3:0]==4'b1111)) begin
                 p2_move_forwards = !p2_8frame_size_delta_sign; //0=pos=forwards
                 p2_move_backwards = p2_8frame_size_delta_sign; //1=neg=backwards
             end else begin
@@ -161,13 +161,13 @@ module camera_top_module (
 
             // get punch, kick
             p1_punch = (p1_8frame_dx > PUNCH_DX_MIN) && (p1_8frame_dy < PUNCH_DY_MAX) &&
-                (p1_detected[3:0]==4'b111);
+                (p1_detected[3:0]==4'b1111);
             p1_kick = (p1_8frame_dy > KICK_DY_MIN) && (p1_8frame_dx < KICK_DX_MAX) &&
-                (p1_detected[3:0]==4'b111);
+                (p1_detected[3:0]==4'b1111);
             p2_punch = (p2_8frame_dx > PUNCH_DX_MIN) && (p2_8frame_dy < PUNCH_DY_MAX) &&
-                (p2_detected[3:0]==4'b111);
+                (p2_detected[3:0]==4'b1111);
             p2_kick = (p2_8frame_dy > KICK_DY_MIN) && (p2_8frame_dx < KICK_DX_MAX) &&
-                (p2_detected[3:0]==4'b111);
+                (p2_detected[3:0]==4'b1111);
         end
     end
 
@@ -504,8 +504,8 @@ module camera_top_module (
             final_num_pixels_for_p2 <= count_num_pixels_for_p2;
             div_inputs_valid <= 1;
             // update whether or not p1 and p2 detected
-            p1_detected <= {p1_detected[6:0], final_num_pixels_for_p1>5};
-            p2_detected <= {p2_detected[6:0], final_num_pixels_for_p2>5};
+            p1_detected <= {p1_detected[6:0], count_num_pixels_for_p1>5};
+            p2_detected <= {p2_detected[6:0], count_num_pixels_for_p2>5};
         end else if (div_inputs_valid) begin
             // reset values to 0 after calculating quotient
             div_inputs_valid <= 0;
