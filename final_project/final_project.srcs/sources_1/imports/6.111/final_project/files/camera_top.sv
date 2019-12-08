@@ -276,7 +276,7 @@ module camera_top_module (
     // LOGIC
     // treshholds
     logic [7:0] PUNCH_DX_MIN, PUNCH_DY_MAX, KICK_DX_MAX, KICK_DY_MIN;
-    logic [2:0] MIN_SIZE_DELTA;
+    logic [6:0] MIN_SIZE_DELTA;
     // punch: move LED in x direction
     /*assign PUNCH_DX_MIN = 'h40 + 'h5 * sw[15:13]; // use sw to calibrate threshholds
     assign PUNCH_DY_MAX = 'h10 + 'h5 * sw[12:11];*/
