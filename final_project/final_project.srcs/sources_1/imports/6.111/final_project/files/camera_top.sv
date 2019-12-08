@@ -504,8 +504,8 @@ module camera_top_module (
             final_num_pixels_for_p2 <= count_num_pixels_for_p2;
             div_inputs_valid <= 1;
             // update whether or not p1 and p2 detected
-            p1_detected <= {p1[6:0], final_num_pixels_for_p1>5};
-            p2_detected <= {p2[6:0], final_num_pixels_for_p2>5};
+            p1_detected <= {p1_detected[6:0], final_num_pixels_for_p1>5};
+            p2_detected <= {p2_detected[6:0], final_num_pixels_for_p2>5};
         end else if (div_inputs_valid) begin
             // reset values to 0 after calculating quotient
             div_inputs_valid <= 0;
