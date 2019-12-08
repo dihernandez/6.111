@@ -3,7 +3,7 @@
 <!--                                                         -->
 <!-- Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.   -->
 
-<Project Version="7" Minor="40" Path="/afs/athena.mit.edu/user/p/e/petrah/6_111_final_project/6.111/final_project/final_project.xpr">
+<Project Version="7" Minor="40" Path="/afs/athena.mit.edu/user/r/d/rdedhia/Private/Documents/6_111/final_project_git/6.111/final_project/final_project.xpr">
   <DefaultLaunch Dir="$PRUNDIR"/>
   <Configuration>
     <Option Name="Id" Val="8ceb4b2ed19240c9a5c94d1d1941f4fd"/>
@@ -199,7 +199,7 @@
       </File>
       <File Path="$PSRCDIR/sources_1/imports/new/seven_seg_controller.sv">
         <FileInfo>
-          <Attr Name="ImportPath" Val="$PPRDIR/../../../6.111Lab4/6.111Lab4.srcs/sources_1/imports/new/seven_seg_controller.sv"/>
+          <Attr Name="ImportPath" Val="$PPRDIR/../../../../../../../../../p/e/petrah/6.111Lab4/6.111Lab4.srcs/sources_1/imports/new/seven_seg_controller.sv"/>
           <Attr Name="ImportTime" Val="1575409653"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>

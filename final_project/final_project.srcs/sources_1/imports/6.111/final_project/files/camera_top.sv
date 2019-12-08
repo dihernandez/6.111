@@ -214,6 +214,7 @@ module camera_top_module (
     logic final_smooth_p1_8frame_size_delta_sign;
     logic [18:0] final_smooth_p2_8frame_size_delta;
     logic final_smooth_p2_8frame_size_delta_sign;
+
     always_comb begin
         // buffer time for iir filter to finish
         if (eight_frame_tally==0) begin
@@ -296,28 +297,28 @@ module camera_top_module (
             // use switches to decide what to output to hex display
             if (sw[2]) begin
                 display_data = {final_smooth_p1_8frame_size_delta_sign,
-                                13'd0,
+                                3'd0,
                                 final_smooth_p1_8frame_size_delta}; 
             end else if (sw[3]) begin
                 display_data = {final_smooth_p1_8frame_dx_sign,
-                                13'd0,
+                                3'd0,
                                 final_smooth_p1_8frame_dx}; 
             end else if (sw[4]) begin
                 display_data = {final_smooth_p1_8frame_dy_sign,
-                                13'd0,
+                                3'd0,
                                 final_smooth_p1_8frame_dy}; 
             end else if (sw[5]) begin
                 display_data = {final_smooth_p2_8frame_size_delta_sign,
-                                13'd0,
+                                3'd0,
                                 final_smooth_p2_8frame_size_delta}; 
             end else if (sw[6]) begin
-                display_data = {final_smooth_p1_8frame_dx_sign,
-                                13'd0,
-                                final_smooth_p1_8frame_dx}; 
+                display_data = {final_smooth_p2_8frame_dx_sign,
+                                3'd0,
+                                final_smooth_p2_8frame_dx}; 
             end else if (sw[7]) begin
-                display_data = {final_smooth_p1_8frame_dy_sign,
-                                13'd0,
-                                final_smooth_p1_8frame_dy}; 
+                display_data = {final_smooth_p2_8frame_dy_sign,
+                                3'd0,
+                                final_smooth_p2_8frame_dy}; 
             end
 
             // get move forwards/backwards
