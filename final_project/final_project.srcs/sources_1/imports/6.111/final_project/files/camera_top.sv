@@ -468,7 +468,7 @@ module camera_top_module (
     // player 1 dividers
     div_gen_y y_div_uut (
         .aclk(clk_65mhz),
-        .s_axis_divisor_tdata(p1_final_size),
+        .s_axis_divisor_tdata(final_num_pixels_for_p1),
         .s_axis_divisor_tvalid(div_inputs_valid),
         .s_axis_dividend_tdata(p1_y_coord_sum),
         .s_axis_dividend_tvalid(div_inputs_valid),
@@ -477,7 +477,7 @@ module camera_top_module (
     );
     div_gen_x x_div_uut (
         .aclk(clk_65mhz),
-        .s_axis_divisor_tdata(p1_final_size),
+        .s_axis_divisor_tdata(final_num_pixels_for_p2),
         .s_axis_divisor_tvalid(div_inputs_valid),
         .s_axis_dividend_tdata(p1_x_coord_sum),
         .s_axis_dividend_tvalid(div_inputs_valid),
