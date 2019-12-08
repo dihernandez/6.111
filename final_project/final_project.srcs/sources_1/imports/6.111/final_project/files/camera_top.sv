@@ -66,8 +66,8 @@ module camera_top_module (
     // calculate size of player LEDs
     logic [15:0] count_num_pixels_for_p1, count_num_pixels_for_p2; // sometimes invalid
     logic [15:0] final_num_pixels_for_p1, final_num_pixels_for_p2; // final (valid) value
-    // sizes: 0=[x0,x50), 1=[x50,x100), 2=[x100,x400), 3=[x400,x800)
-    logic [1:0] p1_final_size, p1_prev_final_size, p2_final_size, p2_prev_final_size; 
+    // sizes: 0=[x0,x50), 1=[x50,x100), 2=[x100,x150), ..., 15=[x750,x800)
+    logic [3:0] p1_final_size, p1_prev_final_size, p2_final_size, p2_prev_final_size; 
     // change in LED size over 2 and 8 frames
     logic [2:0] p1_2frame_size_delta, p2_2frame_size_delta;
     logic p1_2frame_size_delta_sign, p2_2frame_size_delta_sign; // 1=neg; 0=pos
@@ -372,24 +372,39 @@ module camera_top_module (
         else p2_2frame_dy = y_coord_of_p2 - prev_y_coord_of_p2;
 
         // calculate size grade from num. pixels
-        if (final_num_pixels_for_p1 < 'h50) begin
-            p1_final_size = 0;
-        end else if (final_num_pixels_for_p1 < 'h100) begin
-            p1_final_size = 1;
-        end else if (final_num_pixels_for_p1 < 'h400) begin
-            p1_final_size = 2;
-        end else begin
-            p1_final_size = 3;
-        end
-        if (final_num_pixels_for_p2 < 'h50) begin
-            p2_final_size = 0;
-        end else if (final_num_pixels_for_p2 < 'h100) begin
-            p2_final_size = 1;
-        end else if (final_num_pixels_for_p2 < 'h400) begin
-            p2_final_size = 2;
-        end else begin
-            p2_final_size = 3;
-        end
+        if (final_num_pixels_for_p1 < 'h50) p1_final_size = 0;
+        else if (final_num_pixels_for_p1 < 'h100) p1_final_size = 1;
+        else if (final_num_pixels_for_p1 < 'h150) p1_final_size = 2;
+        else if (final_num_pixels_for_p1 < 'h200) p1_final_size = 3;
+        else if (final_num_pixels_for_p1 < 'h250) p1_final_size = 4;
+        else if (final_num_pixels_for_p1 < 'h300) p1_final_size = 5;
+        else if (final_num_pixels_for_p1 < 'h350) p1_final_size = 6;
+        else if (final_num_pixels_for_p1 < 'h400) p1_final_size = 7;
+        else if (final_num_pixels_for_p1 < 'h450) p1_final_size = 8;
+        else if (final_num_pixels_for_p1 < 'h500) p1_final_size = 9;
+        else if (final_num_pixels_for_p1 < 'h550) p1_final_size = 10;
+        else if (final_num_pixels_for_p1 < 'h600) p1_final_size = 11;
+        else if (final_num_pixels_for_p1 < 'h650) p1_final_size = 12;
+        else if (final_num_pixels_for_p1 < 'h700) p1_final_size = 13;
+        else if (final_num_pixels_for_p1 < 'h750) p1_final_size = 14;
+        else p1_final_size = 15;
+
+        if (final_num_pixels_for_p2 < 'h50) p2_final_size = 0;
+        else if (final_num_pixels_for_p2 < 'h100) p2_final_size = 1;
+        else if (final_num_pixels_for_p2 < 'h150) p2_final_size = 2;
+        else if (final_num_pixels_for_p2 < 'h200) p2_final_size = 3;
+        else if (final_num_pixels_for_p2 < 'h250) p2_final_size = 4;
+        else if (final_num_pixels_for_p2 < 'h300) p2_final_size = 5;
+        else if (final_num_pixels_for_p2 < 'h350) p2_final_size = 6;
+        else if (final_num_pixels_for_p2 < 'h400) p2_final_size = 7;
+        else if (final_num_pixels_for_p2 < 'h450) p2_final_size = 8;
+        else if (final_num_pixels_for_p2 < 'h500) p2_final_size = 9;
+        else if (final_num_pixels_for_p2 < 'h550) p2_final_size = 10;
+        else if (final_num_pixels_for_p2 < 'h600) p2_final_size = 11;
+        else if (final_num_pixels_for_p2 < 'h650) p2_final_size = 12;
+        else if (final_num_pixels_for_p2 < 'h700) p2_final_size = 13;
+        else if (final_num_pixels_for_p2 < 'h750) p2_final_size = 14;
+        else p2_final_size = 15;
 
         // change in size grade over 2 frames
         // signs (1=neg., 0=pos.)
