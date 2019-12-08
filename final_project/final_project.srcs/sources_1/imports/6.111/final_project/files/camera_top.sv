@@ -185,7 +185,7 @@ module camera_top_module (
             else p1_punch_strength = 0;
 
             if (p1_8frame_dy > 'hA0) p1_kick_strength = 2;
-            else if (p1_8frame_dy > PUNCH_DY_MIN) p1_kick_strength = 1;
+            else if (p1_8frame_dy > KICK_DY_MIN) p1_kick_strength = 1;
             else p1_kick_strength = 0;
 
             if (p2_8frame_dx > 'hA0) p2_punch_strength = 2;
@@ -193,7 +193,7 @@ module camera_top_module (
             else p2_punch_strength = 0;
 
             if (p2_8frame_dy > 'hA0) p2_kick_strength = 2;
-            else if (p2_8frame_dy > PUNCH_DY_MIN) p2_kick_strength = 1;
+            else if (p2_8frame_dy > KICK_DY_MIN) p2_kick_strength = 1;
             else p2_kick_strength = 0;
         end
     end
