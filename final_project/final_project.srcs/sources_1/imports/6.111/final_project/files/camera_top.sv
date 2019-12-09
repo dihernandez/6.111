@@ -87,10 +87,16 @@ module camera_top_module (
     logic reset_8frame_delta_values;
 
     // keep track of number of frames that no pixels from p1 LED and p1 LED are detected
-    // if p1 LED not detected for 4 frames, do not detect motion
+    // if p1 LED not detected for at least 5 of past 8 frames, do not detect motion
     logic [7:0] p1_detected;
-    // if p2 LED not detected for 4 frames, do not detect motion
+    logic [4:0] p1_detected_sum;
+    assign p1_detected_sum = p1_detected[0] + p1_detected[1] + p1_detected[2] +
+            p1_detected[3] + p1_detected[4] + p1_detected[5] + p1_detected[6] + p1_detected[7];
+    // if p2 LED not detected for at least 5 of past 8 frames, do not detect motion
     logic [7:0] p2_detected;
+    logic [4:0] p2_detected_sum;
+    assign p2_detected_sum = p2_detected[0] + p2_detected[1] + p2_detected[2] +
+            p2_detected[3] + p2_detected[4] + p2_detected[5] + p2_detected[6] + p2_detected[7];
 
     // player 1 + player 2 variables
     logic div_inputs_valid;
@@ -147,7 +153,7 @@ module camera_top_module (
 
             // get move forwards/backwards
             // player 1
-            if ((p1_8frame_size_delta > MIN_SIZE_DELTA) & (p1_detected[3:0]==4'b1111)) begin
+            if ((p1_8frame_size_delta > MIN_SIZE_DELTA) & (p1_detected_sum>=5)) begin
                 p1_move_forwards = !p1_8frame_size_delta_sign; //0=pos=forwards
                 p1_move_backwards = p1_8frame_size_delta_sign; //1=neg=backwards
                 if (p1_8frame_size_delta > 2) p1_step_strength = 2;
@@ -158,7 +164,7 @@ module camera_top_module (
                 p1_step_strength = 0;
             end
             // player 2
-            if ((p2_8frame_size_delta > MIN_SIZE_DELTA) && (p2_detected[3:0]==4'b1111)) begin
+            if ((p2_8frame_size_delta > MIN_SIZE_DELTA) && (p2_detected_sum>=5)) begin
                 p2_move_forwards = !p2_8frame_size_delta_sign; //0=pos=forwards
                 p2_move_backwards = p2_8frame_size_delta_sign; //1=neg=backwards
                 if (p2_8frame_size_delta > 2) p2_step_strength = 2;
