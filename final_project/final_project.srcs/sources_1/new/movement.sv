@@ -134,6 +134,7 @@ module movement(
         end
         
         else if (rising_sync) begin
+            
             if (reset_in) begin
                 p1_x <= 320;
                 p2_x <= 640;    //1024-320-64
@@ -147,27 +148,27 @@ module movement(
             end else begin    
                  if (~p1_dead) begin //when p1 is not dead, they can attack and move
                     //change 100s to hp level later
-                    if ((p1_x + 64 + 25 <= p2_x) && (right_on || p1_fwd_on)) begin  //move forward, but don't run into p2
+                    if ((p1_x + 64 + 4 <= p2_x) && (right_on || p1_fwd_on)) begin  //move forward, but don't run into p2
                         right_on <= 0;
                         p1_fwd_on <= 0;
-                        p1_x <= p1_x + 25;
-                    end else if ((p1_x >= 24 + 25) && (left_on || p1_bwd_on))  begin   // go backwards, but don't run into the wall 
+                        p1_x <= p1_x + 4;
+                    end else if ((p1_x >= 24 + 4) && (left_on || p1_bwd_on))  begin   // go backwards, but don't run into the wall 
                         left_on <= 0;
                         p1_bwd_on <= 0;
-                        p1_x <= p1_x - 25;
+                        p1_x <= p1_x - 4;
                     end
                 end//p1
                 
                 if (~p2_dead) begin //when p2 is not dead, they can attack and move
                     //change 100s to hp level later
-                    if ((p1_x + 64 + 25 <= p2_x) && (up_on || p2_fwd_on)) begin  //move forward, but don't run into p1
+                    if ((p1_x + 64 + 4 <= p2_x) && (up_on || p2_fwd_on)) begin  //move forward, but don't run into p1
                         up_on <= 0;
                         p2_fwd_on <= 0;
-                        p2_x <= p2_x - 25;
-                    end else if ((p2_x + 64 + 25 <= 1000) && (dn_on || p2_bwd_on))  begin  //go backwards, but don't run into the wall 
+                        p2_x <= p2_x - 4;
+                    end else if ((p2_x + 64 + 4 <= 1000) && (dn_on || p2_bwd_on))  begin  //go backwards, but don't run into the wall 
                         dn_on <= 0;
                         p2_bwd_on <= 0;
-                        p2_x <= p2_x + 25;
+                        p2_x <= p2_x + 4;
                     end
                 end//p2
           

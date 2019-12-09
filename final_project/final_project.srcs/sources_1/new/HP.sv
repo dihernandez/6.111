@@ -55,7 +55,7 @@ module HP (
     logic [11:0] p1_hpwidth, p2_hpwidth;
     
     //rectangles that change size and colour!
-    assign p1_hpwidth = {3'b0, p1_hp}<<2 + 10;
+    assign p1_hpwidth = {p1_hp, 2'b11};
     changable_blob p1_hp_bar(
                     .WIDTH(p1_hpwidth),   // default width: 64 pixels
                     .HEIGHT(32),  // default height: 64 pixels
@@ -65,7 +65,7 @@ module HP (
                     .pixel_out(p1_hp_pix)
                     );
     
-    assign p2_hpwidth = {3'b0, p2_hp}<<2 + 10;          
+    assign p2_hpwidth = {p2_hp, 2'b11};          
     changable_blob p2_hp_bar(
                     .WIDTH(p2_hpwidth),   // default width: 64 pixels
                     .HEIGHT(32),  // default height: 64 pixels
@@ -120,16 +120,34 @@ module HP (
             old_p2_kick <= 0;
         end else begin  //in game logic
         
-            //Player 1 hp logic
+//            //Player 1 hp logic
+//            if (p1_hp < 33) begin
+//                p1_hp_colour <= 12'hF00;        //RED
+//            end else if (p1_hp < 66) begin      //YELLOW?
+//                p1_hp_colour <= 12'hFF0;
+//            end else begin                      //GREEN
+//                p1_hp_colour <= 12'h0F0;
+//            end //hp colour p2
+            
+//            if (p2_hp < 33) begin
+//                p2_hp_colour <= 12'hF00;        //RED
+//            end else if (p1_hp < 66) begin      //YELLOW?
+//                p2_hp_colour <= 12'hFF0;
+//            end else begin                      //GREEN
+//                p2_hp_colour <= 12'h0F0;
+//            end //hp colour p2
+            
             if (p1_hp < 0 || p1_hp > start_hp) begin	//player 1 has died
                 p1_hp <= 0;		//hp shows up as "0000"
                 p1_dead <= 1'b1;	//DEAD
-            end else if (~p1_dead) begin 	//player 1 is not dead
+                p1_hp_colour <= 12'hF0F;
+            end else if (~p1_dead) begin 	//player 1 is not dead    
+                //LOGIC
                 if (p1_punch_on) begin
                     p1_punch_on <= 0;
                     if (p1_x + 64 + arm_len >= p2_x) begin	//p1 punches p2
                         p2_hp <= p2_hp - punch_pts;	//drop p2's hp
-//                        p2_hp_colour <= p2_hp_colour - 12'h002;
+                        p2_hp_colour <= p2_hp_colour - 12'h002;
                         
                         //p2 may get shoved back at some point, but not now
                     end//p1 punch
@@ -137,7 +155,7 @@ module HP (
                     p1_kick_on <= 0;
                     if (p1_x + 64 + leg_len >= p2_x) begin	//p1 kicks p2
                         p2_hp <= p2_hp - kick_pts;	//drop p2's hp
-//                        p2_hp_colour <= p2_hp_colour - 12'h004;
+                        p2_hp_colour <= p2_hp_colour - 12'h004;
                     end
                 //p2 punch
                 end
@@ -147,12 +165,14 @@ module HP (
             if (p2_hp < 0 || p2_hp > start_hp) begin	//player 2 has died
                 p2_hp <= 0;		//hp shows up as "0000"
                 p2_dead <= 1'b1;	//DEAD
+                p2_hp_colour <= 12'hF0F;
             end else if (~p2_dead) begin 	//player 2 is not dead
+                //LOGIC    
                 if (p2_punch_on) begin
                     p2_punch_on <= 0;
                     if (p1_x + 64 + arm_len >= p2_x) begin	//p2 punches p1
                         p1_hp <= p1_hp - punch_pts;	//drop p1's hp
-//                        p1_hp_colour <= p1_hp_colour - 12'h200;
+                        p1_hp_colour <= p1_hp_colour - 12'h200;
                         //p1 may get shoved back at some point, but not now
                     end
                 //p2 punch
@@ -160,29 +180,10 @@ module HP (
                     p2_kick_on <= 0;
                     if (p1_x + 64 + leg_len >= p2_x) begin	//p2 kicks p1
                         p1_hp <= p1_hp - kick_pts;	//drop p1's hp
-//                        p1_hp_colour <= p1_hp_colour - 12'h400;
+                        p1_hp_colour <= p1_hp_colour - 12'h400;
                     end
                 end//p2 kick
             end//p2 hit logic
-        
-            //HEALTH BAR COLOUR
-            //P1 HP
-            if (p1_hp >= (3 * start_hp >> 2)) begin         //more than 75% points => green
-                p1_hp_colour <= 12'h0F0;
-            end else if (p1_hp >= (start_hp >> 2)) begin    //more than 25% points => yellow?
-                p1_hp_colour <= 12'hFF0;
-            end else if (p1_hp >= 0) begin                  //more than 0 => red
-                p1_hp_colour <= 12'hF00;
-            end//hp colour p2
-            
-            //P2 HP
-            if (p2_hp >= (3 * start_hp >> 2)) begin         //more than 75% points => green
-                p2_hp_colour <= 12'h0F0;
-            end else if (p1_hp >= (start_hp >> 2)) begin    //more than 50% points => yellow?
-                p2_hp_colour <= 12'hFF0;
-            end else if (p1_hp >= 0) begin                  //more than 0 => red
-                p2_hp_colour <= 12'hF00;
-            end//hp colour p2
         
         end//game logic
     end//always

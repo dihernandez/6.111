@@ -117,6 +117,16 @@ module top_level (
         .pixel_out(game_output)
     );
     
+    //leds
+    assign led16_r = btnl;
+    assign led16_b = btnr;
+    assign led17_r = btnu;
+    assign led17_b = btnd;
+    assign led16_g = btnc;
+    assign led17_g = btnc;
+    
+    
+    
     HP	health_points(
         //debugger inputs
         .up_in(upper), .dn_in(lower),
