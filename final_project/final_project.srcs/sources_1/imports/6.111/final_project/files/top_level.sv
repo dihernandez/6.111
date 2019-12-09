@@ -97,7 +97,7 @@ module top_level (
     );
     
     //TODO: finish logic for to control this
-    logic [9:0] p1_points, p2_points;	//health points of players
+    logic [7:0] p1_points, p2_points;	//health points of players
     logic p1_dead, p2_dead;             //which players, if any, are dead
     logic [11:0] p1_hppix, p2_hppix;    //
     logic [11:0] game_output;           //pixels from game logic
@@ -105,8 +105,8 @@ module top_level (
         .left_in(lefty), .right_in(righty),    //debugger inputs
         .up_in(upper), .dn_in(lower),
         .clk(clk_100mhz), .reset_in(centre),
-        .p1_dead(p1_dead), .p2_dead(p2_dead),
-        .p1_hp(p1_points), .p2_hp(p2_points),
+        .p1_dead(p1_dead), .p2_dead(p2_dead),   //change back to proper vars later
+//        .p1_hp(p1_points), .p2_hp(p2_points),
         .p1_hp_pix(p1_hppix), .p2_hp_pix(p2_hppix),
         .p1_fwd(p1_fwd), .p2_fwd(p2_fwd),
         .p1_bwd(p1_bwd), .p2_bwd(p2_bwd),
@@ -117,11 +117,19 @@ module top_level (
         .pixel_out(game_output)
     );
     
+    //leds
+    assign led16_r = btnl;
+    assign led16_b = btnr;
+    assign led17_r = btnu;
+    assign led17_b = btnd;
+    assign led16_g = btnc;
+    assign led17_g = btnc;
+    
+    
+    
     HP	health_points(
         //debugger inputs
         .up_in(upper), .dn_in(lower),
-        .p1_puncht(sw[12]), .p1_kickt(sw[11]),
-        .p2_puncht(sw[10]), .p2_kickt(sw[9]),
     	
     	//INPUTS
         .clk(clk_100mhz),   //I can't remember what the proper clock for the lights is
