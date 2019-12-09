@@ -43,8 +43,8 @@ module HP (
 
     parameter arm_len = 11'd20;	    //arms be long
     parameter leg_len = 11'd25;	    //legs be longer
-    parameter punch_pts = 8'd12;	//punches are weak
-    parameter kick_pts = 8'd24;	//kicks are strong-ish
+    parameter punch_pts = 8'd14;	//punches are weak
+    parameter kick_pts = 8'd28;	//kicks are strong-ish
     parameter start_hp = 8'd100;
 
     //setup for display of p1_hp | p2_hp
@@ -52,7 +52,10 @@ module HP (
 
     //HP BARS   
     logic [11:0] p1_hp_colour, p2_hp_colour;
+    logic [3:0] p1_r, p1_g, p1_b, p2_r, p2_g, p2_b;
     logic [9:0] p1_hp_width, p2_hp_width;
+    assign p1_hp_colour = {p1_r, p1_g, p1_b};
+    assign p2_hp_colour = {p2_r, p2_g, p2_b};
     
     //rectangles that change size and colour!
     assign p1_hp_width = {p1_hp, 2'b11};
@@ -111,8 +114,8 @@ module HP (
             p2_dead <= 0;
             p1_hp <= start_hp;    //start hp of 1000
             p2_hp <= start_hp;	//start hp of 1000 
-            p1_hp_colour <= 12'h0F0;
-            p2_hp_colour <= 12'h0F0;
+            {p1_r, p1_g, p1_b} <= 12'h0F0;
+            {p2_r, p2_g, p2_b} <= 12'h0F0;
             
             old_p1_punch <= 0;
             old_p2_punch <= 0;
@@ -127,11 +130,13 @@ module HP (
                     if (p1_x + 64 + arm_len >= p2_x) begin	//p1 punches p2
                         if (p2_hp - punch_pts > 0 && p2_hp - punch_pts <= start_hp) begin    //if hit will not cause hp mishaps
                             p2_hp <= p2_hp - punch_pts;	//drop p2's hp
-                            p2_hp_colour <= p2_hp_colour + 12'h180;// - 12'h020;
+//                            p2_hp_colour <= p2_hp_colour + 12'h180;// - 12'h020;
+                            p2_r <= p2_r + 4'h2;
+                            p2_g <= p2_g - 4'h2;
                         end else begin
                             p2_hp <= 0;
                             p2_dead <= 1'b1;
-                            p2_hp_colour <= 12'hF00;
+                            {p2_r, p2_g, p2_b} <= 12'hF00;
                         end
                     end//p1 punch
                 end else if (p1_kick_on) begin
@@ -139,11 +144,13 @@ module HP (
                     if (p1_x + 64 + leg_len >= p2_x) begin	//p1 kicks p2
                         if (p2_hp - kick_pts > 0 && p2_hp - kick_pts <= start_hp) begin
                             p2_hp <= p2_hp - kick_pts;	//drop p2's hp
-                            p2_hp_colour <= p2_hp_colour + 12'h300;// - 12'h040;
+//                            p2_hp_colour <= p2_hp_colour + 12'h300;// - 12'h040;
+                            p2_r <= p2_r + 4'h4;
+                            p2_g <= p2_g - 4'h4;
                         end else begin
                             p2_hp <= 0;
                             p2_dead <= 1'b1;
-                            p2_hp_colour <= 12'hF00;
+                            {p2_r, p2_g, p2_b} <= 12'hF00;
                         end
                     end
                 //p2 punch
@@ -158,11 +165,13 @@ module HP (
                     if (p1_x + 64 + arm_len >= p2_x) begin	//p2 punches p1
                         if (p1_hp - punch_pts > 0 && p1_hp - punch_pts < start_hp) begin    //if hit will not cause hp mishaps
                             p1_hp <= p1_hp - punch_pts;	//drop p2's hp
-                            p1_hp_colour <= p1_hp_colour + 12'h180;// - 12'h20;
+//                            p1_hp_colour <= p1_hp_colour + 12'h180;// - 12'h20;
+                            p1_r <= p1_r + 4'h2;
+                            p1_g <= p1_g - 4'h2;
                         end else begin
                             p1_hp <= 0;
                             p1_dead <= 1'b1;
-                            p1_hp_colour <= 12'hF00;
+                            {p1_r, p1_g, p1_b} <= 12'hF00;
                         end
                     end//p2 punching p1
                 //p2 punch
@@ -171,11 +180,13 @@ module HP (
                     if (p1_x + 64 + leg_len >= p2_x) begin	//p2 kicks p1
                         if (p1_hp - kick_pts > 0 && p1_hp - kick_pts < start_hp) begin    //if hit will not cause hp mishaps
                             p1_hp <= p1_hp - kick_pts;	//drop p2's hp
-                            p1_hp_colour <= p1_hp_colour + 12'h300;// - 12'h040;
+//                            p1_hp_colour <= p1_hp_colour + 12'h300;// - 12'h040;
+                            p1_r <= p1_r + 4'h4;
+                            p1_g <= p1_g - 4'h4; 
                         end else begin
                             p1_hp <= 0;
                             p1_dead <= 1'b1;
-                            p1_hp_colour <= 12'hF00;
+                            {p1_r, p1_g, p1_b} <= 12'hF00;
                         end
                     end
                 end//p2 kick
